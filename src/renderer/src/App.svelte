@@ -92,6 +92,11 @@
           </li>
         {/each}
       </ul>
+    {:else if files.accepted.length}
+      <p>
+        <img class="gears" src="./src/assets/gears.gif" alt="working" />
+        working...
+      </p>
     {/if}
   </div>
 </div>
@@ -140,6 +145,12 @@
   }
   .results img {
     width: 100%;
+    height: auto;
+  }
+  .gears {
+    margin: 0 0 0 0.5rem;
+    user-select: none;
+    width: 40px;
     height: auto;
   }
 </style>
