@@ -69,7 +69,7 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    // should remove start
+    // should remove hard coded path!
     fs.rm(
       '/tmp/imageconverter2',
       {
