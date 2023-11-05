@@ -1,7 +1,8 @@
 import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import fs from 'node:fs'
+import icon from '../../resources/256x256.png?asset'
 
 function createWindow() {
   // Create the browser window.
@@ -68,6 +69,21 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    // should remove start
+    fs.rm(
+      '/tmp/imageconverter2',
+      {
+        recursive: true
+      },
+      (error) => {
+        if (error) {
+          console.log(error)
+        } else {
+          app.quit()
+        }
+      }
+    )
+    // should remove end
     app.quit()
   }
 })

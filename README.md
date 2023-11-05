@@ -1,6 +1,6 @@
-# electron-app
+# image-converter2
 
-An Electron application with Svelte
+An Electron application with Svelte created with [electron-vite](https://electron-vite.org/)
 
 ## Recommended IDE Setup
 

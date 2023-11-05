@@ -26,7 +26,7 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
-  icon: resources/icon.png
+  icon: resources/256x256.png
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
@@ -34,10 +34,9 @@ linux:
     - AppImage
   maintainer: treatkor.com
   category: Utility
-  icon: resources/icon.png
 appImage:
   artifactName: ${name}-${version}.${ext}
-npmRebuild: false
+npmRebuild: true
 publish:
   provider: generic
   url: https://example.com/auto-updates
