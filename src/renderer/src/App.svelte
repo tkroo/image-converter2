@@ -1,11 +1,27 @@
 <script>
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
 
-  let imageFormat = 'png'
+  let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
+  let imageFormat = formats[0]
   let convertedFiles = []
   let files = {
     accepted: [],
     rejected: []
+  }
+
+  async function handleFormatChange(e) {
+    console.log(files.accepted.length)
+    imageFormat = e.target.value
+    console.log('imageFormat: ', imageFormat)
+    if (files.accepted.length) {
+      convertedFiles = []
+      for (let i = 0; i < files.accepted.length; i++) {
+        const file = files.accepted[i]
+        // eslint-disable-next-line no-undef
+        const f = await convert(file, imageFormat) // convert is defined in src/preload/index.js
+        convertedFiles = [...convertedFiles, f]
+      }
+    }
   }
 
   async function handleFilesSelect(e) {
@@ -20,8 +36,7 @@
       const file = acceptedFiles[i]
       // eslint-disable-next-line no-undef
       const f = await convert(file, imageFormat) // convert is defined in src/preload/index.js
-      convertedFiles.push(f)
-      convertedFiles = convertedFiles
+      convertedFiles = [...convertedFiles, f]
     }
   }
 </script>
@@ -31,21 +46,17 @@
   <fieldset>
     <legend>&nbsp;output format&nbsp;</legend>
     <div>
-      <input
-        bind:group={imageFormat}
-        type="radio"
-        id="png"
-        name="imageFormat"
-        value="png"
-        checked
-      />
-      <label for="png">png</label>
-      <input bind:group={imageFormat} type="radio" id="jpg" name="imageFormat" value="jpg" />
-      <label for="jpg">jpg</label>
-      <input bind:group={imageFormat} type="radio" id="webp" name="imageFormat" value="webp" />
-      <label for="webp">webp</label>
-      <input bind:group={imageFormat} type="radio" id="avif" name="imageFormat" value="avif" />
-      <label for="avif">avif</label>
+      {#each formats as format}
+        <input
+          bind:group={imageFormat}
+          on:change={handleFormatChange}
+          type="radio"
+          id={format}
+          name="imageFormat"
+          value={format}
+        />
+        <label for={format}>{format}</label>
+      {/each}
     </div>
   </fieldset>
   <Dropzone
@@ -62,7 +73,7 @@
       <h2>
         convert{convertedFiles.length < files.accepted.length
           ? `ing ${convertedFiles.length} of ${files.accepted.length}`
-          : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''}
+          : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} to {imageFormat}
       </h2>
       <p>Click to download or drag and drop to a file manager window</p>
       <ul class="results">
