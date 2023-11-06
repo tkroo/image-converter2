@@ -1,5 +1,6 @@
 <script>
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
+  import gearicon from '../../../resources/gears.gif?asset'
 
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   let imageFormat = formats[0]
@@ -93,10 +94,7 @@
         {/each}
       </ul>
     {:else if files.accepted.length}
-      <p>
-        <img class="gears" src="./src/assets/gears.gif" alt="working" />
-        working...
-      </p>
+      <p><img src={gearicon} alt="gears" class="gears" />working on it...</p>
     {/if}
   </div>
 </div>
