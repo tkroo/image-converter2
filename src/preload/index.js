@@ -1,12 +1,11 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import fs from 'node:fs'
 import sharp from 'sharp'
-// const sharp = require('sharp')
 
 let prefix = process.argv.slice(-1)[0] + '/imageconverter2'
 
-export const convert = async (file, format) => {
+export const convert = async (file, format, out_directory) => {
   const buffer = Buffer.from(await file.arrayBuffer())
 
   let filepath
@@ -14,11 +13,17 @@ export const convert = async (file, format) => {
   let newname = file.name.replace(re, '_converted')
   let filename = `/${newname}.${format}`
 
-  fs.mkdir(prefix, { recursive: true }, (err) => {
-    if (err) throw err
-  })
-
-  filepath = `${prefix}${filename}`
+  if (!out_directory) {
+    fs.mkdir(prefix, { recursive: true }, (err) => {
+      if (err) throw err
+    })
+    filepath = `${prefix}${filename}`
+  } else {
+    fs.mkdir(out_directory, { recursive: true }, (err) => {
+      if (err) throw err
+    })
+    filepath = `${out_directory}${filename}`
+  }
 
   return sharp(buffer)
     .toFormat(format)
@@ -43,6 +48,10 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
     contextBridge.exposeInMainWorld('convert', convert)
+    contextBridge.exposeInMainWorld('electronAPI', {
+      selectDirectory: () => ipcRenderer.invoke('dialog:selectDirectory'),
+      getDefaultDir: () => ipcRenderer.invoke('dialog:getDefaultDir')
+    })
   } catch (error) {
     console.error(error)
   }

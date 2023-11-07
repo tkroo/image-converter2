@@ -1,12 +1,29 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import fs from 'node:fs'
 import icon from '../../resources/256x256.png?asset'
+
+let mainWindow
+
+async function handleDirectorySelect() {
+  const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
+    properties: ['openDirectory']
+  })
+  if (!canceled) {
+    return filePaths[0]
+  } else {
+    return app.getPath('desktop')
+  }
+}
+
+async function handleGetDefaultDir() {
+  const defaultDir = app.getPath('desktop')
+  return defaultDir
+}
 
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -55,6 +72,9 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  ipcMain.handle('dialog:selectDirectory', handleDirectorySelect)
+  ipcMain.handle('dialog:getDefaultDir', handleGetDefaultDir)
+
   createWindow()
 
   app.on('activate', function () {
@@ -69,24 +89,35 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    // should remove hard coded path!
-    fs.rm(
-      '/tmp/imageconverter2',
-      {
-        recursive: true
-      },
-      (error) => {
-        if (error) {
-          console.log(error)
-        } else {
-          app.quit()
-        }
-      }
-    )
-    // should remove end
     app.quit()
   }
 })
+
+// app.on('before-quit', () => {
+//   console.log('before-quit')
+//   fs.rm(
+//     '/tmp/imageconverter2',
+//     {
+//       recursive: true
+//     },
+//     (error) => {
+//       if (error) {
+//         console.log(error)
+//       } else {
+//         console.log('quitting...')
+//       }
+//     }
+//   )
+// })
+
+// ipcMain.on('select-dirs', async (event, arg) => {
+//   console.log(event, arg)
+//   const result = await dialog.showOpenDialog(mainWindow, {
+//     properties: ['openDirectory']
+//   })
+//   console.log('MAIN directories selected', result.filePaths)
+//   return result
+// })
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.

@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte'
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import gearicon from '../../../resources/gears.gif?asset'
 
@@ -9,6 +10,13 @@
     accepted: [],
     rejected: []
   }
+  let out_directory
+  let default_out_directory
+  onMount(async () => {
+    console.log('onMount')
+    default_out_directory = await window.electronAPI.getDefaultDir()
+    out_directory = default_out_directory
+  })
 
   async function handleFormatChange(e) {
     console.log(files.accepted.length)
@@ -19,7 +27,7 @@
       for (let i = 0; i < files.accepted.length; i++) {
         const file = files.accepted[i]
         // eslint-disable-next-line no-undef
-        const f = await convert(file, imageFormat) // convert is defined in src/preload/index.js
+        const f = await convert(file, imageFormat, out_directory) // convert is defined in src/preload/index.js
         convertedFiles = [...convertedFiles, f]
       }
     }
@@ -36,30 +44,43 @@
     for (let i = 0; i < acceptedFiles.length; i++) {
       const file = acceptedFiles[i]
       // eslint-disable-next-line no-undef
-      const f = await convert(file, imageFormat) // convert is defined in src/preload/index.js
+      const f = await convert(file, imageFormat, out_directory) // convert is defined in src/preload/index.js
       convertedFiles = [...convertedFiles, f]
     }
+  }
+
+  async function selectPath() {
+    const filePath = await window.electronAPI.selectDirectory()
+    out_directory = filePath
   }
 </script>
 
 <div class="container">
   <h1>image format converter</h1>
-  <fieldset>
-    <legend>&nbsp;output format&nbsp;</legend>
-    <div>
-      {#each formats as format}
-        <input
-          bind:group={imageFormat}
-          on:change={handleFormatChange}
-          type="radio"
-          id={format}
-          name="imageFormat"
-          value={format}
-        />
-        <label for={format}>{format}</label>
-      {/each}
+  <div class="options">
+    <fieldset>
+      <legend>&nbsp;convert to:&nbsp;</legend>
+      <div>
+        {#each formats as format}
+          <input
+            bind:group={imageFormat}
+            on:change={handleFormatChange}
+            type="radio"
+            id={format}
+            name="imageFormat"
+            value={format}
+          />
+          <label for={format}>{format}</label>
+        {/each}
+      </div>
+    </fieldset>
+    <div class="saveto">
+      <p>save images to:</p>
+      <button type="button" on:click|preventDefault={selectPath} id="btn">
+        <span>{out_directory}</span>
+      </button>
     </div>
-  </fieldset>
+  </div>
   <Dropzone
     on:drop={handleFilesSelect}
     containerStyles={'padding: 4rem;border-color: #aaaaaa;'}
@@ -116,10 +137,38 @@
   h2 {
     font-size: 1.2rem;
   }
+  .options {
+    font-size: 0.9rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    /* justify-content: flex-start; */
+  }
+  #btn {
+    font-family: inherit;
+    width: fit-content;
+    padding: 0.25rem 0.5rem;
+    margin: 0 0 1rem 0;
+    border: 1px solid #aaa;
+    border-radius: 0.25rem;
+    background-color: #eee;
+  }
+  #btn:hover {
+    background-color: #ddd;
+  }
+  #btn span {
+    font-weight: bold;
+  }
+  .saveto p {
+    margin: 0 0 0.5rem 0;
+  }
   fieldset {
     font-size: 0.9rem;
     margin-bottom: 1rem;
     padding: 0.5rem 1rem 1rem 1rem;
+    min-width: fit-content;
+    border: 1px solid #aaa;
+    border-radius: 0.25rem;
   }
   fieldset label {
     margin-right: 1rem;
