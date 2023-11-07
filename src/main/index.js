@@ -21,6 +21,11 @@ async function handleGetDefaultDir() {
   return defaultDir
 }
 
+async function openDirectory(event, path) {
+  console.log('MAIN openDirectory(path), path: ', path)
+  shell.openPath(path)
+}
+
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -74,6 +79,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('dialog:selectDirectory', handleDirectorySelect)
   ipcMain.handle('dialog:getDefaultDir', handleGetDefaultDir)
+  ipcMain.handle('dialog:openDirectory', openDirectory)
 
   createWindow()
 
@@ -92,32 +98,6 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
-// app.on('before-quit', () => {
-//   console.log('before-quit')
-//   fs.rm(
-//     '/tmp/imageconverter2',
-//     {
-//       recursive: true
-//     },
-//     (error) => {
-//       if (error) {
-//         console.log(error)
-//       } else {
-//         console.log('quitting...')
-//       }
-//     }
-//   )
-// })
-
-// ipcMain.on('select-dirs', async (event, arg) => {
-//   console.log(event, arg)
-//   const result = await dialog.showOpenDialog(mainWindow, {
-//     properties: ['openDirectory']
-//   })
-//   console.log('MAIN directories selected', result.filePaths)
-//   return result
-// })
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.

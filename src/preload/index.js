@@ -50,7 +50,8 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('convert', convert)
     contextBridge.exposeInMainWorld('electronAPI', {
       selectDirectory: () => ipcRenderer.invoke('dialog:selectDirectory'),
-      getDefaultDir: () => ipcRenderer.invoke('dialog:getDefaultDir')
+      getDefaultDir: () => ipcRenderer.invoke('dialog:getDefaultDir'),
+      openDirectory: (path) => ipcRenderer.invoke('dialog:openDirectory', path)
     })
   } catch (error) {
     console.error(error)

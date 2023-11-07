@@ -12,6 +12,7 @@
   }
   let out_directory
   let default_out_directory
+
   onMount(async () => {
     console.log('onMount')
     default_out_directory = await window.electronAPI.getDefaultDir()
@@ -53,6 +54,11 @@
     const filePath = await window.electronAPI.selectDirectory()
     out_directory = filePath
   }
+
+  async function handleOpenPath() {
+    console.log('handleOpenPath()')
+    await window.electronAPI.openDirectory(out_directory)
+  }
 </script>
 
 <div class="container">
@@ -60,27 +66,27 @@
   <div class="options">
     <fieldset>
       <legend>&nbsp;convert to:&nbsp;</legend>
-      <div>
-        {#each formats as format}
-          <input
-            bind:group={imageFormat}
-            on:change={handleFormatChange}
-            type="radio"
-            id={format}
-            name="imageFormat"
-            value={format}
-          />
-          <label for={format}>{format}</label>
-        {/each}
-      </div>
+      {#each formats as format}
+        <input
+          bind:group={imageFormat}
+          on:change={handleFormatChange}
+          type="radio"
+          id={format}
+          name="imageFormat"
+          value={format}
+        />
+        <label for={format}>{format}</label>
+      {/each}
     </fieldset>
     <div class="saveto">
       <p>save images to:</p>
-      <button type="button" on:click|preventDefault={selectPath} id="btn">
+      <button type="button" on:click|preventDefault={selectPath} class="btn">
         <span>{out_directory}</span>
       </button>
+      <p class="warning">existing files with the same name will be overwritten!</p>
     </div>
   </div>
+
   <Dropzone
     on:drop={handleFilesSelect}
     containerStyles={'padding: 4rem;border-color: #aaaaaa;'}
@@ -96,6 +102,12 @@
         convert{convertedFiles.length < files.accepted.length
           ? `ing ${convertedFiles.length} of ${files.accepted.length}`
           : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} to {imageFormat}
+        {#if convertedFiles.length < files.accepted.length}
+          <img src={gearicon} alt="gears" class="gears" />
+        {/if}
+        <button class="btn" on:click|preventDefault={handleOpenPath}>
+          <span>View saved files</span>
+        </button>
       </h2>
       <p>Click to download or drag and drop to a file manager window</p>
       <ul class="results">
@@ -141,22 +153,28 @@
     font-size: 0.9rem;
     display: flex;
     gap: 2rem;
+    flex-wrap: wrap;
     align-items: center;
+    margin-bottom: 1rem;
     /* justify-content: flex-start; */
   }
-  #btn {
+  .warning {
+    font-size: 0.8rem;
+    color: hsl(17, 100%, 48%);
+  }
+  .btn {
     font-family: inherit;
     width: fit-content;
     padding: 0.25rem 0.5rem;
-    margin: 0 0 1rem 0;
+    margin: 0 0 0.5rem 0;
     border: 1px solid #aaa;
     border-radius: 0.25rem;
     background-color: #eee;
   }
-  #btn:hover {
+  .btn:hover {
     background-color: #ddd;
   }
-  #btn span {
+  .btn span {
     font-weight: bold;
   }
   .saveto p {
@@ -164,7 +182,6 @@
   }
   fieldset {
     font-size: 0.9rem;
-    margin-bottom: 1rem;
     padding: 0.5rem 1rem 1rem 1rem;
     min-width: fit-content;
     border: 1px solid #aaa;
