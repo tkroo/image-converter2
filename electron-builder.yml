@@ -1,4 +1,4 @@
-appId: com.tkroo.app
+appId: com.tkroo.imageconverter2
 productName: imageconverter2
 directories:
   buildResources: build
@@ -26,7 +26,6 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
-  icon: resources/256x256.png
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
@@ -36,7 +35,7 @@ linux:
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
-npmRebuild: true
+npmRebuild: false
 publish:
   provider: generic
   url: https://example.com/auto-updates

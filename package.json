@@ -1,9 +1,9 @@
 {
   "name": "imageconverter2",
   "version": "1.0.0",
-  "description": "An Electron application with Svelte",
+  "description": "Image format converterAn Electron application with Svelte",
   "main": "./out/main/index.js",
-  "author": "treatkor.com",
+  "author": "David Sullivan <treatkor@gmail.com>",
   "homepage": "https://www.electronjs.org",
   "scripts": {
     "format": "prettier --plugin prettier-plugin-svelte --write .",
