@@ -12,6 +12,8 @@
   }
   let out_directory
   let default_out_directory
+  let append_string = '_converted'
+  let append_prepend = false
 
   onMount(async () => {
     console.log('onMount')
@@ -20,17 +22,10 @@
   })
 
   async function handleFormatChange(e) {
-    console.log(files.accepted.length)
     imageFormat = e.target.value
-    console.log('imageFormat: ', imageFormat)
     if (files.accepted.length) {
       convertedFiles = []
-      for (let i = 0; i < files.accepted.length; i++) {
-        const file = files.accepted[i]
-        // eslint-disable-next-line no-undef
-        const f = await convert(file, imageFormat, out_directory) // convert is defined in src/preload/index.js
-        convertedFiles = [...convertedFiles, f]
-      }
+      convertFiles(files.accepted, imageFormat, out_directory, append_string)
     }
   }
 
@@ -42,10 +37,12 @@
     files.accepted = [...files.accepted, ...acceptedFiles]
     files.rejected = [...files.rejected, ...fileRejections]
 
-    for (let i = 0; i < acceptedFiles.length; i++) {
-      const file = acceptedFiles[i]
-      // eslint-disable-next-line no-undef
-      const f = await convert(file, imageFormat, out_directory) // convert is defined in src/preload/index.js
+    convertFiles(acceptedFiles, imageFormat, out_directory, append_string)
+  }
+
+  async function convertFiles(files, format, out_directory, append_string) {
+    for (let i = 0; i < files.length; i++) {
+      const f = await convert(files[i], imageFormat, out_directory, append_string) // convert is defined in src/preload/index.js
       convertedFiles = [...convertedFiles, f]
     }
   }
@@ -65,25 +62,40 @@
   <h1>image format converter</h1>
   <div class="options">
     <fieldset>
-      <legend>&nbsp;convert to:&nbsp;</legend>
+      <legend>&nbsp;convert to&nbsp;</legend>
       {#each formats as format}
-        <input
-          bind:group={imageFormat}
-          on:change={handleFormatChange}
-          type="radio"
-          id={format}
-          name="imageFormat"
-          value={format}
-        />
-        <label for={format}>{format}</label>
+        <label for={format}>
+          <input
+            bind:group={imageFormat}
+            on:change={handleFormatChange}
+            type="radio"
+            id={format}
+            name="imageFormat"
+            value={format}
+          />
+          {format}
+        </label>
       {/each}
     </fieldset>
     <div class="saveto">
-      <p>save images to:</p>
+      <p>save images to</p>
       <button type="button" on:click|preventDefault={selectPath} class="btn">
         <span>{out_directory}</span>
       </button>
-      <p class="warning">existing files with the same name will be overwritten!</p>
+      <!-- <p class="warning">existing files with the same name will be overwritten!</p> -->
+    </div>
+    <div class="append">
+      <label for="append_string">
+        append string<br />
+        <input id="append_string" type="text" bind:value={append_string} />
+      </label><br />
+      <small>
+        <em>example.jpg</em>
+        <br />
+        becomes
+        <br />
+        <em>example</em><strong>{append_string}</strong><em>.{imageFormat}</em>
+      </small>
     </div>
   </div>
 
@@ -120,9 +132,9 @@
               target="_blank"
             >
               <img src="file://{file.filepath}" alt={file.filename} /><br />
+              <span>{file.filename.slice(1)}</span>
             </a>
             <!-- <span>file.filename: {file.filename}</span><br /> -->
-            <span>{file.filename.slice(1)}</span>
           </li>
         {/each}
       </ul>
@@ -134,6 +146,7 @@
 
 <style>
   .container {
+    font-size: 0.9rem;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -143,24 +156,20 @@
     height: 100%;
   }
   h1 {
-    font-size: 1.4rem;
+    font-size: 1.4em;
     margin-bottom: 0.5rem;
   }
   h2 {
-    font-size: 1.2rem;
+    font-size: 1.2em;
   }
   .options {
-    font-size: 0.9rem;
+    font-size: 0.8em;
     display: flex;
     gap: 2rem;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: space-between;
     margin-bottom: 1rem;
-    /* justify-content: flex-start; */
-  }
-  .warning {
-    font-size: 0.8rem;
-    color: hsl(17, 100%, 48%);
   }
   .btn {
     font-family: inherit;
@@ -180,15 +189,26 @@
   .saveto p {
     margin: 0 0 0.5rem 0;
   }
+  .append input {
+    font-size: inherit;
+    margin-top: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid #aaa;
+    border-radius: 0.25rem;
+  }
   fieldset {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem 1rem 1rem;
+    /* font-size: 0.9rem; */
+    padding: 0.5em 1em 1em 1em;
     min-width: fit-content;
     border: 1px solid #aaa;
     border-radius: 0.25rem;
   }
   fieldset label {
+    user-select: none;
     margin-right: 1rem;
+  }
+  fieldset label:last-child {
+    margin-right: 0;
   }
   .results-wrap {
     margin-top: 1rem;
@@ -199,7 +219,7 @@
     font-size: 0.8rem;
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }
   .results li {
     max-width: 180px;

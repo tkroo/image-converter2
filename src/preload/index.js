@@ -5,12 +5,12 @@ import sharp from 'sharp'
 
 let prefix = process.argv.slice(-1)[0] + '/imageconverter2'
 
-export const convert = async (file, format, out_directory) => {
+export const convert = async (file, format, out_directory, append_string) => {
   const buffer = Buffer.from(await file.arrayBuffer())
 
   let filepath
   let re = /\.[^.]*$/gm
-  let newname = file.name.replace(re, '_converted')
+  let newname = file.name.replace(re, append_string)
   let filename = `/${newname}.${format}`
 
   if (!out_directory) {

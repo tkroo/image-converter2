@@ -29,30 +29,13 @@ ul {
   list-style: none;
 }
 
-code {
-  font-weight: 600;
-  padding: 3px 5px;
-  border-radius: 2px;
-  background-color: #26282e;
-  font-family:
-    ui-monospace,
-    SFMono-Regular,
-    SF Mono,
-    Menlo,
-    Consolas,
-    Liberation Mono,
-    monospace;
-  font-size: 85%;
-}
-
 a {
-  color: #9feaf9;
-  font-weight: 600;
+  color: #244349; */
   cursor: pointer;
   text-decoration: none;
   outline: none;
 }
 
 a:hover {
-  border-bottom: 1px solid;
+  border-bottom: 1px solid orangered;
 }
