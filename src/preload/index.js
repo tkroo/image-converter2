@@ -53,8 +53,8 @@ if (process.contextIsolated) {
       getDefaultDir: () => ipcRenderer.invoke('dialog:getDefaultDir'),
       openDirectory: (path) => ipcRenderer.invoke('dialog:openDirectory', path)
     })
-  } catch (error) {
-    console.error(error)
+  } catch (err) {
+    console.log(`error: ${err}`)
   }
 } else {
   window.electron = electronAPI

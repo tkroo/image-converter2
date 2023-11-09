@@ -17,12 +17,11 @@ async function handleDirectorySelect() {
 }
 
 async function handleGetDefaultDir() {
-  const defaultDir = app.getPath('desktop')
+  const defaultDir = app.getPath('desktop') + '/foo'
   return defaultDir
 }
 
 async function openDirectory(event, path) {
-  console.log('MAIN openDirectory(path), path: ', path)
   shell.openPath(path)
 }
 

@@ -10,13 +10,10 @@
     accepted: [],
     rejected: []
   }
-  let out_directory
-  let default_out_directory
+  let out_directory, default_out_directory
   let append_string = '_converted'
-  let append_prepend = false
 
   onMount(async () => {
-    console.log('onMount')
     default_out_directory = await window.electronAPI.getDefaultDir()
     out_directory = default_out_directory
   })
@@ -32,16 +29,15 @@
   async function handleFilesSelect(e) {
     files.accepted = []
     convertedFiles = []
-
     const { acceptedFiles, fileRejections } = e.detail
     files.accepted = [...files.accepted, ...acceptedFiles]
     files.rejected = [...files.rejected, ...fileRejections]
-
     convertFiles(acceptedFiles, imageFormat, out_directory, append_string)
   }
 
   async function convertFiles(files, format, out_directory, append_string) {
     for (let i = 0; i < files.length; i++) {
+      // eslint-disable-next-line no-undef
       const f = await convert(files[i], imageFormat, out_directory, append_string) // convert is defined in src/preload/index.js
       convertedFiles = [...convertedFiles, f]
     }
@@ -53,14 +49,16 @@
   }
 
   async function handleOpenPath() {
-    console.log('handleOpenPath()')
     await window.electronAPI.openDirectory(out_directory)
   }
 </script>
 
 <div class="container">
-  <h1>image format converter</h1>
-  <div class="options">
+  <header>
+    <h1>image format converter</h1>
+  </header>
+
+  <section class="options">
     <fieldset>
       <legend>&nbsp;convert to&nbsp;</legend>
       {#each formats as format}
@@ -85,19 +83,15 @@
       <!-- <p class="warning">existing files with the same name will be overwritten!</p> -->
     </div>
     <div class="append">
-      <label for="append_string">
-        append string<br />
-        <input id="append_string" type="text" bind:value={append_string} />
-      </label><br />
+      <p>append string to file names</p>
+      <input id="append_string" type="text" bind:value={append_string} /><br />
       <small>
-        <em>example.jpg</em>
-        <br />
-        becomes
-        <br />
-        <em>example</em><strong>{append_string}</strong><em>.{imageFormat}</em>
+        <em>example.jpg</em> becomes <em>example</em><strong>{append_string}</strong><em
+          >.{imageFormat}</em
+        >
       </small>
     </div>
-  </div>
+  </section>
 
   <Dropzone
     on:drop={handleFilesSelect}
@@ -108,21 +102,23 @@
     <p>Drop files here, or click to select files</p>
   </Dropzone>
 
-  <div class="results-wrap">
+  <section class="results-wrap">
     {#if convertedFiles.length}
-      <h2>
-        convert{convertedFiles.length < files.accepted.length
-          ? `ing ${convertedFiles.length} of ${files.accepted.length}`
-          : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} to {imageFormat}
+      <div class="row">
+        <h2>
+          convert{convertedFiles.length < files.accepted.length
+            ? `ing ${convertedFiles.length} of ${files.accepted.length}`
+            : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} to {imageFormat}
+        </h2>
         {#if convertedFiles.length < files.accepted.length}
           <img src={gearicon} alt="gears" class="gears" />
         {/if}
-        <button class="btn" on:click|preventDefault={handleOpenPath}>
+        <button type="button" class="btn" on:click|preventDefault={handleOpenPath}>
           <span>View saved files</span>
         </button>
-      </h2>
-      <p>Click to download or drag and drop to a file manager window</p>
-      <ul class="results">
+        <span>Click to download or drag and drop to a file manager window</span>
+      </div>
+      <ul class="results-list">
         {#each convertedFiles as file}
           <li>
             <a
@@ -141,29 +137,23 @@
     {:else if files.accepted.length}
       <p><img src={gearicon} alt="gears" class="gears" />working on it...</p>
     {/if}
-  </div>
+  </section>
 </div>
 
 <style>
   .container {
-    font-size: 0.9rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    /* max-width: 840px; */
-    margin: 0 auto;
-    padding: 15px 30px 0 30px;
+    font-size: 0.8em;
+    padding: 1rem 2rem 0 2rem;
     height: 100%;
   }
   h1 {
     font-size: 1.4em;
-    margin-bottom: 0.5rem;
   }
   h2 {
     font-size: 1.2em;
+    display: inline-block;
   }
   .options {
-    font-size: 0.8em;
     display: flex;
     gap: 2rem;
     flex-wrap: wrap;
@@ -172,6 +162,7 @@
     margin-bottom: 1rem;
   }
   .btn {
+    font-weight: inherit;
     font-family: inherit;
     width: fit-content;
     padding: 0.25rem 0.5rem;
@@ -186,18 +177,17 @@
   .btn span {
     font-weight: bold;
   }
-  .saveto p {
+  .saveto p,
+  .append p {
     margin: 0 0 0.5rem 0;
   }
   .append input {
-    font-size: inherit;
-    margin-top: 0.25rem;
-    padding: 0.25rem;
+    margin: 0 0 0.5rem 0;
+    padding: 0.25rem 0.5rem;
     border: 1px solid #aaa;
     border-radius: 0.25rem;
   }
   fieldset {
-    /* font-size: 0.9rem; */
     padding: 0.5em 1em 1em 1em;
     min-width: fit-content;
     border: 1px solid #aaa;
@@ -213,21 +203,37 @@
   .results-wrap {
     margin-top: 1rem;
   }
-  .results {
-    padding: 2rem 0;
+  .results-wrap .row h2 {
+    margin: 0;
+  }
+  .results-wrap .row {
+    margin-top: 1rem;
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    /* background-color: aqua; */
+    justify-content: space-between;
+  }
+  .results-wrap .btn {
+    background-color: hsl(152, 83%, 40%);
+    border-color: hsl(152, 83%, 40%);
+    color: white;
+    margin: 0 1rem;
+  }
+  .results-list {
+    padding: 1rem 0;
     list-style: none;
-    font-size: 0.8rem;
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }
-  .results li {
+  .results-list li {
     max-width: 180px;
   }
-  .results li span {
+  .results-list li span {
     word-break: break-all;
   }
-  .results img {
+  .results-list img {
     width: 100%;
     height: auto;
   }
