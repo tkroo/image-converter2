@@ -31,8 +31,6 @@ dmg:
 linux:
   target:
     - AppImage
-    - snap
-    - deb
   maintainer: treatkor.com
   category: Utility
 appImage:
