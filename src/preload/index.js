@@ -3,7 +3,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 import fs from 'node:fs'
 import sharp from 'sharp'
 
-let prefix = process.argv.slice(-1)[0] + '/imageconverter2'
+let basePath = process.argv.slice(-1)[0]
 
 export const convert = async (file, format, out_directory, append_string) => {
   const buffer = Buffer.from(await file.arrayBuffer())
@@ -14,10 +14,10 @@ export const convert = async (file, format, out_directory, append_string) => {
   let filename = `/${newname}.${format}`
 
   if (!out_directory) {
-    fs.mkdir(prefix, { recursive: true }, (err) => {
+    fs.mkdir(basePath, { recursive: true }, (err) => {
       if (err) throw err
     })
-    filepath = `${prefix}${filename}`
+    filepath = `${basePath}${filename}`
   } else {
     fs.mkdir(out_directory, { recursive: true }, (err) => {
       if (err) throw err
