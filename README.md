@@ -1,6 +1,6 @@
 # image-converter2
 
-An Electron application with Svelte created with [electron-vite](https://electron-vite.org/)
+Image format converter app. An Electron app built with created with [electron-vite](https://electron-vite.org/), [svelte](https://svelte.dev) and [sharp](https://sharp.pixelplumbing.com)    
 
 ## Recommended IDE Setup
 
