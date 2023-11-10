@@ -18,9 +18,7 @@ const schema = {
     default: 'png'
   }
 }
-
 const store = new Store({ schema })
-console.log(store.store)
 
 let mainWindow
 
@@ -49,11 +47,6 @@ async function getDefaultOutDir() {
   } catch (err) {
     console.log(`error: ${err}`)
   }
-
-  // const defaultDir = join(app.getPath('desktop'), extraPath)
-  // store.set('outputDirectory', defaultDir)
-  // console.log(store.get('outputDirectory'))
-  // return defaultDir
 }
 
 async function openDirectory(event, path) {

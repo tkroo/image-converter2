@@ -19,10 +19,14 @@
     imageFormat = defaultFormat
     out_directory = outputDirectory
     append_string = appendString
-    console.log('defaultFormat: ', defaultFormat)
-    console.log('outputDirectory: ', outputDirectory)
-    console.log('appendString: ', appendString)
   })
+
+  let timer
+  $: append_string && debounceUpdate()
+  function debounceUpdate() {
+    clearTimeout(timer)
+    timer = setTimeout(() => window.electronAPI.setConfig('appendString', append_string), 750)
+  }
 
   async function handleConversion(e) {
     if (e.detail) {
