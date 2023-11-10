@@ -31,6 +31,8 @@ dmg:
 linux:
   target:
     - AppImage
+    - snap
+    - deb
   maintainer: treatkor.com
   category: Utility
 appImage:
@@ -38,4 +40,4 @@ appImage:
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: https://github.com/tkroo/image-converter2
