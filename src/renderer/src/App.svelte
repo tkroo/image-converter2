@@ -3,36 +3,49 @@
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import gearicon from '../../../resources/gears.gif?asset'
 
+  // let myConfig
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
-  let imageFormat = formats[0]
+  let imageFormat = 'png'
   let convertedFiles = []
   let files = {
     accepted: [],
     rejected: []
   }
-  let out_directory, default_out_directory
+  let out_directory
   let append_string = '_converted'
 
   onMount(async () => {
-    default_out_directory = await window.electronAPI.getDefaultDir()
-    out_directory = default_out_directory
+    let { defaultFormat, outputDirectory, appendString } = await window.electronAPI.getConfig()
+    imageFormat = defaultFormat
+    out_directory = outputDirectory
+    append_string = appendString
+    console.log('defaultFormat: ', defaultFormat)
+    console.log('outputDirectory: ', outputDirectory)
+    console.log('appendString: ', appendString)
   })
 
-  async function handleFormatChange(e) {
-    imageFormat = e.target.value
-    if (files.accepted.length) {
+  async function handleConversion(e) {
+    if (e.detail) {
+      files.accepted = []
       convertedFiles = []
-      convertFiles(files.accepted, imageFormat, out_directory, append_string)
+      // const { acceptedFiles, fileRejections } = e.detail
+      const { acceptedFiles } = e.detail
+      files.accepted = [...files.accepted, ...acceptedFiles]
+      // files.rejected = [...files.rejected, ...fileRejections]
+      convertFiles(acceptedFiles, imageFormat, out_directory, append_string)
+    } else {
+      imageFormat = e.target.value
+      window.electronAPI.setConfig('defaultFormat', imageFormat)
+      if (files.accepted.length) {
+        convertedFiles = []
+        convertFiles(files.accepted, imageFormat, out_directory, append_string)
+      }
     }
   }
 
-  async function handleFilesSelect(e) {
+  async function clearFiles() {
     files.accepted = []
     convertedFiles = []
-    const { acceptedFiles, fileRejections } = e.detail
-    files.accepted = [...files.accepted, ...acceptedFiles]
-    files.rejected = [...files.rejected, ...fileRejections]
-    convertFiles(acceptedFiles, imageFormat, out_directory, append_string)
   }
 
   async function convertFiles(files, format, out_directory, append_string) {
@@ -44,12 +57,8 @@
   }
 
   async function selectPath() {
-    const filePath = await window.electronAPI.selectDirectory()
+    const filePath = await window.electronAPI.selectOutDir()
     out_directory = filePath
-  }
-
-  async function handleOpenPath() {
-    await window.electronAPI.openDirectory(out_directory)
   }
 </script>
 
@@ -65,7 +74,7 @@
         <label for={format}>
           <input
             bind:group={imageFormat}
-            on:change={handleFormatChange}
+            on:change={handleConversion}
             type="radio"
             id={format}
             name="imageFormat"
@@ -86,15 +95,15 @@
       <p>append string to file names</p>
       <input id="append_string" type="text" bind:value={append_string} /><br />
       <small>
-        <em>example.jpg</em> becomes <em>example</em><strong>{append_string}</strong><em
-          >.{imageFormat}</em
-        >
+        <em>example.jpg</em>
+        <br />becomes<br />
+        <em>example</em><strong>{append_string}</strong><em>.{imageFormat}</em>
       </small>
     </div>
   </section>
 
   <Dropzone
-    on:drop={handleFilesSelect}
+    on:drop={handleConversion}
     containerStyles={'padding: 4rem;border-color: #aaaaaa;'}
     name="image"
     accept="image/*"
@@ -105,18 +114,29 @@
   <section class="results-wrap">
     {#if convertedFiles.length}
       <div class="row">
-        <h2>
-          convert{convertedFiles.length < files.accepted.length
-            ? `ing ${convertedFiles.length} of ${files.accepted.length}`
-            : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} to {imageFormat}
-        </h2>
+        <div>
+          <h2>
+            convert{convertedFiles.length < files.accepted.length
+              ? `ing ${convertedFiles.length} of ${files.accepted.length}`
+              : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} to {imageFormat}
+          </h2>
+          <br />
+          <span>Click to download or drag and drop to a file manager window</span>
+        </div>
         {#if convertedFiles.length < files.accepted.length}
           <img src={gearicon} alt="gears" class="gears" />
         {/if}
-        <button type="button" class="btn" on:click|preventDefault={handleOpenPath}>
-          <span>View saved files</span>
+        <button
+          type="button"
+          class="btn btn-green"
+          on:click|preventDefault={async () => await window.electronAPI.openDirectory(out_directory)}
+        >
+          <span>View converted files</span>
         </button>
-        <span>Click to download or drag and drop to a file manager window</span>
+
+        <button type="button" class="btn" on:click|preventDefault={clearFiles}>
+          <span>Clear files</span>
+        </button>
       </div>
       <ul class="results-list">
         {#each convertedFiles as file}
@@ -124,10 +144,10 @@
             <a
               download="file://{file.filepath}"
               href="file://{file.filepath}"
-              title="click to download"
+              title="click to download, or drag and drop"
               target="_blank"
             >
-              <img src="file://{file.filepath}" alt={file.filename} /><br />
+              <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
               <span>{file.filename.slice(1)}</span>
             </a>
             <!-- <span>file.filename: {file.filename}</span><br /> -->
@@ -155,7 +175,7 @@
   }
   .options {
     display: flex;
-    gap: 2rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
@@ -166,7 +186,7 @@
     font-family: inherit;
     width: fit-content;
     padding: 0.25rem 0.5rem;
-    margin: 0 0 0.5rem 0;
+    margin: 0;
     border: 1px solid #aaa;
     border-radius: 0.25rem;
     background-color: #eee;
@@ -214,7 +234,7 @@
     /* background-color: aqua; */
     justify-content: space-between;
   }
-  .results-wrap .btn {
+  .btn-green {
     background-color: hsl(152, 83%, 40%);
     border-color: hsl(152, 83%, 40%);
     color: white;

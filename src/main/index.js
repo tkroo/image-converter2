@@ -2,27 +2,76 @@ import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/256x256.png?asset'
+import Store from 'electron-store'
+
+const extraPath = 'foo'
+const schema = {
+  outputDirectory: {
+    type: 'string'
+  },
+  appendString: {
+    type: 'string',
+    default: '_extra'
+  },
+  defaultFormat: {
+    type: 'string',
+    default: 'png'
+  }
+}
+
+const store = new Store({ schema })
+console.log(store.store)
 
 let mainWindow
 
-async function handleDirectorySelect() {
+async function selectOutDir() {
   const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
     properties: ['openDirectory']
   })
   if (!canceled) {
+    store.set('outputDirectory', filePaths[0])
     return filePaths[0]
   } else {
-    return app.getPath('desktop')
+    return getDefaultOutDir()
   }
 }
 
-async function handleGetDefaultDir() {
-  const defaultDir = app.getPath('desktop') + '/foo'
-  return defaultDir
+async function getDefaultOutDir() {
+  try {
+    const out = store.get('outputDirectory')
+    if (out) {
+      return out
+    } else {
+      const tmp = join(app.getPath('desktop'), extraPath)
+      store.set('outputDirectory', tmp)
+      return tmp
+    }
+  } catch (err) {
+    console.log(`error: ${err}`)
+  }
+
+  // const defaultDir = join(app.getPath('desktop'), extraPath)
+  // store.set('outputDirectory', defaultDir)
+  // console.log(store.get('outputDirectory'))
+  // return defaultDir
 }
 
 async function openDirectory(event, path) {
   shell.openPath(path)
+}
+
+async function getConfig() {
+  return store.store
+}
+
+async function setConfig(event, key, value) {
+  store.set(key, value)
+}
+
+function initConfig() {
+  getDefaultOutDir()
+  let tempObj = store.store
+  store.store = tempObj
 }
 
 function createWindow() {
@@ -76,10 +125,12 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  ipcMain.handle('dialog:selectDirectory', handleDirectorySelect)
-  ipcMain.handle('dialog:getDefaultDir', handleGetDefaultDir)
+  ipcMain.handle('dialog:selectOutDir', selectOutDir)
   ipcMain.handle('dialog:openDirectory', openDirectory)
+  ipcMain.handle('dialog:getConfig', getConfig)
+  ipcMain.handle('dialog:setConfig', setConfig)
 
+  initConfig()
   createWindow()
 
   app.on('activate', function () {
