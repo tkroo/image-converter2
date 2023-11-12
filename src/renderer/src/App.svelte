@@ -14,6 +14,7 @@
   let out_directory
   let append_string = '_converted'
   let format_options = []
+  let open_toggle = false
 
   onMount(async () => {
     let { defaultFormat, outputDirectory, appendString, formatOptions } = await window.electronAPI.getConfig()
@@ -89,79 +90,105 @@
     await window.electronAPI.resetConfig()
   }
 
+  async function editPrefs() {
+    await window.electronAPI.editConfig()
+  }
+
+  function toggle() {
+    open_toggle = !open_toggle
+  }
 </script>
 
 <div class="container">
   <header>
-    <h1>image format converter</h1>
+    <h1 class="uppercase">image format converter</h1>
   </header>
 
-  <section class="options">
-    <fieldset>
-      <legend>&nbsp;convert to&nbsp;</legend>
-      {#each formats as format}
-        <label for={format}>
-          <input
-            bind:group={imageFormat}
-            on:change={handleConversion}
-            type="radio"
-            id={format}
-            name="imageFormat"
-            value={format}
-          />
-          {format}
-        </label>
-      {/each}
-      <details class="format-options">
-        <summary>options</summary>
-        <ul>
-          {#each format_options as option}
-            <li>
-              <fieldset>
-                <legend>&nbsp;{option.format}&nbsp;</legend>
-                {#each Object.entries(option.options) as [key, v]}
-                  <label for={key}>
-                    {key}:
-                    <input
-                      id={key}
-                      type="text"
-                      bind:value={option.options[key]}
-                      on:change={() => (option.options[key] = coerceValue(v))}
-                    />
-                  </label>
-                {/each}
-              </fieldset>
-            </li>
-          {/each}
-        </ul>
-        <button on:click={resetPrefs} type="button" class="btn"> restore defaults </button>
-      </details>
-    </fieldset>
-    <div class="saveto">
-      <p>save images to</p>
-      <button type="button" on:click|preventDefault={selectPath} class="btn">
-        <span>{out_directory}</span>
-      </button>
-      <!-- <p class="warning">existing files with the same name will be overwritten!</p> -->
+  <button class="unbutton" on:click|preventDefault={toggle}>
+    saving to <strong>{out_directory}</strong> as <strong class="uppercase">{imageFormat}</strong>
+  </button>
+  <details class="config" bind:open={open_toggle}>
+    <summary>settings</summary>
+    <section class="options">
+      <fieldset>
+        <legend>&nbsp;convert to&nbsp;</legend>
+        {#each formats as format}
+          <label for={format}>
+            <input
+              bind:group={imageFormat}
+              on:change={handleConversion}
+              type="radio"
+              id={format}
+              name="imageFormat"
+              value={format}
+            />
+            {format}
+          </label>
+        {/each}
+        <details class="format-options">
+          <summary>options</summary>
+          <ul>
+            {#each format_options as option}
+              <li>
+                <fieldset>
+                  <legend>&nbsp;{option.format}&nbsp;</legend>
+                  {#each Object.entries(option.options) as [key, v]}
+                    <label for={key}>
+                      {key}:
+                      <input
+                        id={key}
+                        type="text"
+                        bind:value={option.options[key]}
+                        on:change={() => (option.options[key] = coerceValue(v))}
+                      />
+                    </label>
+                  {/each}
+                </fieldset>
+              </li>
+            {/each}
+          </ul>
+          <button on:click={resetPrefs} type="button" class="btn btn-small">
+            restore defaults
+          </button>
+        </details>
+      </fieldset>
+      <div class="saveto">
+        <p>save images to</p>
+        <button type="button" on:click|preventDefault={selectPath} class="btn">
+          <span>{out_directory}</span>
+        </button>
+        <br />
+        <button
+          type="button"
+          class="btn pt-1"
+          on:click|preventDefault={async () => await window.electronAPI.openDirectory(out_directory)}
+        >
+          <span>open output directory</span>
+        </button>
+        <!-- <p class="warning">existing files with the same name will be overwritten!</p> -->
+      </div>
+      <div class="append">
+        <p>append string to file names</p>
+        <input id="append_string" type="text" bind:value={append_string} /><br />
+        <small>
+          <em>example.jpg</em>
+          <br />becomes<br />
+          <em>example</em><strong>{append_string}</strong><em>.{imageFormat}</em>
+        </small>
+      </div>
+    </section>
+    <div class="open-config">
+      <button type="button" class="btn btn-small" on:click={editPrefs}>open settings file</button>
     </div>
-    <div class="append">
-      <p>append string to file names</p>
-      <input id="append_string" type="text" bind:value={append_string} /><br />
-      <small>
-        <em>example.jpg</em>
-        <br />becomes<br />
-        <em>example</em><strong>{append_string}</strong><em>.{imageFormat}</em>
-      </small>
-    </div>
-  </section>
+  </details>
 
   <Dropzone
     on:drop={handleConversion}
-    containerStyles={'padding: 4rem;border-color: #aaaaaa;'}
+    containerStyles={'padding: 4rem;border-color: #aaaaaa; cursor: pointer;'}
     name="image"
     accept="image/*"
   >
-    <p>Drop files here, or click to select files</p>
+    <p class="message">Drop files here, or click to select files</p>
   </Dropzone>
 
   <section class="results-wrap">
@@ -181,14 +208,14 @@
         {/if}
         <button
           type="button"
-          class="btn btn-green"
+          class="btn btn-accent"
           on:click|preventDefault={async () => await window.electronAPI.openDirectory(out_directory)}
         >
-          <span>View converted files</span>
+          <span>open output directory</span>
         </button>
 
         <button type="button" class="btn" on:click|preventDefault={clearFiles}>
-          <span>Clear files</span>
+          <span>clear results list</span>
         </button>
       </div>
       <ul class="results-list">
@@ -218,13 +245,41 @@
     font-size: 0.8em;
     padding: 1rem 2rem 0 2rem;
     height: 100%;
+    /* display: flex;
+    flex-direction: column; */
+  }
+  .open-config {
+    /* position: fixed; */
+    /* bottom: 1rem; */
+    /* right: 2rem; */
+    /* margin-top: auto; */
+    /* padding: 0 0 1rem 2rem; */
   }
   h1 {
-    font-size: 1.4em;
+    text-transform: uppercase;
+    font-size: 1.6em;
+    margin-bottom: 0.5rem;
+    user-select: none;
   }
   h2 {
     font-size: 1.2em;
     display: inline-block;
+  }
+  .config {
+    margin: 0.5rem 0 0 0;
+    /* padding-bottom: 1rem; */
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+  }
+  .config[open] {
+    background-color: #222;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    /* margin: 0.5rem -0.5rem 1rem -0.5rem; */
+  }
+  .config summary {
+    cursor: pointer;
+    user-select: none;
   }
   .options {
     display: flex;
@@ -232,7 +287,7 @@
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    margin: 1rem 0;
   }
   .btn {
     font-weight: inherit;
@@ -250,6 +305,10 @@
   }
   .btn span {
     font-weight: bold;
+  }
+  .btn-small {
+    font-size: 0.8em;
+    padding: 0.125rem 0.25rem;
   }
   .saveto p,
   .append p {
@@ -289,11 +348,10 @@
     /* background-color: aqua; */
     justify-content: space-between;
   }
-  .btn-green {
-    background-color: hsl(152, 83%, 40%);
-    border-color: hsl(152, 83%, 40%);
-    color: white;
-    margin: 0 1rem;
+  .btn-accent {
+    background-color: lightblue;
+    border-color: lightblue;
+    color: #222;
   }
   .results-list {
     padding: 1rem 0;
@@ -335,5 +393,33 @@
     cursor: pointer;
     user-select: none;
     margin: 0.5rem 0 0 0.5rem;
+  }
+  .pt-1 {
+    margin-top: 0.25rem;
+  }
+  .pt-2 {
+    margin-top: 0.5rem;
+  }
+  .uppercase {
+    text-transform: uppercase;
+  }
+  .unbutton {
+    background-color: transparent;
+    color: inherit;
+    border: none;
+    margin: 0;
+    padding: 0;
+    text-align: inherit;
+    font: inherit;
+    border-radius: 0;
+    appearance: none;
+    cursor: pointer;
+  }
+  .message {
+    color: #222;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+    user-select: none;
   }
 </style>

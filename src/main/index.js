@@ -49,8 +49,8 @@ async function setConfig(event, key, value) {
   store.set(key, value)
 }
 
-function initConfig() {
-  getDefaultOutDir()
+async function initConfig() {
+  await getDefaultOutDir()
   let tempObj = store.store
   store.store = tempObj
 }
@@ -58,6 +58,10 @@ function initConfig() {
 function resetConfig() {
   store.reset('formatOptions')
   mainWindow.reload()
+}
+
+function editConfig() {
+  store.openInEditor()
 }
 
 function createWindow() {
@@ -117,6 +121,7 @@ app.whenReady().then(() => {
   ipcMain.handle('dialog:getConfig', getConfig)
   ipcMain.handle('dialog:setConfig', setConfig)
   ipcMain.handle('dialog:resetConfig', resetConfig)
+  ipcMain.handle('dialog:editConfig', editConfig)
 
   initConfig()
   createWindow()

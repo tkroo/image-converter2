@@ -18,7 +18,8 @@ if (process.contextIsolated) {
       openDirectory: (path) => ipcRenderer.invoke('dialog:openDirectory', path),
       getConfig: () => ipcRenderer.invoke('dialog:getConfig'),
       setConfig: (key, value) => ipcRenderer.invoke('dialog:setConfig', key, value),
-      resetConfig: () => ipcRenderer.invoke('dialog:resetConfig')
+      resetConfig: () => ipcRenderer.invoke('dialog:resetConfig'),
+      editConfig: () => ipcRenderer.invoke('dialog:editConfig')
     })
   } catch (err) {
     console.log(`error: ${err}`)
