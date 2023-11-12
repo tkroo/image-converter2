@@ -3,21 +3,9 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/256x256.png?asset'
 import Store from 'electron-store'
+import schema from './schema'
 
 const extraPath = 'foo'
-const schema = {
-  outputDirectory: {
-    type: 'string'
-  },
-  appendString: {
-    type: 'string',
-    default: '_extra'
-  },
-  defaultFormat: {
-    type: 'string',
-    default: 'png'
-  }
-}
 const store = new Store({ schema })
 
 let mainWindow
