@@ -13,19 +13,37 @@
   }
   let out_directory
   let append_string = '_converted'
+  let format_options = []
 
   onMount(async () => {
-    let { defaultFormat, outputDirectory, appendString } = await window.electronAPI.getConfig()
+    let { defaultFormat, outputDirectory, appendString, formatOptions } = await window.electronAPI.getConfig()
     imageFormat = defaultFormat
     out_directory = outputDirectory
     append_string = appendString
+    format_options = formatOptions
   })
 
   let timer
-  $: append_string && debounceUpdate()
-  function debounceUpdate() {
+  $: append_string && debounceUpdate('appendString', append_string)
+  $: format_options && debounceUpdate('formatOptions', format_options)
+  function debounceUpdate(key, val) {
     clearTimeout(timer)
-    timer = setTimeout(() => window.electronAPI.setConfig('appendString', append_string), 750)
+    if (key == 'formatOptions') {
+      format_options = val
+    }
+    timer = setTimeout(() => window.electronAPI.setConfig(key, val), 750)
+  }
+
+  function coerceValue(value) {
+    if (value == 'true') {
+      return true
+    } else if (value == 'false') {
+      return false
+    } else if (Number(value)) {
+      return Number(value)
+    } else {
+      return value
+    }
   }
 
   async function handleConversion(e) {
@@ -55,7 +73,9 @@
   async function convertFiles(files, format, out_directory, append_string) {
     for (let i = 0; i < files.length; i++) {
       // eslint-disable-next-line no-undef
-      const f = await convert(files[i], imageFormat, out_directory, append_string) // convert is defined in src/preload/index.js
+      const options = format_options.find((o) => o.format === format).options
+      // eslint-disable-next-line no-undef
+      const f = await convert(files[i], imageFormat, out_directory, append_string, options) // convert is defined in src/preload/index.js
       convertedFiles = [...convertedFiles, f]
     }
   }
@@ -64,6 +84,11 @@
     const filePath = await window.electronAPI.selectOutDir()
     out_directory = filePath
   }
+
+  async function resetPrefs() {
+    await window.electronAPI.resetConfig()
+  }
+
 </script>
 
 <div class="container">
@@ -87,6 +112,30 @@
           {format}
         </label>
       {/each}
+      <details class="format-options">
+        <summary>options</summary>
+        <ul>
+          {#each format_options as option}
+            <li>
+              <fieldset>
+                <legend>&nbsp;{option.format}&nbsp;</legend>
+                {#each Object.entries(option.options) as [key, v]}
+                  <label for={key}>
+                    {key}:
+                    <input
+                      id={key}
+                      type="text"
+                      bind:value={option.options[key]}
+                      on:change={() => (option.options[key] = coerceValue(v))}
+                    />
+                  </label>
+                {/each}
+              </fieldset>
+            </li>
+          {/each}
+        </ul>
+        <button on:click={resetPrefs} type="button" class="btn"> restore defaults </button>
+      </details>
     </fieldset>
     <div class="saveto">
       <p>save images to</p>
@@ -194,6 +243,7 @@
     border: 1px solid #aaa;
     border-radius: 0.25rem;
     background-color: #eee;
+    cursor: pointer;
   }
   .btn:hover {
     background-color: #ddd;
@@ -219,6 +269,7 @@
   }
   fieldset label {
     user-select: none;
+    cursor: pointer;
     margin-right: 1rem;
   }
   fieldset label:last-child {
@@ -266,5 +317,23 @@
     user-select: none;
     width: 40px;
     height: auto;
+  }
+
+  .format-options ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+  }
+  .format-options input {
+    width: 50px;
+    margin-left: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #aaa;
+    border-radius: 0.25rem;
+  }
+  .format-options summary {
+    cursor: pointer;
+    user-select: none;
+    margin: 0.5rem 0 0 0.5rem;
   }
 </style>

@@ -55,6 +55,11 @@ function initConfig() {
   store.store = tempObj
 }
 
+function resetConfig() {
+  store.reset('formatOptions')
+  mainWindow.reload()
+}
+
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -111,6 +116,7 @@ app.whenReady().then(() => {
   ipcMain.handle('dialog:openDirectory', openDirectory)
   ipcMain.handle('dialog:getConfig', getConfig)
   ipcMain.handle('dialog:setConfig', setConfig)
+  ipcMain.handle('dialog:resetConfig', resetConfig)
 
   initConfig()
   createWindow()
