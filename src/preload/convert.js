@@ -1,9 +1,15 @@
 import fs from 'node:fs'
 import sharp from 'sharp'
-const convert = async (file, format, out_directory, append_string) => {
+const convert = async (file, format, out_directory, append_string, options) => {
   let basePath = process.argv.slice(-1)[0]
   const buffer = Buffer.from(await file.arrayBuffer())
+  // console.log('---OPTIONS---')
+  // console.log(options)
 
+  // options = coerceTypes(options)
+  // console.log('---correctedtypes options---')
+  // console.log(options)
+  // console.log('---options---')
   let filepath
   let re = /\.[^.]*$/gm
   let newname = file.name.replace(re, append_string)
@@ -22,7 +28,7 @@ const convert = async (file, format, out_directory, append_string) => {
   }
 
   return sharp(buffer)
-    .toFormat(format)
+    .toFormat(format, options)
     .toBuffer()
     .then((data) => {
       fs.writeFileSync(filepath, data, 'base64')
@@ -32,5 +38,24 @@ const convert = async (file, format, out_directory, append_string) => {
       console.log(`error: ${err}`)
     })
 }
+
+// const coerceTypes = (options) => {
+//   Object.entries(options).forEach((e) => {
+//     options[e[0]] = coerceValue(e[1])
+//   })
+//   return options
+// }
+
+// const coerceValue = (value) => {
+//   if (value == 'true') {
+//     return true
+//   } else if (value == 'false') {
+//     return false
+//   } else if (!isNaN(parseFloat(value))) {
+//     return parseFloat(value)
+//   } else {
+//     return value
+//   }
+// }
 
 export default convert
