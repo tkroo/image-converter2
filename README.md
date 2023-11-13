@@ -4,7 +4,7 @@ Image format conversion app.
 An Electron app built with created with [electron-vite](https://electron-vite.org/), [svelte](https://svelte.dev) and [sharp](https://sharp.pixelplumbing.com)  
 
 ![screenshot after conversion](screenshot.png)  
-![screenshot of settings](screenshot_settings.png)  
+![screenshot of settings](screenshot-settings.png)  
 
 ## Install  
 
