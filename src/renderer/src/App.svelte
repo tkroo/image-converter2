@@ -2,6 +2,8 @@
   import { onMount } from 'svelte'
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import gearicon from '../../../resources/gears.gif?asset'
+  import Modal from './components/Modal.svelte'
+  let showModal = false
 
   // let myConfig
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
@@ -15,13 +17,15 @@
   let append_string = '_converted'
   let format_options = []
   let open_toggle = false
+  let use_append_string
 
   onMount(async () => {
-    let { defaultFormat, outputDirectory, appendString, formatOptions } = await window.electronAPI.getConfig()
+    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.electronAPI.getConfig()
     imageFormat = defaultFormat
     out_directory = outputDirectory
     append_string = appendString
     format_options = formatOptions
+    use_append_string = appendStringUsed
   })
 
   let timer
@@ -55,13 +59,13 @@
       const { acceptedFiles } = e.detail
       files.accepted = [...files.accepted, ...acceptedFiles]
       // files.rejected = [...files.rejected, ...fileRejections]
-      convertFiles(acceptedFiles, imageFormat, out_directory, append_string)
+      convertFiles(acceptedFiles, imageFormat, out_directory, use_append_string ? append_string : '')
     } else {
       imageFormat = e.target.value
       window.electronAPI.setConfig('defaultFormat', imageFormat)
       if (files.accepted.length) {
         convertedFiles = []
-        convertFiles(files.accepted, imageFormat, out_directory, append_string)
+        convertFiles(files.accepted, imageFormat, out_directory, use_append_string ? append_string : '')
       }
     }
   }
@@ -94,21 +98,22 @@
     await window.electronAPI.editConfig()
   }
 
-  function toggle() {
-    open_toggle = !open_toggle
-  }
+  // function toggle() {
+  //   open_toggle = !open_toggle
+  // }
 </script>
 
 <div class="container">
   <header>
     <h1 class="uppercase">image format converter</h1>
+    <button class="btn btn-small ml-1" on:click={() => (showModal = true)}> settings </button>
   </header>
 
-  <button class="unbutton color-accent" on:click|preventDefault={toggle}>
+  <button class="unbutton color-accent mb-1" on:click|preventDefault={() => (showModal = true)}>
     saving to <strong>{out_directory}</strong> as <strong class="uppercase">{imageFormat}</strong>
   </button>
-  <details class="config" bind:open={open_toggle}>
-    <summary>settings</summary>
+  <Modal bind:showModal>
+    <h2 slot="header">settings</h2>
     <section class="options">
       <fieldset>
         <legend>&nbsp;convert to&nbsp;</legend>
@@ -166,19 +171,27 @@
         <!-- <p class="warning">existing files with the same name will be overwritten!</p> -->
       </div>
       <div class="append">
-        <p>append string to file names</p>
-        <input id="append_string" type="text" bind:value={append_string} /><br />
+        <label for="use_append_string">
+          append string to file name
+          <input
+            id="use_append_string"
+            type="checkbox"
+            bind:checked={use_append_string}
+            on:change={async () => await window.electronAPI.setConfig('appendStringUsed', use_append_string)}
+          />
+          <br />
+          <input id="append_string" type="text" bind:value={append_string} />
+        </label>
+        <br />
         <small>
-          <em>example.jpg</em>
-          <br />becomes<br />
-          <em>example</em><strong>{append_string}</strong><em>.{imageFormat}</em>
+          pic.jpg becomes pic{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}
         </small>
       </div>
     </section>
     <div class="open-config">
-      <button type="button" class="btn btn-small" on:click={editPrefs}>open settings file</button>
+      <button type="button" class="btn" on:click={editPrefs}>open settings file</button>
     </div>
-  </details>
+  </Modal>
 
   <Dropzone
     on:drop={handleConversion}
@@ -224,9 +237,8 @@
               target="_blank"
             >
               <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
-              <span>{file.filename.slice(1)}</span>
+              <span>{file.filename}</span>
             </a>
-            <!-- <span>file.filename: {file.filename}</span><br /> -->
           </li>
         {/each}
       </ul>
@@ -244,6 +256,11 @@
     /* display: flex;
     flex-direction: column; */
   }
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
   h1 {
     text-transform: uppercase;
     font-size: 1.6em;
@@ -254,9 +271,8 @@
     font-size: 1.2em;
     display: inline-block;
   }
-  .config {
+  /* .config {
     margin: 0.5rem 0 0 0;
-    /* padding-bottom: 1rem; */
     padding: 0.5rem;
     border-radius: 0.25rem;
   }
@@ -269,7 +285,7 @@
   .config summary {
     cursor: pointer;
     user-select: none;
-  }
+  } */
   .options {
     display: flex;
     gap: 0.5rem;
@@ -297,9 +313,6 @@
     padding: 0.125rem 0.25rem;
   }
   .saveto p,
-  .append p {
-    margin: 0 0 0.5rem 0;
-  }
   .append input {
     margin: 0 0 0.5rem 0;
     padding: 0.25rem 0.5rem;
@@ -344,13 +357,6 @@
   .results-list li {
     max-width: 180px;
   }
-  .results-list li span {
-    word-break: break-all;
-  }
-  .results-list img {
-    width: 100%;
-    height: auto;
-  }
   .gears {
     margin: 0 0 0 0.5rem;
     user-select: none;
@@ -375,12 +381,6 @@
     user-select: none;
     margin: 0.5rem 0 0 0.5rem;
   }
-  .pt-1 {
-    margin-top: 0.25rem;
-  }
-  /* .pt-2 {
-    margin-top: 0.5rem;
-  } */
   .uppercase {
     text-transform: uppercase;
   }
@@ -406,4 +406,16 @@
     margin: 0;
     user-select: none;
   }
+  .pt-1 {
+    margin-top: 0.25rem;
+  }
+  .ml-1 {
+    margin-left: 0.25rem;
+  }
+  .mb-1 {
+    margin-bottom: 1rem;
+  }
+  /* .pt-2 {
+    margin-top: 0.5rem;
+  } */
 </style>
