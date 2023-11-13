@@ -23,7 +23,7 @@
     border-radius: 0.2em;
     border: none;
     padding: 2rem;
-    height: 60vh;
+    height: 80vh;
   }
   dialog::backdrop {
     background: rgba(0, 0, 0, 0.7);

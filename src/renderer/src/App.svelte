@@ -312,7 +312,11 @@
     font-size: 0.8em;
     padding: 0.125rem 0.25rem;
   }
-  .saveto p,
+  .saveto p {
+    line-height: 1.1;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
   .append input {
     margin: 0 0 0.5rem 0;
     padding: 0.25rem 0.5rem;
@@ -320,7 +324,7 @@
     border-radius: 0.25rem;
   }
   fieldset {
-    padding: 0.5em 1em 1em 1em;
+    padding: 0em 0.5em 0.5em 0.5em;
     min-width: fit-content;
     border: 1px solid #aaa;
     border-radius: 0.25rem;
@@ -328,7 +332,7 @@
   fieldset label {
     user-select: none;
     cursor: pointer;
-    margin-right: 1rem;
+    margin-right: 0.5rem;
   }
   fieldset label:last-child {
     margin-right: 0;
