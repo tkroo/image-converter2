@@ -1,7 +1,9 @@
 singleQuote: true
 semi: false
-printWidth: 100
+printWidth: 128
 trailingComma: none
+tabWidth: 2
+useTabs: false
 plugins:
   - prettier-plugin-svelte
 overrides:
