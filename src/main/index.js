@@ -66,6 +66,7 @@ function editConfig() {
 
 function createWindow() {
   // Create the browser window.
+  const fallbackPath = join(app.getPath('temp'), extraPath)
   mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -77,7 +78,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: true,
       preload: join(__dirname, '../preload/index.js'),
-      additionalArguments: [app.getPath('temp') + extraPath]
+      additionalArguments: [fallbackPath]
     }
   })
 
