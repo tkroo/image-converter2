@@ -1,9 +1,28 @@
+:root {
+  @media (prefers-color-scheme: dark) {
+    --color-bg: #333;
+    --color-fg: white;
+    --color-accent: hsl(138, 53%, 80%);
+    --color-accent2: #222;
+  }
+  
+  @media (prefers-color-scheme: light) {
+    --color-bg: white;
+    --color-fg: #333;
+    --color-accent: hsl(138, 45%, 33%);
+    --color-accent2: #eee;
+  }
+}
+
 /* Box sizing rules */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
+/* ::selection {
+  background-color: var(--color-accent);
+} */
 
 /* Prevent font size inflation */
 html {
@@ -11,6 +30,7 @@ html {
   -webkit-text-size-adjust: none;
   text-size-adjust: none;
   height: 100%;
+  accent-color: var(--color-accent);
 }
 
 /* Remove default margin in favour of better control in authored CSS */
@@ -111,14 +131,7 @@ textarea:not([rows]) {
   height: 100%;
 }
 
-@media (prefers-color-scheme: dark) {
-  body { background: #333; color: white; }
-  a {color: lightblue; text-decoration: none;}
-  a:hover {text-decoration: underline;}
-}
 
-@media (prefers-color-scheme: light) {
-  body { background: #fff; color: black; }
-  a {color: text-decoration: none;}
-  a:hover {text-decoration: underline;}
-}
+a {color: var(--color-accent); text-decoration: none;}
+a:hover {text-decoration: underline;}
+body { background: var(--color-bg); color: var(--color-fg); }

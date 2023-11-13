@@ -104,7 +104,7 @@
     <h1 class="uppercase">image format converter</h1>
   </header>
 
-  <button class="unbutton" on:click|preventDefault={toggle}>
+  <button class="unbutton color-accent" on:click|preventDefault={toggle}>
     saving to <strong>{out_directory}</strong> as <strong class="uppercase">{imageFormat}</strong>
   </button>
   <details class="config" bind:open={open_toggle}>
@@ -155,7 +155,7 @@
       <div class="saveto">
         <p>save images to</p>
         <button type="button" on:click|preventDefault={selectPath} class="btn">
-          <span>{out_directory}</span>
+          {out_directory}
         </button>
         <br />
         <button
@@ -163,7 +163,7 @@
           class="btn pt-1"
           on:click|preventDefault={async () => await window.electronAPI.openDirectory(out_directory)}
         >
-          <span>open output directory</span>
+          open output directory
         </button>
         <!-- <p class="warning">existing files with the same name will be overwritten!</p> -->
       </div>
@@ -208,14 +208,14 @@
         {/if}
         <button
           type="button"
-          class="btn btn-accent"
+          class="btn"
           on:click|preventDefault={async () => await window.electronAPI.openDirectory(out_directory)}
         >
-          <span>open output directory</span>
+          open output directory
         </button>
 
         <button type="button" class="btn" on:click|preventDefault={clearFiles}>
-          <span>clear results list</span>
+          clear results list
         </button>
       </div>
       <ul class="results-list">
@@ -248,13 +248,6 @@
     /* display: flex;
     flex-direction: column; */
   }
-  .open-config {
-    /* position: fixed; */
-    /* bottom: 1rem; */
-    /* right: 2rem; */
-    /* margin-top: auto; */
-    /* padding: 0 0 1rem 2rem; */
-  }
   h1 {
     text-transform: uppercase;
     font-size: 1.6em;
@@ -272,10 +265,10 @@
     border-radius: 0.25rem;
   }
   .config[open] {
-    background-color: #222;
-    margin-bottom: 1rem;
+    background-color: var(--color-accent2);
+    color: var(--color-fg);
     padding: 0.5rem;
-    /* margin: 0.5rem -0.5rem 1rem -0.5rem; */
+    margin-bottom: 1rem;
   }
   .config summary {
     cursor: pointer;
@@ -290,7 +283,7 @@
     margin: 1rem 0;
   }
   .btn {
-    font-weight: inherit;
+    font-weight: bold;
     font-family: inherit;
     width: fit-content;
     padding: 0.25rem 0.5rem;
@@ -302,9 +295,6 @@
   }
   .btn:hover {
     background-color: #ddd;
-  }
-  .btn span {
-    font-weight: bold;
   }
   .btn-small {
     font-size: 0.8em;
@@ -347,11 +337,6 @@
     width: 100%;
     /* background-color: aqua; */
     justify-content: space-between;
-  }
-  .btn-accent {
-    background-color: lightblue;
-    border-color: lightblue;
-    color: #222;
   }
   .results-list {
     padding: 1rem 0;
@@ -397,9 +382,9 @@
   .pt-1 {
     margin-top: 0.25rem;
   }
-  .pt-2 {
+  /* .pt-2 {
     margin-top: 0.5rem;
-  }
+  } */
   .uppercase {
     text-transform: uppercase;
   }
@@ -414,6 +399,9 @@
     border-radius: 0;
     appearance: none;
     cursor: pointer;
+  }
+  .color-accent {
+    color: var(--color-accent);
   }
   .message {
     color: #222;
