@@ -126,7 +126,7 @@
           </label>
         {/each}
         <details class="format-options">
-          <summary>options</summary>
+          <summary>format options</summary>
           <ul>
             {#each format_options as option}
               <li>
@@ -147,9 +147,7 @@
               </li>
             {/each}
           </ul>
-          <button on:click={resetPrefs} type="button" class="btn btn-small">
-            restore defaults
-          </button>
+          <button on:click={resetPrefs} type="button" class="btn btn-small"> restore defaults </button>
         </details>
       </fieldset>
       <div class="saveto">
@@ -214,9 +212,7 @@
           open output directory
         </button>
 
-        <button type="button" class="btn" on:click|preventDefault={clearFiles}>
-          clear results list
-        </button>
+        <button type="button" class="btn" on:click|preventDefault={clearFiles}> clear results list </button>
       </div>
       <ul class="results-list">
         {#each convertedFiles as file}
