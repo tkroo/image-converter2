@@ -29,6 +29,8 @@ mac:
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
+  mimeTypes:
+    - "image/*"
   target:
     - AppImage
   maintainer: treatkor.com
