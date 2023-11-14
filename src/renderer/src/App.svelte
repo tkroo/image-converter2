@@ -1,11 +1,10 @@
 <script>
   import { onMount } from 'svelte'
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
-  import gearicon from '../../../resources/gears.gif?asset'
+  import Gears from './components/GearsSVG.svelte'
   import Modal from './components/Modal.svelte'
   let showModal = false
 
-  // let myConfig
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   let imageFormat = 'png'
   let convertedFiles = []
@@ -16,11 +15,10 @@
   let out_directory
   let append_string = '_converted'
   let format_options = []
-  let open_toggle = false
   let use_append_string
 
   onMount(async () => {
-    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.electronAPI.getConfig()
+    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.bridgeAPI.getConfig()
     imageFormat = defaultFormat
     out_directory = outputDirectory
     append_string = appendString
@@ -36,7 +34,7 @@
     if (key == 'formatOptions') {
       format_options = val
     }
-    timer = setTimeout(() => window.electronAPI.setConfig(key, val), 750)
+    timer = setTimeout(() => window.bridgeAPI.setConfig(key, val), 750)
   }
 
   function coerceValue(value) {
@@ -62,7 +60,7 @@
       convertFiles(acceptedFiles, imageFormat, out_directory, use_append_string ? append_string : '')
     } else {
       imageFormat = e.target.value
-      window.electronAPI.setConfig('defaultFormat', imageFormat)
+      window.bridgeAPI.setConfig('defaultFormat', imageFormat)
       if (files.accepted.length) {
         convertedFiles = []
         convertFiles(files.accepted, imageFormat, out_directory, use_append_string ? append_string : '')
@@ -86,16 +84,16 @@
   }
 
   async function selectPath() {
-    const filePath = await window.electronAPI.selectOutDir()
+    const filePath = await window.bridgeAPI.selectOutDir()
     out_directory = filePath
   }
 
   async function resetPrefs() {
-    await window.electronAPI.resetConfig()
+    await window.bridgeAPI.resetConfig()
   }
 
   async function editPrefs() {
-    await window.electronAPI.editConfig()
+    await window.bridgeAPI.editConfig()
   }
 
   // function toggle() {
@@ -112,6 +110,23 @@
   <button class="unbutton color-accent mb-1" on:click|preventDefault={() => (showModal = true)}>
     saving to <strong>{out_directory}</strong> as <strong class="uppercase">{imageFormat}</strong>
   </button>
+  <br />
+  <!-- <fieldset>
+    <legend>&nbsp;convert to&nbsp;</legend>
+    {#each formats as format}
+      <label for={format}>
+        <input
+          bind:group={imageFormat}
+          on:change={handleConversion}
+          type="radio"
+          id={format}
+          name="imageFormat"
+          value={format}
+        />
+        {format}
+      </label>
+    {/each}
+  </fieldset> -->
   <Modal bind:showModal>
     <h2 slot="header">settings</h2>
     <section class="options">
@@ -164,7 +179,7 @@
         <button
           type="button"
           class="btn pt-1"
-          on:click|preventDefault={async () => await window.electronAPI.openDirectory(out_directory)}
+          on:click|preventDefault={async () => await window.bridgeAPI.openDirectory(out_directory)}
         >
           open output directory
         </button>
@@ -177,14 +192,14 @@
             id="use_append_string"
             type="checkbox"
             bind:checked={use_append_string}
-            on:change={async () => await window.electronAPI.setConfig('appendStringUsed', use_append_string)}
+            on:change={async () => await window.bridgeAPI.setConfig('appendStringUsed', use_append_string)}
           />
           <br />
           <input id="append_string" type="text" bind:value={append_string} />
         </label>
         <br />
         <small>
-          pic.jpg becomes pic{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}
+          image.jpg will be saved as image{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}
         </small>
       </div>
     </section>
@@ -215,12 +230,12 @@
           <span>Click to download or drag and drop to a file manager window</span>
         </div>
         {#if convertedFiles.length < files.accepted.length}
-          <img src={gearicon} alt="gears" class="gears" />
+          <Gears />
         {/if}
         <button
           type="button"
           class="btn"
-          on:click|preventDefault={async () => await window.electronAPI.openDirectory(out_directory)}
+          on:click|preventDefault={async () => await window.bridgeAPI.openDirectory(out_directory)}
         >
           open output directory
         </button>
@@ -243,7 +258,7 @@
         {/each}
       </ul>
     {:else if files.accepted.length}
-      <p><img src={gearicon} alt="gears" class="gears" />working on it...</p>
+      <p><Gears />working on it...</p>
     {/if}
   </section>
 </div>
