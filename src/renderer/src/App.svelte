@@ -367,6 +367,9 @@
     /* background-color: aqua; */
     justify-content: space-between;
   }
+  .results-wrap img {
+    background: repeating-conic-gradient(#666 0 90deg, #999 0 180deg) 0 0/20px 20px round;
+  }
   .results-list {
     padding: 1rem 0;
     list-style: none;
@@ -377,13 +380,6 @@
   .results-list li {
     max-width: 180px;
   }
-  .gears {
-    margin: 0 0 0 0.5rem;
-    user-select: none;
-    width: 40px;
-    height: auto;
-  }
-
   .format-options ul {
     list-style: none;
     padding: 0;
