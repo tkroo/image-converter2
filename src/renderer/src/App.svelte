@@ -28,13 +28,14 @@
 
   let timer
   $: append_string && debounceUpdate('appendString', append_string)
+  $: imageFormat && debounceUpdate('defaultFormat', imageFormat, 250)
   $: format_options && debounceUpdate('formatOptions', format_options)
-  function debounceUpdate(key, val) {
+  function debounceUpdate(key, val, timeout = 750) {
     clearTimeout(timer)
     if (key == 'formatOptions') {
       format_options = val
     }
-    timer = setTimeout(() => window.bridgeAPI.setConfig(key, val), 750)
+    timer = setTimeout(() => window.bridgeAPI.setConfig(key, val), timeout)
   }
 
   function coerceValue(value) {
@@ -59,8 +60,8 @@
       // files.rejected = [...files.rejected, ...fileRejections]
       convertFiles(acceptedFiles, imageFormat, out_directory, use_append_string ? append_string : '')
     } else {
-      imageFormat = e.target.value
-      window.bridgeAPI.setConfig('defaultFormat', imageFormat)
+      // imageFormat = e.target.value
+      // window.bridgeAPI.setConfig('defaultFormat', imageFormat)
       if (files.accepted.length) {
         convertedFiles = []
         convertFiles(files.accepted, imageFormat, out_directory, use_append_string ? append_string : '')
