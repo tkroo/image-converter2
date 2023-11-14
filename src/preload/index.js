@@ -13,7 +13,7 @@ if (process.contextIsolated) {
     // contextBridge.exposeInMainWorld('electron', electronAPI)
     // contextBridge.exposeInMainWorld('api', api)
     contextBridge.exposeInMainWorld('convert', convert)
-    contextBridge.exposeInMainWorld('electronAPI', {
+    contextBridge.exposeInMainWorld('bridgeAPI', {
       selectOutDir: () => ipcRenderer.invoke('dialog:selectOutDir'),
       openDirectory: (path) => ipcRenderer.invoke('dialog:openDirectory', path),
       getConfig: () => ipcRenderer.invoke('dialog:getConfig'),
