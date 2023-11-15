@@ -2,9 +2,10 @@
   import { onMount } from 'svelte'
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import Gears from './components/GearsSVG.svelte'
-  import Modal from './components/Modal.svelte'
-  let showModal = false
+  // import Modal from './components/Modal.svelte'
+  // let showModal = false
 
+  let open_toggle = false
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   let imageFormat = 'png'
   let convertedFiles = []
@@ -97,39 +98,25 @@
     await window.bridgeAPI.editConfig()
   }
 
-  // function toggle() {
-  //   open_toggle = !open_toggle
-  // }
+  function toggle() {
+    open_toggle = !open_toggle
+  }
 </script>
 
 <div class="container">
   <header>
     <h1 class="uppercase">image format converter</h1>
-    <button class="btn btn-small ml-1" on:click={() => (showModal = true)}> settings </button>
+    <!-- <button class="btn btn-small ml-1" on:click={() => (showModal = true)}> settings </button> -->
   </header>
 
-  <button class="unbutton color-accent mb-1" on:click|preventDefault={() => (showModal = true)}>
+  <button class="unbutton color-accent" on:click|preventDefault={toggle}>
     saving to <strong>{out_directory}</strong> as <strong class="uppercase">{imageFormat}</strong>
   </button>
-  <br />
-  <!-- <fieldset>
-    <legend>&nbsp;convert to&nbsp;</legend>
-    {#each formats as format}
-      <label for={format}>
-        <input
-          bind:group={imageFormat}
-          on:change={handleConversion}
-          type="radio"
-          id={format}
-          name="imageFormat"
-          value={format}
-        />
-        {format}
-      </label>
-    {/each}
-  </fieldset> -->
-  <Modal bind:showModal>
-    <h2 slot="header">settings</h2>
+
+  <details class="config" bind:open={open_toggle}>
+    <summary class="summary-handle">
+      <h2>settings</h2>
+    </summary>
     <section class="options">
       <fieldset>
         <legend>&nbsp;convert to&nbsp;</legend>
@@ -204,10 +191,9 @@
         </small>
       </div>
     </section>
-    <div class="open-config">
-      <button type="button" class="btn" on:click={editPrefs}>open settings file</button>
-    </div>
-  </Modal>
+    <button type="button" class="btn open-config" on:click={editPrefs}>open settings file</button>
+  </details>
+  <!-- </Modal> -->
 
   <Dropzone
     on:drop={handleConversion}
@@ -287,28 +273,32 @@
     font-size: 1.2em;
     display: inline-block;
   }
-  /* .config {
-    margin: 0.5rem 0 0 0;
-    padding: 0.5rem;
+  .config {
+    margin: 0 0 0.5rem 0;
+    padding: 0;
     border-radius: 0.25rem;
   }
   .config[open] {
     background-color: var(--color-accent2);
     color: var(--color-fg);
-    padding: 0.5rem;
     margin-bottom: 1rem;
   }
-  .config summary {
+  .config .summary-handle {
     cursor: pointer;
     user-select: none;
-  } */
+    margin-left: 0.5rem;
+  }
+  .btn.open-config {
+    margin: 0 0 1rem 0.5rem;
+  }
   .options {
+    padding: 0.5rem;
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
-    margin: 1rem 0;
+    margin: 0;
   }
   .btn {
     font-weight: bold;
