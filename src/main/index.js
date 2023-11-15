@@ -1,68 +1,20 @@
-import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/256x256.png?asset'
-import Store from 'electron-store'
-import schema from './schema'
+import icon from '../../resources/icon.png?asset'
 
-const extraPath = 'foo'
-const store = new Store({ schema })
+import {
+  extraPath,
+  selectOutDir,
+  openDirectory,
+  getConfig,
+  setConfig,
+  editConfig,
+  initConfig,
+  resetFormatOptions
+} from './helpers'
 
 let mainWindow
-
-async function selectOutDir() {
-  const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
-    properties: ['openDirectory']
-  })
-  if (!canceled) {
-    store.set('outputDirectory', filePaths[0])
-    return filePaths[0]
-  } else {
-    return getDefaultOutDir()
-  }
-}
-
-async function getDefaultOutDir() {
-  try {
-    const out = store.get('outputDirectory')
-    if (out) {
-      return out
-    } else {
-      const tmp = join(app.getPath('desktop'), extraPath)
-      store.set('outputDirectory', tmp)
-      return tmp
-    }
-  } catch (err) {
-    console.log(`error: ${err}`)
-  }
-}
-
-async function openDirectory(event, path) {
-  shell.openPath(path)
-}
-
-async function getConfig() {
-  return store.store
-}
-
-async function setConfig(event, key, value) {
-  store.set(key, value)
-}
-
-async function initConfig() {
-  await getDefaultOutDir()
-  let tempObj = store.store
-  store.store = tempObj
-}
-
-function resetConfig() {
-  store.reset('formatOptions')
-  mainWindow.reload()
-}
-
-function editConfig() {
-  store.openInEditor()
-}
 
 function createWindow() {
   // Create the browser window.
@@ -72,7 +24,7 @@ function createWindow() {
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon: process.platform === 'linux' ? { icon } : {},
     webPreferences: {
       webSecurity: is.dev ? false : true,
       nodeIntegration: true,
@@ -84,16 +36,13 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
-    if (is.dev) {
-      mainWindow.webContents.openDevTools()
-    }
+    is.dev && mainWindow.webContents.openDevTools()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
-
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -145,3 +94,7 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+function resetConfig() {
+  resetFormatOptions()
+  mainWindow.reload()
+}

@@ -19,7 +19,8 @@
   let use_append_string
 
   onMount(async () => {
-    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.bridgeAPI.getConfig()
+    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } =
+      await window.bridgeAPI.getConfig()
     imageFormat = defaultFormat
     out_directory = outputDirectory
     append_string = appendString
@@ -156,6 +157,10 @@
             {/each}
           </ul>
           <button on:click={resetPrefs} type="button" class="btn btn-small"> restore defaults </button>
+          <p>
+            read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid
+            values.
+          </p>
         </details>
       </fieldset>
       <div class="saveto">
@@ -415,13 +420,14 @@
   .pt-1 {
     margin-top: 0.25rem;
   }
+  /*
   .ml-1 {
     margin-left: 0.25rem;
   }
   .mb-1 {
     margin-bottom: 1rem;
   }
-  /* .pt-2 {
+  .pt-2 {
     margin-top: 0.5rem;
   } */
 </style>
