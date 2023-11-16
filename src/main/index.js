@@ -14,6 +14,8 @@ import {
   resetFormatOptions
 } from './helpers'
 
+import { handleFiles } from './convert'
+
 let mainWindow
 
 function createWindow() {
@@ -72,6 +74,7 @@ app.whenReady().then(() => {
   ipcMain.handle('dialog:setConfig', setConfig)
   ipcMain.handle('dialog:resetConfig', resetConfig)
   ipcMain.handle('dialog:editConfig', editConfig)
+  ipcMain.handle('dialog:handleFiles', handleFiles)
 
   initConfig()
   createWindow()

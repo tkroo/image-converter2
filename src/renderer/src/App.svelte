@@ -19,8 +19,7 @@
   let use_append_string
 
   onMount(async () => {
-    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } =
-      await window.api.getConfig()
+    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.api.getConfig()
     imageFormat = defaultFormat
     out_directory = outputDirectory
     append_string = appendString
@@ -52,6 +51,11 @@
     }
   }
 
+  async function clearFiles() {
+    files.accepted = []
+    convertedFiles = []
+  }
+
   async function handleConversion(e) {
     if (e.detail) {
       files.accepted = []
@@ -71,11 +75,6 @@
     }
   }
 
-  async function clearFiles() {
-    files.accepted = []
-    convertedFiles = []
-  }
-
   async function convertFiles(files, format, out_directory, append_string) {
     for (let i = 0; i < files.length; i++) {
       // eslint-disable-next-line no-undef
@@ -84,6 +83,11 @@
       const f = await convert(files[i], imageFormat, out_directory, append_string, options) // convert is defined in src/preload/index.js
       convertedFiles = [...convertedFiles, f]
     }
+  }
+
+  async function handleFiles(e) {
+    const foo = await window.api.handleFiles(e)
+    console.log('foo', foo)
   }
 
   async function selectPath() {
@@ -201,7 +205,7 @@
   <!-- </Modal> -->
 
   <Dropzone
-    on:drop={handleConversion}
+    on:drop={handleFiles}
     containerStyles={'padding: 4rem;border-color: #aaaaaa; cursor: pointer;'}
     name="image"
     accept="image/*"
@@ -417,9 +421,9 @@
     margin: 0;
     user-select: none;
   }
-  .pt-1 {
+  /* .pt-1 {
     margin-top: 0.25rem;
-  }
+  } */
   .pt-2 {
     margin-top: 0.5rem;
   }
