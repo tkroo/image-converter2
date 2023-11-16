@@ -20,7 +20,7 @@
 
   onMount(async () => {
     let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } =
-      await window.bridgeAPI.getConfig()
+      await window.api.getConfig()
     imageFormat = defaultFormat
     out_directory = outputDirectory
     append_string = appendString
@@ -37,7 +37,7 @@
     if (key == 'formatOptions') {
       format_options = val
     }
-    timer = setTimeout(() => window.bridgeAPI.setConfig(key, val), timeout)
+    timer = setTimeout(() => window.api.setConfig(key, val), timeout)
   }
 
   function coerceValue(value) {
@@ -63,7 +63,7 @@
       convertFiles(acceptedFiles, imageFormat, out_directory, use_append_string ? append_string : '')
     } else {
       // imageFormat = e.target.value
-      // window.bridgeAPI.setConfig('defaultFormat', imageFormat)
+      // window.api.setConfig('defaultFormat', imageFormat)
       if (files.accepted.length) {
         convertedFiles = []
         convertFiles(files.accepted, imageFormat, out_directory, use_append_string ? append_string : '')
@@ -87,16 +87,16 @@
   }
 
   async function selectPath() {
-    const filePath = await window.bridgeAPI.selectOutDir()
+    const filePath = await window.api.selectOutDir()
     out_directory = filePath
   }
 
   async function resetPrefs() {
-    await window.bridgeAPI.resetConfig()
+    await window.api.resetConfig()
   }
 
   async function editPrefs() {
-    await window.bridgeAPI.editConfig()
+    await window.api.editConfig()
   }
 
   function toggle() {
@@ -156,11 +156,11 @@
               </li>
             {/each}
           </ul>
-          <button on:click={resetPrefs} type="button" class="btn btn-small"> restore defaults </button>
           <p>
             read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid
             values.
           </p>
+          <button on:click={resetPrefs} type="button" class="btn btn-small pt-2"> restore defaults </button>
         </details>
       </fieldset>
       <div class="saveto">
@@ -171,8 +171,8 @@
         <br />
         <button
           type="button"
-          class="btn pt-1"
-          on:click|preventDefault={async () => await window.bridgeAPI.openDirectory(out_directory)}
+          class="btn pt-2"
+          on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}
         >
           open output directory
         </button>
@@ -185,7 +185,7 @@
             id="use_append_string"
             type="checkbox"
             bind:checked={use_append_string}
-            on:change={async () => await window.bridgeAPI.setConfig('appendStringUsed', use_append_string)}
+            on:change={async () => await window.api.setConfig('appendStringUsed', use_append_string)}
           />
           <br />
           <input id="append_string" type="text" bind:value={append_string} />
@@ -227,7 +227,7 @@
         <button
           type="button"
           class="btn"
-          on:click|preventDefault={async () => await window.bridgeAPI.openDirectory(out_directory)}
+          on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}
         >
           open output directory
         </button>
@@ -420,6 +420,9 @@
   .pt-1 {
     margin-top: 0.25rem;
   }
+  .pt-2 {
+    margin-top: 0.5rem;
+  }
   /*
   .ml-1 {
     margin-left: 0.25rem;
@@ -427,7 +430,12 @@
   .mb-1 {
     margin-bottom: 1rem;
   }
-  .pt-2 {
-    margin-top: 0.5rem;
-  } */
+  */
+  a {
+    color: var(--color-accent);
+    text-decoration: none !important;
+  }
+  a:hover {
+    text-decoration: underline !important;
+  }
 </style>
