@@ -5,8 +5,8 @@ NOTE: Work in progress. There may be security vulnerabilities.
 Image format conversion app.  
 An Electron app built with created with [electron-vite](https://electron-vite.org/), [svelte](https://svelte.dev) and [sharp](https://sharp.pixelplumbing.com)  
 
-![screenshot after conversion](screenshot.png)  
-![screenshot of settings](screenshot-settings.png)  
+![screenshot after conversion](screenshot1.png)  
+![screenshot of settings](screenshot2.png)  
 
 ## Install  
 
