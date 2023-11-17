@@ -29,9 +29,9 @@ function createWindow() {
     icon: process.platform === 'linux' ? { icon } : {},
     webPreferences: {
       webSecurity: is.dev ? false : true,
-      nodeIntegration: true,
+      nodeIntegration: false,
       contextIsolation: true,
-      // sandbox: true,
+      sandbox: true,
       preload: join(__dirname, '../preload/index.js'),
       additionalArguments: [fallbackPath]
     }
