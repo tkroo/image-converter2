@@ -5,6 +5,12 @@
   // import Modal from './components/Modal.svelte'
   // let showModal = false
 
+  let count = 0
+  // $: count = window.electron.ipcRenderer.on('update-progress', (_, args) => {
+  //   console.log(args)
+  //   return args
+  // })
+
   let open_toggle = false
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   let imageFormat = 'png'
@@ -17,6 +23,11 @@
   let append_string = '_converted'
   let format_options = []
   let use_append_string
+
+  // let count = 0
+  // $: count = window.api.updateProgress()
+  // $: count = (async () => await window.api.updateProgress())()
+  
 
   onMount(async () => {
     let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.api.getConfig()
@@ -31,6 +42,7 @@
   $: append_string && debounceUpdate('appendString', append_string)
   $: imageFormat && debounceUpdate('defaultFormat', imageFormat, 250)
   $: format_options && debounceUpdate('formatOptions', format_options)
+  
   function debounceUpdate(key, val, timeout = 750) {
     clearTimeout(timer)
     if (key == 'formatOptions') {
@@ -56,38 +68,31 @@
     convertedFiles = []
   }
 
-  async function handleConversion(e) {
-    if (e.detail) {
+  async function handleConvert(event) {
+    let af
+    if (event.detail.acceptedFiles) {
       files.accepted = []
       convertedFiles = []
-      // const { acceptedFiles, fileRejections } = e.detail
-      const { acceptedFiles } = e.detail
+      const { acceptedFiles } = event.detail
+      af = acceptedFiles
       files.accepted = [...files.accepted, ...acceptedFiles]
-      // files.rejected = [...files.rejected, ...fileRejections]
-      convertFiles(acceptedFiles, imageFormat, out_directory, use_append_string ? append_string : '')
     } else {
-      // imageFormat = e.target.value
-      // window.api.setConfig('defaultFormat', imageFormat)
       if (files.accepted.length) {
         convertedFiles = []
-        convertFiles(files.accepted, imageFormat, out_directory, use_append_string ? append_string : '')
+        af = files.accepted
+      } else {
+        af = []
       }
     }
-  }
-
-  async function convertFiles(files, format, out_directory, append_string) {
-    for (let i = 0; i < files.length; i++) {
-      // eslint-disable-next-line no-undef
-      const options = format_options.find((o) => o.format === format).options
-      // eslint-disable-next-line no-undef
-      const f = await convert(files[i], imageFormat, out_directory, append_string, options) // convert is defined in src/preload/index.js
-      convertedFiles = [...convertedFiles, f]
-    }
-  }
-
-  async function handleFiles(e) {
-    const foo = await window.api.handleFiles(e)
-    console.log('foo', foo)
+    const myfiles = af.map((f) => f.path)
+    const foo = await window.api.handleFiles(
+      myfiles,
+      imageFormat,
+      out_directory,
+      use_append_string ? append_string : ''
+    )
+    convertedFiles = [...convertedFiles, ...foo]
+    console.log('convertedFiles: ', convertedFiles)
   }
 
   async function selectPath() {
@@ -111,11 +116,13 @@
 <div class="container">
   <header>
     <h1 class="uppercase">image format converter</h1>
+    <!-- <p>count: {count}</p> -->
     <!-- <button class="btn btn-small ml-1" on:click={() => (showModal = true)}> settings </button> -->
   </header>
 
   <button class="unbutton color-accent" on:click|preventDefault={toggle}>
-    saving to <strong>{out_directory}</strong> as <strong class="uppercase">{imageFormat}</strong>
+    image.xxx will be saved to <strong>{out_directory}</strong> as image{#if use_append_string}<em>{append_string}</em
+      >{/if}.<em>{imageFormat}</em>
   </button>
 
   <details class="config" bind:open={open_toggle}>
@@ -127,14 +134,7 @@
         <legend>&nbsp;convert to&nbsp;</legend>
         {#each formats as format}
           <label for={format}>
-            <input
-              bind:group={imageFormat}
-              on:change={handleConversion}
-              type="radio"
-              id={format}
-              name="imageFormat"
-              value={format}
-            />
+            <input bind:group={imageFormat} type="radio" id={format} name="imageFormat" value={format} />
             {format}
           </label>
         {/each}
@@ -200,12 +200,13 @@
         </small>
       </div>
     </section>
+    <button type="button" class="btn open-config" on:click={handleConvert}>convert again</button>
     <button type="button" class="btn open-config" on:click={editPrefs}>open settings file</button>
   </details>
   <!-- </Modal> -->
 
   <Dropzone
-    on:drop={handleFiles}
+    on:drop={handleConvert}
     containerStyles={'padding: 4rem;border-color: #aaaaaa; cursor: pointer;'}
     name="image"
     accept="image/*"
@@ -220,7 +221,7 @@
           <h2>
             convert{convertedFiles.length < files.accepted.length
               ? `ing ${convertedFiles.length} of ${files.accepted.length}`
-              : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} to {imageFormat}
+              : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} to {convertedFiles[0].imageFormat}
           </h2>
           <br />
           <span>Click to download or drag and drop to a file manager window</span>

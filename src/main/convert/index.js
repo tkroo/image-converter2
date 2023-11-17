@@ -1,6 +1,9 @@
+// import { contextBridge, ipcRenderer } from 'electron'
+// import { electronAPI } from '@electron-toolkit/preload'
 import fs from 'node:fs'
 import sharp from 'sharp'
 import path from 'path'
+import { myStore } from '../helpers'
 
 const re = /\.[^.]*$/gm
 
@@ -17,66 +20,56 @@ function checkFileExistenceAndIncrementFilename(filepath) {
   return filepath
 }
 
-export async function handleFiles(event) {
-  console.log('PRELOAD - handleFiles')
-  const { acceptedFiles } = event.detail
-  console.log(acceptedFiles)
-  return acceptedFiles
+// contextBridge.exposeInMainWorld('updateProgress', updateProgress)
+
+export function updateProgress(c) {
+  console.log('updateProgress: ', c)
+  // electronAPI.ipcRenderer.send('update-progress', c)
+  // const foo = ipcRenderer.invoke('update-progress', c)
+  return c
 }
 
-export async function handleConversion(e) {
-  if (e.detail) {
-    files.accepted = []
-    convertedFiles = []
-    // const { acceptedFiles, fileRejections } = e.detail
-    const { acceptedFiles } = e.detail
-    files.accepted = [...files.accepted, ...acceptedFiles]
-    // files.rejected = [...files.rejected, ...fileRejections]
-    convertFiles(acceptedFiles, imageFormat, out_directory, use_append_string ? append_string : '')
-  } else {
-    // imageFormat = e.target.value
-    // window.api.setConfig('defaultFormat', imageFormat)
-    if (files.accepted.length) {
-      convertedFiles = []
-      convertFiles(files.accepted, imageFormat, out_directory, use_append_string ? append_string : '')
-    }
+
+
+export async function handleFiles(_, ...args) {
+  let count = 0
+  const options = myStore.get('formatOptions').find((o) => o.format === args[1]).options
+  
+  // return args[0].map((file) => {
+    //   return convert(file, args[1], args[2], args[3] ? args[3] : '', options)
+    // })
+    
+  const convertedFiles = []
+  for (let i = 0; i < args[0].length; i++) {
+    const converted = await convert(args[0][i], args[1], args[2], args[3] ? args[3] : '', options)
+    count += 1
+    // updateProgress(count)
+    convertedFiles.push(converted)
+    console.log(converted.filename, count)
   }
+  console.log('finished')
+  return convertedFiles
 }
 
-async function convertFiles(files, format, out_directory, append_string) {
-  for (let i = 0; i < files.length; i++) {
-    // eslint-disable-next-line no-undef
-    const options = format_options.find((o) => o.format === format).options
-    // eslint-disable-next-line no-undef
-    const f = await convert(files[i], imageFormat, out_directory, append_string, options) // convert is defined in src/preload/index.js
-    convertedFiles = [...convertedFiles, f]
-  }
-}
-
-export const convert = async (buffer, filename, format, out_directory, append_string, options) => {
-  console.log('CONVERT')
-  console.log(filename)
-  // let buffer = Buffer.from(await file.arrayBuffer())
-  let filepath
-  filename = filename.replace(re, append_string) + '.' + format
+export async function convert(file, format, out_directory, append_string, options) {
   if (!out_directory) {
     out_directory = process.argv.slice(-1)[0]
   }
   fs.mkdir(out_directory, { recursive: true }, (err) => {
     if (err) throw err
   })
-  // filepath = path.join(out_directory, filename)
-  filepath = checkFileExistenceAndIncrementFilename(path.join(out_directory, filename))
 
-  return sharp(buffer)
-    .toFormat(format, options)
-    .toBuffer()
-    .then((data) => {
-      fs.writeFileSync(filepath, data, 'base64')
-      filename = path.basename(filepath)
-      return { filename, filepath, imageFormat: format }
-    })
-    .catch((err) => {
-      console.log(`error: ${err}`)
-    })
+  let filename = path.basename(file).replace(re, append_string) + '.' + format
+  let filepath = checkFileExistenceAndIncrementFilename(path.join(out_directory, filename))
+
+  try {
+    const data = await sharp(file)
+      .toFormat(format, options)
+      .toBuffer()
+    fs.writeFileSync(filepath, data, 'base64')
+    filename = path.basename(filepath)
+    return { filename, filepath, imageFormat: format }
+  } catch (err_1) {
+    console.log(`error: ${err_1}`)
+  }
 }

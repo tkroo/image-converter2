@@ -9,9 +9,8 @@ const api = {
   setConfig: (key, value) => ipcRenderer.invoke('dialog:setConfig', key, value),
   resetConfig: () => ipcRenderer.invoke('dialog:resetConfig'),
   editConfig: () => ipcRenderer.invoke('dialog:editConfig'),
-  handleFiles: (event) => ipcRenderer.invoke('dialog:handleFiles', event),
-  convert: (buffer, filename, format, out_directory, append_string, options) =>
-    ipcRenderer.invoke('dialog:convert', buffer, filename, format, out_directory, append_string, options)
+  handleFiles: (_,...args) => ipcRenderer.invoke('dialog:handleFiles', _, ...args),
+  // updateProgress: (cb) => { ipcRenderer.on('update-progress', (event, count) => cb(count))}
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -25,6 +24,6 @@ if (process.contextIsolated) {
     console.log(`error: ${err}`)
   }
 } else {
-  //   window.electron = electronAPI
-  //   // window.api = api
+  window.electron = electronAPI
+  window.api = api
 }

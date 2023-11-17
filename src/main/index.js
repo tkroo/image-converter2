@@ -11,7 +11,7 @@ import {
   setConfig,
   editConfig,
   initConfig,
-  resetFormatOptions
+  resetFormatOptions,
 } from './helpers'
 
 import { handleFiles } from './convert'
@@ -31,6 +31,7 @@ function createWindow() {
       webSecurity: is.dev ? false : true,
       nodeIntegration: true,
       contextIsolation: true,
+      // sandbox: true,
       preload: join(__dirname, '../preload/index.js'),
       additionalArguments: [fallbackPath]
     }
@@ -75,6 +76,9 @@ app.whenReady().then(() => {
   ipcMain.handle('dialog:resetConfig', resetConfig)
   ipcMain.handle('dialog:editConfig', editConfig)
   ipcMain.handle('dialog:handleFiles', handleFiles)
+  // ipcMain.on('update-progress', (event, count) => {
+  //   mainWindow.webContents.send('update-progress', count)
+  // })
 
   initConfig()
   createWindow()
