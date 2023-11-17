@@ -6,6 +6,8 @@ const store = new Store({ schema })
 
 export const extraPath = 'foo'
 
+export const myStore = store
+
 export async function selectOutDir() {
   const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
     properties: ['openDirectory']

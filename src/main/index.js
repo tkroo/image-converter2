@@ -11,8 +11,10 @@ import {
   setConfig,
   editConfig,
   initConfig,
-  resetFormatOptions
+  resetFormatOptions,
 } from './helpers'
+
+import { handleFile } from './convert'
 
 let mainWindow
 
@@ -29,6 +31,7 @@ function createWindow() {
       webSecurity: is.dev ? false : true,
       nodeIntegration: true,
       contextIsolation: true,
+      // sandbox: true,
       preload: join(__dirname, '../preload/index.js'),
       additionalArguments: [fallbackPath]
     }
@@ -72,6 +75,7 @@ app.whenReady().then(() => {
   ipcMain.handle('dialog:setConfig', setConfig)
   ipcMain.handle('dialog:resetConfig', resetConfig)
   ipcMain.handle('dialog:editConfig', editConfig)
+  ipcMain.handle('dialog:handleFile', handleFile)
 
   initConfig()
   createWindow()
