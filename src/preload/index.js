@@ -9,8 +9,7 @@ const api = {
   setConfig: (key, value) => ipcRenderer.invoke('dialog:setConfig', key, value),
   resetConfig: () => ipcRenderer.invoke('dialog:resetConfig'),
   editConfig: () => ipcRenderer.invoke('dialog:editConfig'),
-  handleFiles: (_,...args) => ipcRenderer.invoke('dialog:handleFiles', _, ...args),
-  // updateProgress: (cb) => { ipcRenderer.on('update-progress', (event, count) => cb(count))}
+  handleFile: (_,...args) => ipcRenderer.invoke('dialog:handleFile', _, ...args),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

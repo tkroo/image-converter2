@@ -1,8 +1,6 @@
-// import { contextBridge, ipcRenderer } from 'electron'
-// import { electronAPI } from '@electron-toolkit/preload'
 import fs from 'node:fs'
-import sharp from 'sharp'
 import path from 'path'
+import sharp from 'sharp'
 import { myStore } from '../helpers'
 
 const re = /\.[^.]*$/gm
@@ -20,38 +18,7 @@ function checkFileExistenceAndIncrementFilename(filepath) {
   return filepath
 }
 
-// contextBridge.exposeInMainWorld('updateProgress', updateProgress)
-
-export function updateProgress(c) {
-  console.log('updateProgress: ', c)
-  // electronAPI.ipcRenderer.send('update-progress', c)
-  // const foo = ipcRenderer.invoke('update-progress', c)
-  return c
-}
-
-
-
-export async function handleFiles(_, ...args) {
-  let count = 0
-  const options = myStore.get('formatOptions').find((o) => o.format === args[1]).options
-  
-  // return args[0].map((file) => {
-    //   return convert(file, args[1], args[2], args[3] ? args[3] : '', options)
-    // })
-    
-  const convertedFiles = []
-  for (let i = 0; i < args[0].length; i++) {
-    const converted = await convert(args[0][i], args[1], args[2], args[3] ? args[3] : '', options)
-    count += 1
-    // updateProgress(count)
-    convertedFiles.push(converted)
-    console.log(converted.filename, count)
-  }
-  console.log('finished')
-  return convertedFiles
-}
-
-export async function convert(file, format, out_directory, append_string, options) {
+async function convert(file, format, out_directory, append_string, options) {
   if (!out_directory) {
     out_directory = process.argv.slice(-1)[0]
   }
@@ -72,4 +39,20 @@ export async function convert(file, format, out_directory, append_string, option
   } catch (err_1) {
     console.log(`error: ${err_1}`)
   }
+}
+
+// export async function handleFiles(_, ...args) {
+//   const fileList = args[0]
+//   const options = myStore.get('formatOptions').find((o) => o.format === args[1]).options
+//   const convertedFiles = []
+//   for (let i = 0; i < fileList.length; i++) {
+//     const data = await convert(fileList[i], args[1], args[2], args[3] ? args[3] : '', options)
+//     convertedFiles.push(data)
+//   }
+//   return convertedFiles
+// }
+
+export async function handleFile(_, ...args) {
+  const options = myStore.get('formatOptions').find((o) => o.format === args[1]).options
+  return await convert(args[0], args[1], args[2], args[3] ? args[3] : '', options)
 }

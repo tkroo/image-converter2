@@ -2,14 +2,6 @@
   import { onMount } from 'svelte'
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import Gears from './components/GearsSVG.svelte'
-  // import Modal from './components/Modal.svelte'
-  // let showModal = false
-
-  let count = 0
-  // $: count = window.electron.ipcRenderer.on('update-progress', (_, args) => {
-  //   console.log(args)
-  //   return args
-  // })
 
   let open_toggle = false
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
@@ -23,11 +15,6 @@
   let append_string = '_converted'
   let format_options = []
   let use_append_string
-
-  // let count = 0
-  // $: count = window.api.updateProgress()
-  // $: count = (async () => await window.api.updateProgress())()
-  
 
   onMount(async () => {
     let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.api.getConfig()
@@ -85,14 +72,11 @@
       }
     }
     const myfiles = af.map((f) => f.path)
-    const foo = await window.api.handleFiles(
-      myfiles,
-      imageFormat,
-      out_directory,
-      use_append_string ? append_string : ''
-    )
-    convertedFiles = [...convertedFiles, ...foo]
-    console.log('convertedFiles: ', convertedFiles)
+    for (let i = 0; i < myfiles.length; i++) {
+      const file = myfiles[i]
+      const foo = await window.api.handleFile(file, imageFormat, out_directory, use_append_string ? append_string : '')
+      convertedFiles = [...convertedFiles, foo]
+    }
   }
 
   async function selectPath() {
@@ -116,8 +100,6 @@
 <div class="container">
   <header>
     <h1 class="uppercase">image format converter</h1>
-    <!-- <p>count: {count}</p> -->
-    <!-- <button class="btn btn-small ml-1" on:click={() => (showModal = true)}> settings </button> -->
   </header>
 
   <button class="unbutton color-accent" on:click|preventDefault={toggle}>
@@ -200,7 +182,7 @@
         </small>
       </div>
     </section>
-    <button type="button" class="btn open-config" on:click={handleConvert}>convert again</button>
+    <button type="button" class="btn open-config" on:click={handleConvert} disabled={files.accepted.length === 0}>convert again</button>
     <button type="button" class="btn open-config" on:click={editPrefs}>open settings file</button>
   </details>
   <!-- </Modal> -->

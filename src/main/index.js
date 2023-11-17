@@ -14,7 +14,7 @@ import {
   resetFormatOptions,
 } from './helpers'
 
-import { handleFiles } from './convert'
+import { handleFile } from './convert'
 
 let mainWindow
 
@@ -75,10 +75,7 @@ app.whenReady().then(() => {
   ipcMain.handle('dialog:setConfig', setConfig)
   ipcMain.handle('dialog:resetConfig', resetConfig)
   ipcMain.handle('dialog:editConfig', editConfig)
-  ipcMain.handle('dialog:handleFiles', handleFiles)
-  // ipcMain.on('update-progress', (event, count) => {
-  //   mainWindow.webContents.send('update-progress', count)
-  // })
+  ipcMain.handle('dialog:handleFile', handleFile)
 
   initConfig()
   createWindow()
