@@ -10,7 +10,7 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
 asarUnpack:
   - resources/**
-  - node_modules/sharp/**
+  - node_modules/sharp
 win:
   executableName: imageconverter2
 nsis:
