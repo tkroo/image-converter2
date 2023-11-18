@@ -53,15 +53,19 @@ body {
     @media (prefers-color-scheme: dark) {
       --color-bg: #333;
       --color-fg: white;
-      --color-accent: hsl(138, 53%, 80%);
+      --color-accent: hsl(138, 60%, 80%);
       --color-accent2: #222;
+      --color-btn-bg: hsl(138, 40%, 90%);
+      --color-btn-bg-hover: hsl(138, 40%, 70%);
     }
     
     @media (prefers-color-scheme: light) {
       --color-bg: white;
       --color-fg: #333;
-      --color-accent: hsl(138, 45%, 33%);
+      --color-accent: hsl(138, 60%, 33%);
       --color-accent2: #eee;
+      --color-btn-bg: hsl(138, 40%, 33%);
+      --color-btn-bg-hover: hsl(138, 40%, 23%);
     }
     background: var(--color-bg); color: var(--color-fg);
 }

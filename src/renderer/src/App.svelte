@@ -306,6 +306,12 @@
   .btn:hover {
     background-color: #ddd;
   }
+  .btn:disabled {
+    cursor: auto;
+  }
+  .btn:disabled:hover {
+    background-color: #eee;
+  }
   .btn-small {
     font-size: 0.8em;
     padding: 0.125rem 0.25rem;
