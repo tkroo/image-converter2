@@ -35,9 +35,10 @@ async function convert(file, format, out_directory, append_string, options) {
       .toBuffer()
     fs.writeFileSync(filepath, data, 'base64')
     filename = path.basename(filepath)
-    return { filename, filepath, imageFormat: format }
+    return { filename, filepath, imageFormat: format, status: 'success' }
   } catch (err_1) {
-    console.log(`error: ${err_1}`)
+    console.log(`error: ${err_1} - ${path.basename(filepath)}`)
+    return { filename: path.basename(filepath), filepath:'./assets/error-icon-25239.png', imageFormat: 'png', status: 'error' }
   }
 }
 

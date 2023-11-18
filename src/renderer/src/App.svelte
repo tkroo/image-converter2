@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import Gears from './components/GearsSVG.svelte'
+  import errorIcon from './assets/error-icon-25239.png'
 
   let open_toggle = false
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
@@ -15,6 +16,10 @@
   let append_string = '_converted'
   let format_options = []
   let use_append_string
+  let isProcessing = false
+
+  $: filesOk = convertedFiles.filter((f) => f.status != 'error')
+  $: filesError = convertedFiles.filter((f) => f.status == 'error')
 
   onMount(async () => {
     let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.api.getConfig()
@@ -56,6 +61,7 @@
   }
 
   async function handleConvert(event) {
+    isProcessing = true
     let af
     if (event.detail.acceptedFiles) {
       files.accepted = []
@@ -72,11 +78,22 @@
       }
     }
     const myfiles = af.map((f) => f.path)
-    for (let i = 0; i < myfiles.length; i++) {
-      const file = myfiles[i]
-      const foo = await window.api.handleFile(file, imageFormat, out_directory, use_append_string ? append_string : '')
-      convertedFiles = [...convertedFiles, foo]
-    }
+    // for (let i = 0; i < myfiles.length; i++) {
+    //   const file = myfiles[i]
+    //   const foo = await window.api.handleFile(file, imageFormat, out_directory, use_append_string ? append_string : '')
+    //   convertedFiles = [...convertedFiles, foo]
+    // }
+    const foo = await Promise.all(myfiles.map(async(f) => {
+      const tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
+      // convertedFiles.push(tmp)
+      console.log(tmp.filename)
+      convertedFiles = [...convertedFiles, tmp]
+      return tmp
+    }))
+    // convertedFiles = [...convertedFiles, ...foo]
+    console.log('finished converting files')
+    isProcessing = false
+    convertedFiles = convertedFiles
   }
 
   async function selectPath() {
@@ -204,6 +221,11 @@
             convert{convertedFiles.length < files.accepted.length
               ? `ing ${convertedFiles.length} of ${files.accepted.length}`
               : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} to {convertedFiles[0].imageFormat}
+              {#if filesError.length}
+              <br />
+              <span class="ok">ok: {filesOk.length}</span> ,
+              <span class="error">errors: {filesError.length}</span>
+              {/if}
           </h2>
           <br />
           <span>Click to download or drag and drop to a file manager window</span>
@@ -224,6 +246,7 @@
       <ul class="results-list">
         {#each convertedFiles as file}
           <li>
+            {#if file.status === 'success'}
             <a
               download="file://{file.filepath}"
               href="file://{file.filepath}"
@@ -233,6 +256,10 @@
               <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
               <span>{file.filename}</span>
             </a>
+            {:else}
+              <img class="error" src={errorIcon} alt="error icon">
+              <span>could not convert file:<br />{file.filename}</span>
+            {/if}
           </li>
         {/each}
       </ul>
@@ -358,6 +385,10 @@
   .results-wrap img {
     background: repeating-conic-gradient(#666 0 90deg, #999 0 180deg) 0 0/20px 20px round;
   }
+  .results-wrap img.error {
+    background: hsla(0, 100%, 50%, 0.5);
+    padding: 2rem;
+  }
   .results-list {
     padding: 1rem 0;
     list-style: none;
@@ -430,5 +461,11 @@
   }
   a:hover {
     text-decoration: underline !important;
+  }
+  .ok {
+    color: green;
+  }
+  .error {
+    color: red;
   }
 </style>
