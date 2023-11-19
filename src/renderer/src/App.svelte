@@ -267,7 +267,7 @@
                 target="_blank"
               >
                 <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
-                <span>{file.filename}</span>
+                <span class="filename">{file.filename}</span>
               </a>
               <!-- {:else}
                 <img class="error" src={errorIcon} alt="error icon">
@@ -414,6 +414,9 @@
   .results-list li {
     max-width: 180px;
   }
+  .results-list .filename {
+    overflow-wrap: anywhere;
+  }
   .format-options ul {
     list-style: none;
     padding: 0;
@@ -485,6 +488,7 @@
   }
   .error-list {
     margin-top: 0.5rem;
+    margin-bottom: 0.4rem;
   }
   .error-list ol {
     padding-left: 2rem;
