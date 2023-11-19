@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import Gears from './components/GearsSVG.svelte'
-  import errorIcon from './assets/error-icon-25239.png'
+  // import errorIcon from './assets/warning-svgrepo-com.svg'
 
   let open_toggle = false
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
@@ -218,13 +218,26 @@
       <div class="row">
         <div>
           <h2>
-            convert{convertedFiles.length < files.accepted.length
+            process{convertedFiles.length < files.accepted.length
               ? `ing ${convertedFiles.length} of ${files.accepted.length}`
-              : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} to {convertedFiles[0].imageFormat}
+              : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''}
               {#if filesError.length}
-              <br />
-              <span class="ok">ok: {filesOk.length}</span> ,
-              <span class="error">errors: {filesError.length}</span>
+              {#if !isProcessing}<br />converted {filesOk.length} file{filesOk.length > 1 ? 's' : ''} successfully{/if}
+              
+              <details class="error-list">
+                <summary>
+                  <span class="error">
+                    {filesError.length} error{filesError.length > 1 ? 's' : ''}:
+                  </span>
+                </summary>
+                <ol>
+                  {#each filesError as file}
+                    <li>file: {file.filename}<br />
+                      <small>{file.error}</small>
+                    </li>
+                  {/each}
+                </ol>
+              </details>
               {/if}
           </h2>
           <br />
@@ -245,22 +258,22 @@
       </div>
       <ul class="results-list">
         {#each convertedFiles as file}
-          <li>
-            {#if file.status === 'success'}
-            <a
-              download="file://{file.filepath}"
-              href="file://{file.filepath}"
-              title="click to download, or drag and drop"
-              target="_blank"
-            >
-              <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
-              <span>{file.filename}</span>
-            </a>
-            {:else}
-              <img class="error" src={errorIcon} alt="error icon">
-              <span>could not convert file:<br />{file.filename}</span>
-            {/if}
-          </li>
+          {#if file.status === 'success'}
+            <li>
+              <a
+                download="file://{file.filepath}"
+                href="file://{file.filepath}"
+                title="click to download, or drag and drop"
+                target="_blank"
+              >
+                <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
+                <span>{file.filename}</span>
+              </a>
+              <!-- {:else}
+                <img class="error" src={errorIcon} alt="error icon">
+                <span>could not convert file:<br />{file.filename}</span> -->
+            </li>
+          {/if}
         {/each}
       </ul>
     {:else if files.accepted.length}
@@ -386,8 +399,10 @@
     background: repeating-conic-gradient(#666 0 90deg, #999 0 180deg) 0 0/20px 20px round;
   }
   .results-wrap img.error {
-    background: hsla(0, 100%, 50%, 0.5);
-    padding: 2rem;
+    /* background: hsla(0, 100%, 50%, 0.5); */
+    background: var(--color-accent2);
+    border-radius: 0.25rem;
+    padding: 1rem;
   }
   .results-list {
     padding: 1rem 0;
@@ -466,6 +481,20 @@
     color: green;
   }
   .error {
-    color: red;
+    color: hsl(0, 80%, 60%);
+  }
+  .error-list {
+    margin-top: 0.5rem;
+  }
+  .error-list ol {
+    padding-left: 2rem;
+  }
+  .error-list li {
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+  }
+  .error-list small {
+    font-weight: 300;
+    font-size: 0.9em;
   }
 </style>
