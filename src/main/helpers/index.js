@@ -15,25 +15,25 @@ export async function selectOutDir() {
   if (!canceled) {
     store.set('outputDirectory', filePaths[0])
     return filePaths[0]
-  } else {
-    return getDefaultOutDir()
   }
+  return getDefaultOutDir()
 }
 
-export async function getDefaultOutDir() {
+function getDefaultOutDir() {
   try {
-    const out = store.get('outputDirectory')
+    const out = store.get('outputDirectory');
     if (out) {
       return out
-    } else {
-      const tmp = join(app.getPath('desktop'), extraPath)
-      store.set('outputDirectory', tmp)
-      return tmp
     }
+    const tmp = join(app.getPath('desktop'), extraPath);
+    store.set('outputDirectory', tmp)
+    return tmp
   } catch (err) {
     console.log(`error: ${err}`)
   }
 }
+
+
 
 export async function openDirectory(event, path) {
   shell.openPath(path)
@@ -48,7 +48,7 @@ export async function setConfig(event, key, value) {
 }
 
 export async function initConfig() {
-  await getDefaultOutDir()
+  getDefaultOutDir()
   let tempObj = store.store
   store.store = tempObj
 }
