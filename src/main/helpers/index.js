@@ -5,6 +5,7 @@ import schema from '../schema'
 const store = new Store({ schema })
 
 export const extraPath = 'foo'
+export const fallbackPath = join(app.getPath('temp'), extraPath)
 
 export const myStore = store
 

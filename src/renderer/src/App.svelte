@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte'
+  import { fade } from 'svelte/transition'
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import Gears from './components/GearsSVG.svelte'
   // import errorIcon from './assets/warning-svgrepo-com.svg'
@@ -85,8 +86,6 @@
     // }
     const foo = await Promise.all(myfiles.map(async(f) => {
       const tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
-      // convertedFiles.push(tmp)
-      console.log(tmp.filename)
       convertedFiles = [...convertedFiles, tmp]
       return tmp
     }))
@@ -120,7 +119,7 @@
   </header>
 
   <button class="unbutton color-accent" on:click|preventDefault={toggle}>
-    image.xxx will be saved to <strong>{out_directory}</strong> as image{#if use_append_string}<em>{append_string}</em
+    image.*** will be saved to <strong>{out_directory}</strong> as image{#if use_append_string}<em>{append_string}</em
       >{/if}.<em>{imageFormat}</em>
   </button>
 
@@ -216,9 +215,8 @@
   <section class="results-wrap">
     {#if convertedFiles.length}
       <div class="row">
-        <div>
-          <h2>
-            process{convertedFiles.length < files.accepted.length
+        <div class="fgrow">
+          <h2>process{isProcessing
               ? `ing ${convertedFiles.length} of ${files.accepted.length}`
               : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''}
               {#if filesError.length}
@@ -243,8 +241,10 @@
           <br />
           <span>Click to download or drag and drop to a file manager window</span>
         </div>
-        {#if convertedFiles.length < files.accepted.length}
+        {#if isProcessing}
+        <span class="geartest" transition:fade>
           <Gears />
+        </span>  
         {/if}
         <button
           type="button"
@@ -260,24 +260,16 @@
         {#each convertedFiles as file}
           {#if file.status === 'success'}
             <li>
-              <a
-                download="file://{file.filepath}"
-                href="file://{file.filepath}"
-                title="click to download, or drag and drop"
-                target="_blank"
-              >
+              <a download="file://{file.filepath}" href="file://{file.filepath}" title="click to download, or drag and drop" target="_blank">
                 <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
                 <span class="filename">{file.filename}</span>
               </a>
-              <!-- {:else}
-                <img class="error" src={errorIcon} alt="error icon">
-                <span>could not convert file:<br />{file.filename}</span> -->
             </li>
           {/if}
         {/each}
       </ul>
-    {:else if files.accepted.length}
-      <p><Gears />working on it...</p>
+    {:else if isProcessing}
+      <p>working on it...</p>
     {/if}
   </section>
 </div>
@@ -392,18 +384,21 @@
     display: flex;
     align-items: flex-end;
     width: 100%;
+    gap: 2rem;
     /* background-color: aqua; */
     justify-content: space-between;
+  }
+  .fgrow {
+    flex-grow: 2;
   }
   .results-wrap img {
     background: repeating-conic-gradient(#666 0 90deg, #999 0 180deg) 0 0/20px 20px round;
   }
-  .results-wrap img.error {
-    /* background: hsla(0, 100%, 50%, 0.5); */
+  /* .results-wrap img.error {
     background: var(--color-accent2);
     border-radius: 0.25rem;
     padding: 1rem;
-  }
+  } */
   .results-list {
     padding: 1rem 0;
     list-style: none;
@@ -480,9 +475,9 @@
   a:hover {
     text-decoration: underline !important;
   }
-  .ok {
+  /* .ok {
     color: green;
-  }
+  } */
   .error {
     color: hsl(0, 80%, 60%);
   }
@@ -500,5 +495,8 @@
   .error-list small {
     font-weight: 300;
     font-size: 0.9em;
+  }
+  .geartest {
+    width: 4rem;
   }
 </style>

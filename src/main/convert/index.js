@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'path'
 import sharp from 'sharp'
-import { myStore } from '../helpers'
+import { myStore, fallbackPath } from '../helpers'
 
 const re = /\.[^.]*$/gm
 
@@ -19,9 +19,7 @@ function checkFileExistenceAndIncrementFilename(filepath) {
 }
 
 async function convert(file, format, out_directory, append_string, options) {
-  if (!out_directory) {
-    out_directory = process.argv.slice(-1)[0]
-  }
+  out_directory = out_directory ?? fallbackPath
   fs.mkdir(out_directory, { recursive: true }, (err) => {
     if (err) throw err
   })
@@ -30,11 +28,10 @@ async function convert(file, format, out_directory, append_string, options) {
   let filepath = checkFileExistenceAndIncrementFilename(path.join(out_directory, filename))
 
   try {
-    const data = await sharp(file)
-      .toFormat(format, options)
-      .toBuffer()
-    fs.writeFileSync(filepath, data, 'base64')
-    filename = path.basename(filepath)
+    await sharp(file).toFormat(format, options).toFile(filepath)
+    // const data = await sharp(file).toFormat(format, options).toBuffer()
+    // fs.writeFileSync(filepath, data, 'base64')
+    // filename = path.basename(filepath)
     return { filename, filepath, imageFormat: format, status: 'success' }
   } catch (err) {
     console.log(`error: ${err} - ${path.basename(filepath)}`)

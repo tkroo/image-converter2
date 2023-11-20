@@ -20,7 +20,6 @@ let mainWindow
 
 function createWindow() {
   // Create the browser window.
-  const fallbackPath = join(app.getPath('temp'), extraPath)
   mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -33,7 +32,7 @@ function createWindow() {
       contextIsolation: true,
       sandbox: true,
       preload: join(__dirname, '../preload/index.js'),
-      additionalArguments: [fallbackPath]
+      additionalArguments: []
     }
   })
 
