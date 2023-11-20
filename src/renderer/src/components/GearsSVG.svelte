@@ -20,7 +20,7 @@
 
 <style>
   #gears {
-    max-width: 48px;
+    max-width: 32px;
     height: auto;
     --speed: 3s;
   }
