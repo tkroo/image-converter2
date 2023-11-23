@@ -15,12 +15,13 @@
     accepted: [],
     rejected: []
   }
+  let mydragoverClass = ''
   let out_directory
   let append_string = '_converted'
   let format_options = []
   let use_append_string
   let isProcessing = false
-  let panelOpen = true
+  let panelOpen = false
 
   $: filesOk = convertedFiles.filter((f) => f.status != 'error')
   $: filesError = convertedFiles.filter((f) => f.status == 'error')
@@ -65,6 +66,7 @@
   }
 
   async function handleConvert(event) {
+    mydragoverClass = ''
     isProcessing = true
     let af
     if (event.detail.acceptedFiles) {
@@ -120,12 +122,17 @@
       console.log('open')
     }
   }
-
 </script>
 
 <div class="container" class:panelOpen={panelOpen}>
   {#if panelOpen}
-  <button in:fade={{ delay: 100, duration: 300 }} out:fade={{ delay: 250, duration: 300 }} type="button" class="unbutton close-overlay" on:click={() => (panelOpen = false)} on:mousewheel={(e) => (e.preventDefault(), e.stopPropagation(), console.log('mousewheel'))}></button>
+  <button
+    class="unbutton close-overlay"
+    in:fade={{ delay: 100, duration: 300 }}
+    out:fade={{ delay: 250, duration: 300 }}
+    on:click={() => (panelOpen = false)}
+    on:mousewheel={(e) => (e.preventDefault(), e.stopPropagation())}
+  ></button>
   {/if}
   <!-- <button type="button" class=" unbutton open-panel" on:click={(e) => (e.preventDefault(),panelOpen = true)} title="open settings">
     <img class="icon" src={openIcon} alt="settings" />
@@ -217,10 +224,11 @@
     <p class="pb-3">image.*** will be saved to <strong>{out_directory}</strong> as image{#if use_append_string}<em>{append_string}</em>{/if}.<em>{imageFormat}</em></p>
     <Dropzone
       on:drop={handleConvert}
-      containerStyles={'padding: 4rem;border-color: #aaaaaa; cursor: pointer;'}
-      name="image"
-      accept="image/*"
-      tabindex="1"
+      accept={["image/*"]}
+      containerStyles="transition: background-color 200ms ease-in-out;"
+      containerClasses={mydragoverClass}
+      on:dragover={() => (mydragoverClass = 'custom-dropzone')}
+      on:dragleave={() => (mydragoverClass = '')}
     >
       <p class="message">Drop files here, or click to select files</p>
     </Dropzone>
@@ -333,6 +341,7 @@
   }
   
   .close-overlay {
+    cursor: pointer !important;
     display: block;
     overflow: hidden;
     position: fixed;
@@ -506,6 +515,7 @@
     font-size: 1.2rem;
     font-weight: bold;
     margin: 0;
+    padding: 3rem;
     user-select: none;
   }
   /* .pt-1 {
@@ -555,5 +565,10 @@
   }
   .geartest {
     width: 4rem;
+  }
+  :global(.custom-dropzone) {
+    border: 2px dashed #999 !important;
+    border-radius: 2px;
+    background-color: var(--color-drop) !important;
   }
 </style>
