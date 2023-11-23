@@ -3,6 +3,8 @@
   import { fade } from 'svelte/transition'
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import Gears from './components/GearsSVG.svelte'
+  import SettingsIcon from './components/SettingsIcon.svelte'
+  // import closeIcon from './assets/close-square-filled-svgrepo-com.svg'
   // import errorIcon from './assets/warning-svgrepo-com.svg'
 
   let open_toggle = false
@@ -18,6 +20,7 @@
   let format_options = []
   let use_append_string
   let isProcessing = false
+  let panelOpen = true
 
   $: filesOk = convertedFiles.filter((f) => f.status != 'error')
   $: filesError = convertedFiles.filter((f) => f.status == 'error')
@@ -108,25 +111,32 @@
     await window.api.editConfig()
   }
 
+  
+  
+
   function toggle() {
-    open_toggle = !open_toggle
+    panelOpen = !panelOpen
+    if (panelOpen) {
+      console.log('open')
+    }
   }
+
 </script>
 
-<div class="container">
-  <header>
-    <h1 class="uppercase">image format converter</h1>
-  </header>
+<div class="container" class:panelOpen={panelOpen}>
+  {#if panelOpen}
+  <button in:fade={{ delay: 100, duration: 300 }} out:fade={{ delay: 250, duration: 300 }} type="button" class="unbutton close-overlay" on:click={() => (panelOpen = false)} on:mousewheel={(e) => (e.preventDefault(), e.stopPropagation(), console.log('mousewheel'))}></button>
+  {/if}
+  <!-- <button type="button" class=" unbutton open-panel" on:click={(e) => (e.preventDefault(),panelOpen = true)} title="open settings">
+    <img class="icon" src={openIcon} alt="settings" />
+  </button> -->
 
-  <button class="unbutton color-accent" on:click|preventDefault={toggle}>
-    image.*** will be saved to <strong>{out_directory}</strong> as image{#if use_append_string}<em>{append_string}</em
-      >{/if}.<em>{imageFormat}</em>
-  </button>
-
-  <details class="config" bind:open={open_toggle}>
-    <summary class="summary-handle">
-      <h2>settings</h2>
-    </summary>
+  <aside>
+    <h2>settings
+      <button type="button" class="unbutton toggle-btn" on:click={toggle} title={panelOpen ? "close settings" : "open settings"}>
+        <SettingsIcon />
+      </button>
+    </h2>
     <section class="options">
       <fieldset>
         <legend>&nbsp;convert to&nbsp;</legend>
@@ -200,128 +210,173 @@
     </section>
     <button type="button" class="btn open-config" on:click={handleConvert} disabled={files.accepted.length === 0}>convert again</button>
     <button type="button" class="btn open-config" on:click={editPrefs}>open settings file</button>
-  </details>
-  <!-- </Modal> -->
+  </aside>
 
-  <Dropzone
-    on:drop={handleConvert}
-    containerStyles={'padding: 4rem;border-color: #aaaaaa; cursor: pointer;'}
-    name="image"
-    accept="image/*"
-  >
-    <p class="message">Drop files here, or click to select files</p>
-  </Dropzone>
-
-  <section class="results-wrap">
-    {#if convertedFiles.length}
-      <div class="row">
-        <div class="fgrow">
-          <h2>process{isProcessing
-              ? `ing ${convertedFiles.length} of ${files.accepted.length}`
-              : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''}
-              {#if filesError.length}
-              {#if !isProcessing}<br />converted {filesOk.length} file{filesOk.length > 1 ? 's' : ''} successfully{/if}
-              
-              <details class="error-list">
-                <summary>
-                  <span class="error">
-                    {filesError.length} error{filesError.length > 1 ? 's' : ''}:
-                  </span>
-                </summary>
-                <ol>
-                  {#each filesError as file}
-                    <li>file: {file.filename}<br />
-                      <small>{file.error}</small>
-                    </li>
-                  {/each}
-                </ol>
-              </details>
-              {/if}
-          </h2>
-          <br />
-          <span>Click to download or drag and drop to a file manager window</span>
-        </div>
-        {#if isProcessing}
-        <span class="geartest" transition:fade>
-          <Gears />
-        </span>  
-        {/if}
-        <button
-          type="button"
-          class="btn"
-          on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}
-        >
-          open output directory
-        </button>
-
-        <button type="button" class="btn" on:click|preventDefault={clearFiles}> clear results list </button>
-      </div>
-      <ul class="results-list">
-        {#each convertedFiles as file}
-          {#if file.status === 'success'}
-            <li>
-              <a download="file://{file.filepath}" href="file://{file.filepath}" title="click to download, or drag and drop" target="_blank">
-                <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
-                <span class="filename">{file.filename}</span>
-              </a>
-            </li>
+  <main>
+    <h1 class="uppercase">image format converter</h1>
+    <p class="pb-3">image.*** will be saved to <strong>{out_directory}</strong> as image{#if use_append_string}<em>{append_string}</em>{/if}.<em>{imageFormat}</em></p>
+    <Dropzone
+      on:drop={handleConvert}
+      containerStyles={'padding: 4rem;border-color: #aaaaaa; cursor: pointer;'}
+      name="image"
+      accept="image/*"
+      tabindex="1"
+    >
+      <p class="message">Drop files here, or click to select files</p>
+    </Dropzone>
+  
+    <section class="results-wrap">
+      {#if convertedFiles.length}
+        <div class="row">
+          <div class="fgrow">
+            <h2>process{isProcessing
+                ? `ing ${convertedFiles.length} of ${files.accepted.length}`
+                : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''}
+                {#if filesError.length}
+                {#if !isProcessing}<br />converted {filesOk.length} file{filesOk.length > 1 ? 's' : ''} successfully{/if}
+                
+                <details class="error-list">
+                  <summary>
+                    <span class="error">
+                      {filesError.length} error{filesError.length > 1 ? 's' : ''}:
+                    </span>
+                  </summary>
+                  <ol>
+                    {#each filesError as file}
+                      <li>file: {file.filename}<br />
+                        <small>{file.error}</small>
+                      </li>
+                    {/each}
+                  </ol>
+                </details>
+                {/if}
+            </h2>
+            <br />
+            <span>Click to download or drag and drop to a file manager window</span>
+          </div>
+          {#if isProcessing}
+          <span class="geartest" transition:fade>
+            <Gears />
+          </span>  
           {/if}
-        {/each}
-      </ul>
-    {:else if isProcessing}
-      <p>working on it...</p>
-    {/if}
-  </section>
+          <button
+            type="button"
+            class="btn"
+            on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}
+          >
+            open output directory
+          </button>
+  
+          <button type="button" class="btn" on:click|preventDefault={clearFiles}> clear results list </button>
+        </div>
+        <ul class="results-list">
+          {#each convertedFiles as file}
+            {#if file.status === 'success'}
+              <li>
+                <a download="file://{file.filepath}" href="file://{file.filepath}" title="click to download, or drag and drop" target="_blank">
+                  <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
+                  <span class="filename">{file.filename}</span>
+                </a>
+              </li>
+            {/if}
+          {/each}
+        </ul>
+      {:else if isProcessing}
+        <p>working on it...</p>
+      {/if}
+    </section>
+  </main>
+  
 </div>
 
+
 <style>
+  :root {
+    --o: 38%;
+    --c: calc(var(--o)*-1);
+  }
+
   .container {
-    font-size: 0.8em;
-    padding: 1rem 2rem 0 2rem;
+    min-height: 100%;
     height: 100%;
-    /* display: flex;
-    flex-direction: column; */
+    padding-right: 2rem;
   }
-  header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
+
+  main {
+    font-size: 0.8em;
+    padding: 1rem 0rem 0 4rem;
+    height: 100%;
   }
+
+  aside {
+    font-size: 0.8em;
+    position: fixed;
+    width: calc(var(--o) + 2rem);
+    height: 100%;
+    top: 0;
+    padding: 1rem 2rem 1rem 1rem;
+    background-color: var(--color-bg);
+    overflow: auto;
+    left: var(--c);
+    transition: left 400ms ease-out, background-color 300ms ease-in-out;
+    border-right: 1px solid var(--color-accent2);
+  }
+
+  .panelOpen aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    box-shadow: rgba(0, 0, 0, 0.75) 0px 5px 15px;
+    background-color: var(--color-settings-bg);
+    border-right: 1px solid var(--color-settings-bg);
+    transition: left 300ms ease-in-out, background-color 300ms ease-in-out;
+  }
+  
+  .close-overlay {
+    display: block;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    background-color: hsla(45, 100%, 0%, 0.75) !important;
+  }
+
+  .toggle-btn {
+    position: absolute;
+    top: 1rem;
+    right: 0.25rem;
+    cursor: pointer;
+  }
+
+  
+
   h1 {
     text-transform: uppercase;
     font-size: 1.6em;
-    margin-bottom: 0.5rem;
+    margin: 0;
     user-select: none;
   }
+
   h2 {
+    margin: 0;
     font-size: 1.2em;
     display: inline-block;
   }
-  .config {
-    margin: 0 0 0.5rem 0;
-    padding: 0;
-    border-radius: 0.25rem;
-  }
-  .config[open] {
-    background-color: var(--color-accent2);
-    color: var(--color-fg);
-    margin-bottom: 1rem;
-  }
-  .config .summary-handle {
-    cursor: pointer;
-    user-select: none;
-    margin-left: 0.5rem;
-  }
+
   .btn.open-config {
     margin: 0 0 1rem 0.5rem;
   }
   .options {
     padding: 0.5rem;
     display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 1rem;
+    /* flex-wrap: wrap; */
+    /* align-items: flex-start; */
+    /* justify-content: space-between; */
     margin: 0;
   }
   .btn {
@@ -385,7 +440,6 @@
     align-items: flex-end;
     width: 100%;
     gap: 2rem;
-    /* background-color: aqua; */
     justify-content: space-between;
   }
   .fgrow {
@@ -444,9 +498,9 @@
     appearance: none;
     cursor: pointer;
   }
-  .color-accent {
+  /* .color-accent {
     color: var(--color-accent);
-  }
+  } */
   .message {
     color: #222;
     font-size: 1.2rem;
@@ -459,6 +513,9 @@
   } */
   .pt-2 {
     margin-top: 0.5rem;
+  }
+  .pb-3 {
+    margin-bottom: 1rem;
   }
   /*
   .ml-1 {
