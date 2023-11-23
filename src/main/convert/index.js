@@ -34,7 +34,12 @@ async function convert(file, format, out_directory, append_string, options) {
     // filename = path.basename(filepath)
     return { filename, filepath, imageFormat: format, status: 'success' }
   } catch (err) {
-    console.log(`error: ${err} - ${path.basename(filepath)}`)
+    console.error(`error: ${err} - ${path.basename(filepath)}`)
+    try {
+      fs.unlinkSync(filepath)
+    } catch (err) {
+      console.error(`unlinkSync error: ${err}`)
+    }
     return { filename: path.basename(file), filepath:'./assets/error-icon-25239.png', imageFormat: 'png', status: 'error', error: err }
   }
 }
