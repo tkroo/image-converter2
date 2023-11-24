@@ -1,6 +1,6 @@
 # image-converter2
 
-NOTE: Work in progress. There may be security vulnerabilities.
+Work in progress.
 
 Image format conversion app.  
 An Electron app built with created with [electron-vite](https://electron-vite.org/), [svelte](https://svelte.dev) and [sharp](https://sharp.pixelplumbing.com)  
