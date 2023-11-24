@@ -4,10 +4,7 @@
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import Gears from './components/GearsSVG.svelte'
   import SettingsIcon from './components/SettingsIcon.svelte'
-  // import closeIcon from './assets/close-square-filled-svgrepo-com.svg'
-  // import errorIcon from './assets/warning-svgrepo-com.svg'
-
-  let open_toggle = false
+  
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   let imageFormat = 'png'
   let convertedFiles = []
@@ -68,40 +65,31 @@
   async function handleConvert(event) {
     mydragoverClass = ''
     isProcessing = true
+    convertedFiles = []
+
     let af
     if (event.detail.acceptedFiles) {
-      files.accepted = []
-      convertedFiles = []
-      const { acceptedFiles } = event.detail
-      af = acceptedFiles
-      files.accepted = [...files.accepted, ...acceptedFiles]
+      files.accepted = af = event.detail.acceptedFiles
+    } else if (files.accepted.length) {
+      af = files.accepted
     } else {
-      if (files.accepted.length) {
-        convertedFiles = []
-        af = files.accepted
-      } else {
-        af = []
-      }
+      af = []
     }
+
     // create directories if they don't exist
     await window.api.createDirectories(out_directory)
-
+    
     const myfiles = af.map((f) => f.path)
-    // for (let i = 0; i < myfiles.length; i++) {
-    //   const file = myfiles[i]
-    //   const foo = await window.api.handleFile(file, imageFormat, out_directory, use_append_string ? append_string : '')
-    //   convertedFiles = [...convertedFiles, foo]
-    // }
-    const foo = await Promise.all(myfiles.map(async(f) => {
-      const tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
+
+    await Promise.all(myfiles.map(async(f) => {
+      let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
       convertedFiles = [...convertedFiles, tmp]
-      return tmp
     }))
-    // convertedFiles = [...convertedFiles, ...foo]
-    console.log('finished converting files')
+
     isProcessing = false
     convertedFiles = convertedFiles
   }
+
 
   async function selectPath() {
     const filePath = await window.api.selectOutDir()
@@ -115,9 +103,6 @@
   async function editPrefs() {
     await window.api.editConfig()
   }
-
-  
-  
 
   function toggle() {
     panelOpen = !panelOpen
@@ -148,6 +133,7 @@
       </button>
     </h2>
     <section class="options">
+      <button type="button" class="btn" on:click={handleConvert} disabled={files.accepted.length === 0}>convert again</button>
       <fieldset>
         <legend>&nbsp;convert to&nbsp;</legend>
         {#each formats as format}
@@ -217,9 +203,8 @@
           image.jpg will be saved as image{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}
         </small>
       </div>
+      <button type="button" class="btn" on:click={editPrefs}>open settings file</button>
     </section>
-    <button type="button" class="btn open-config" on:click={handleConvert} disabled={files.accepted.length === 0}>convert again</button>
-    <button type="button" class="btn open-config" on:click={editPrefs}>open settings file</button>
   </aside>
 
   <main>
@@ -306,19 +291,16 @@
     --o: 38%;
     --c: calc(var(--o)*-1);
   }
-
   .container {
     min-height: 100%;
     height: 100%;
     padding-right: 2rem;
   }
-
   main {
     font-size: 0.8em;
     padding: 1rem 0rem 0 4rem;
     height: 100%;
   }
-
   aside {
     font-size: 0.8em;
     position: fixed;
@@ -332,7 +314,6 @@
     transition: left 400ms ease-out, background-color 300ms ease-in-out;
     border-right: 1px solid var(--color-accent2);
   }
-
   .panelOpen aside {
     position: fixed;
     top: 0;
@@ -342,7 +323,6 @@
     border-right: 1px solid var(--color-settings-bg);
     transition: left 300ms ease-in-out, background-color 300ms ease-in-out;
   }
-  
   .close-overlay {
     cursor: pointer !important;
     display: block;
@@ -355,40 +335,28 @@
     height: 100%;
     background-color: hsla(45, 100%, 0%, 0.75) !important;
   }
-
   .toggle-btn {
     position: absolute;
     top: 1rem;
     right: 0.25rem;
     cursor: pointer;
   }
-
-  
-
   h1 {
     text-transform: uppercase;
     font-size: 1.6em;
     margin: 0;
     user-select: none;
   }
-
   h2 {
     margin: 0;
     font-size: 1.2em;
     display: inline-block;
-  }
-
-  .btn.open-config {
-    margin: 0 0 1rem 0.5rem;
   }
   .options {
     padding: 0.5rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    /* flex-wrap: wrap; */
-    /* align-items: flex-start; */
-    /* justify-content: space-between; */
     margin: 0;
   }
   .btn {
@@ -460,11 +428,6 @@
   .results-wrap img {
     background: repeating-conic-gradient(#666 0 90deg, #999 0 180deg) 0 0/20px 20px round;
   }
-  /* .results-wrap img.error {
-    background: var(--color-accent2);
-    border-radius: 0.25rem;
-    padding: 1rem;
-  } */
   .results-list {
     padding: 1rem 0;
     list-style: none;
@@ -510,9 +473,6 @@
     appearance: none;
     cursor: pointer;
   }
-  /* .color-accent {
-    color: var(--color-accent);
-  } */
   .message {
     color: #222;
     font-size: 1.2rem;
@@ -521,23 +481,12 @@
     padding: 3rem;
     user-select: none;
   }
-  /* .pt-1 {
-    margin-top: 0.25rem;
-  } */
   .pt-2 {
     margin-top: 0.5rem;
   }
   .pb-3 {
     margin-bottom: 1rem;
   }
-  /*
-  .ml-1 {
-    margin-left: 0.25rem;
-  }
-  .mb-1 {
-    margin-bottom: 1rem;
-  }
-  */
   a {
     color: var(--color-accent);
     text-decoration: none !important;
@@ -545,9 +494,6 @@
   a:hover {
     text-decoration: underline !important;
   }
-  /* .ok {
-    color: green;
-  } */
   .error {
     color: hsl(0, 80%, 60%);
   }
