@@ -10,6 +10,7 @@ const api = {
   resetConfig: () => ipcRenderer.invoke('dialog:resetConfig'),
   editConfig: () => ipcRenderer.invoke('dialog:editConfig'),
   handleFile: (_,...args) => ipcRenderer.invoke('dialog:handleFile', _, ...args),
+  createDirectories: (path) => ipcRenderer.invoke('dialog:createDirectories', path),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

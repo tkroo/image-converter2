@@ -6,6 +6,8 @@ const store = new Store({ schema })
 
 export const extraPath = 'foo'
 export const fallbackPath = join(app.getPath('temp'), extraPath)
+export const appTmpDir = join(app.getPath('temp'), app.name)
+export const thumbnailsDir = join(appTmpDir, 'thumbnails')
 
 export const myStore = store
 

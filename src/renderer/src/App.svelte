@@ -83,6 +83,9 @@
         af = []
       }
     }
+    // create directories if they don't exist
+    await window.api.createDirectories(out_directory)
+
     const myfiles = af.map((f) => f.path)
     // for (let i = 0; i < myfiles.length; i++) {
     //   const file = myfiles[i]

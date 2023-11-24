@@ -1,9 +1,24 @@
 import fs from 'node:fs'
 import path from 'path'
 import sharp from 'sharp'
-import { myStore, fallbackPath } from '../helpers'
+import { myStore, fallbackPath, thumbnailsDir } from '../helpers'
 
 const re = /\.[^.]*$/gm
+
+export async function createDirectories(_, out_directory) {
+  out_directory = out_directory ?? fallbackPath
+
+  if (!fs.existsSync(out_directory)) {
+    fs.mkdir(out_directory, { recursive: true }, (err) => {
+      if (err) throw err
+    })
+  }
+  if (!fs.existsSync(thumbnailsDir)) {
+    fs.mkdir(thumbnailsDir, { recursive: true }, (err) => {
+      if (err) throw err
+    })
+  }
+}
 
 function checkFileExistenceAndIncrementFilename(filepath) {
   // Check if file exists and increment the filename if it does.
@@ -20,9 +35,6 @@ function checkFileExistenceAndIncrementFilename(filepath) {
 
 async function convert(file, format, out_directory, append_string, options) {
   out_directory = out_directory ?? fallbackPath
-  fs.mkdir(out_directory, { recursive: true }, (err) => {
-    if (err) throw err
-  })
 
   let filename = path.basename(file).replace(re, append_string) + '.' + format
   let filepath = checkFileExistenceAndIncrementFilename(path.join(out_directory, filename))

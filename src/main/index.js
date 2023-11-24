@@ -1,10 +1,11 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
+import fs from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 import {
-  extraPath,
+  appTmpDir,
   selectOutDir,
   openDirectory,
   getConfig,
@@ -14,7 +15,7 @@ import {
   resetFormatOptions,
 } from './helpers'
 
-import { handleFile } from './convert'
+import { handleFile, createDirectories } from './convert'
 
 let mainWindow
 
@@ -75,6 +76,7 @@ app.whenReady().then(() => {
   ipcMain.handle('dialog:resetConfig', resetConfig)
   ipcMain.handle('dialog:editConfig', editConfig)
   ipcMain.handle('dialog:handleFile', handleFile)
+  ipcMain.handle('dialog:createDirectories', createDirectories)
 
   initConfig()
   createWindow()
@@ -93,6 +95,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('before-quit', async(e) => {
+  fs.rmSync(appTmpDir, { recursive: true, force: true })
 })
 
 // In this file you can include the rest of your app"s specific main process
