@@ -35,6 +35,7 @@ linux:
     - AppImage
   maintainer: treatkor.com
   category: Utility
+  icon: build/icons/png
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false

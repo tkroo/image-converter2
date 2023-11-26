@@ -36,7 +36,7 @@ function createWindow() {
       additionalArguments: []
     }
   })
-
+  
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
     is.dev && mainWindow.webContents.openDevTools()
