@@ -63,7 +63,3 @@ export function editConfig() {
 export function resetFormatOptions() {
   store.reset('formatOptions')
 }
-
-export function getConcurrency() {
-  return store.get('sharpConcurrency')
-}

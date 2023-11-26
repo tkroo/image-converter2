@@ -10,10 +10,6 @@ const schema = {
     type: 'string',
     default: 'png'
   },
-  sharpConcurrency: {
-    type: 'number',
-    default: 0
-  },
   formatOptions: {
     type: 'array',
     items: {

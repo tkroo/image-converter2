@@ -1,13 +1,7 @@
 import fs from 'node:fs'
 import path from 'path'
 import sharp from 'sharp'
-import { myStore, fallbackPath, thumbnailsDir, getConcurrency } from '../helpers'
-
-// sharp.cache( { files: 5, memory: 128 } )
-let concurrency = getConcurrency()*1
-sharp.concurrency(concurrency)
-console.log('sharp.concurrency(): ' + sharp.concurrency())
-console.log('sharp.cache(): ' + JSON.stringify(sharp.cache()))
+import { myStore, fallbackPath, thumbnailsDir } from '../helpers'
 
 const re = /\.[^.]*$/gm
 

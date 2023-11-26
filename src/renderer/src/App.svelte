@@ -17,7 +17,6 @@
   let append_string = '_converted'
   let format_options = []
   let use_append_string
-  let sharp_Concurrency = 0
   let isProcessing = false
   let panelOpen = false
 
@@ -25,13 +24,12 @@
   $: filesError = convertedFiles.filter((f) => f.status == 'error')
 
   onMount(async () => {
-    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed, sharpConcurrency } = await window.api.getConfig()
+    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.api.getConfig()
     imageFormat = defaultFormat
     out_directory = outputDirectory
     append_string = appendString
     format_options = formatOptions
     use_append_string = appendStringUsed
-    sharp_Concurrency = sharpConcurrency
   })
 
   let timer
@@ -205,11 +203,6 @@
           image.jpg will be saved as image{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}
         </small>
       </div>
-      <label for="sharpConcurrency">sharp concurrency
-        <input class="pt-2" id="sharpConcurrency" type="number" bind:value={sharp_Concurrency} on:change={async () => await window.api.setConfig('sharpConcurrency', sharp_Concurrency)}>
-        <br />
-        see <a href="https://sharp.pixelplumbing.com/api-utility#concurrency">sharp concurrency</a> for more info
-      </label>
       <button type="button" class="btn" on:click={editPrefs}>open settings file</button>
     </section>
   </aside>
