@@ -5,13 +5,17 @@ import { contextBridge, ipcRenderer } from 'electron'
 const api = {
   openDirectory: (path) => ipcRenderer.invoke('dialog:openDirectory', path),
   selectOutDir: () => ipcRenderer.invoke('dialog:selectOutDir'),
-  getConfig: () => ipcRenderer.invoke('dialog:getConfig'),
-  setConfig: (key, value) => ipcRenderer.invoke('dialog:setConfig', key, value),
-  resetConfig: () => ipcRenderer.invoke('dialog:resetConfig'),
-  editConfig: () => ipcRenderer.invoke('dialog:editConfig'),
   handleFile: (_,...args) => ipcRenderer.invoke('dialog:handleFile', _, ...args),
   createDirectories: (path) => ipcRenderer.invoke('dialog:createDirectories', path),
+  configOps: {
+    get: (key) => ipcRenderer.invoke('dialog:configOps.get', key),
+    set: (key, value) => ipcRenderer.invoke('dialog:configOps.set', key, value),
+    reset: (key) => ipcRenderer.invoke('dialog:configOps.reset', key),
+    open: () => ipcRenderer.invoke('dialog:configOps.open'),
+    init: () => ipcRenderer.invoke('dialog:configOps.init'),
+  }
 }
+
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

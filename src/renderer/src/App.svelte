@@ -24,13 +24,17 @@
   $: filesError = convertedFiles.filter((f) => f.status == 'error')
 
   onMount(async () => {
-    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.api.getConfig()
+    updateConfig()
+  })
+
+  async function updateConfig() {
+    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.api.configOps.get()
     imageFormat = defaultFormat
     out_directory = outputDirectory
     append_string = appendString
     format_options = formatOptions
     use_append_string = appendStringUsed
-  })
+  }
 
   let timer
   $: append_string && debounceUpdate('appendString', append_string)
@@ -42,7 +46,7 @@
     if (key == 'formatOptions') {
       format_options = val
     }
-    timer = setTimeout(() => window.api.setConfig(key, val), timeout)
+    timer = setTimeout(() => window.api.configOps.set(key, val), timeout)
   }
 
   function coerceValue(value) {
@@ -96,12 +100,14 @@
     out_directory = filePath
   }
 
-  async function resetPrefs() {
-    await window.api.resetConfig()
+  async function resetConfig(key) {
+    await window.api.configOps.reset(key)
+    await window.api.configOps.init()
+    updateConfig()
   }
 
-  async function editPrefs() {
-    await window.api.editConfig()
+  async function openConfig() {
+    await window.api.configOps.open()
   }
 
   function toggle() {
@@ -165,7 +171,7 @@
             read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid
             values.
           </p>
-          <button on:click={resetPrefs} type="button" class="btn btn-small pt-2"> restore defaults </button>
+          <button on:click={() => {resetConfig('formatOptions')}} type="button" class="btn btn-small pt-2"> restore format defaults </button>
         </details>
       </fieldset>
       <div class="saveto">
@@ -190,7 +196,7 @@
             id="use_append_string"
             type="checkbox"
             bind:checked={use_append_string}
-            on:change={async () => await window.api.setConfig('appendStringUsed', use_append_string)}
+            on:change={async () => await window.api.configOps.set('appendStringUsed', use_append_string)}
           />
           <br />
           <input id="append_string" type="text" bind:value={append_string} />
@@ -200,7 +206,10 @@
           image.jpg will be saved as image{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}
         </small>
       </div>
-      <button type="button" class="btn" on:click={editPrefs}>open settings file</button>
+      <div class="cols-2">
+        <button type="button" class="btn" on:click={openConfig}> open settings file </button>
+        <button type="button" class="btn" on:click={resetConfig}> restore all defaults </button>
+      </div>
     </section>
   </aside>
 
@@ -306,7 +315,7 @@
     top: 0;
     padding: 1rem 2rem 1rem 1rem;
     background-color: var(--color-bg);
-    overflow: auto;
+    overflow: none;
     left: var(--c);
     transition: left 400ms ease-out, background-color 300ms ease-in-out;
     border-right: 1px solid var(--color-accent2);
@@ -316,6 +325,7 @@
     top: 0;
     left: 0;
     box-shadow: rgba(0, 0, 0, 0.75) 0px 5px 15px;
+    overflow: auto;
     background-color: var(--color-settings-bg);
     border-right: 1px solid var(--color-settings-bg);
     transition: left 300ms ease-in-out, background-color 300ms ease-in-out;
@@ -477,6 +487,12 @@
     margin: 0;
     padding: 3rem;
     user-select: none;
+  }
+  .cols-2 {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
   .pt-2 {
     margin-top: 0.5rem;

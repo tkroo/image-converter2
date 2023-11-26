@@ -36,30 +36,23 @@ function getDefaultOutDir() {
   }
 }
 
-
-
 export async function openDirectory(event, path) {
   shell.openPath(path)
 }
 
-export async function getConfig() {
-  return store.store
-}
-
-export async function setConfig(event, key, value) {
-  store.set(key, value)
-}
-
-export async function initConfig() {
-  getDefaultOutDir()
-  let tempObj = store.store
-  store.store = tempObj
-}
-
-export function editConfig() {
-  store.openInEditor()
-}
-
-export function resetFormatOptions() {
-  store.reset('formatOptions')
+export const configOps = {
+  init: () => {
+    const _ = getDefaultOutDir()
+    store.store = { ...store.store }
+  },
+  get: () => store.store,
+  set: (_, key, value) => store.set(key, value),
+  reset: (_, key) => {
+    if(typeof key === 'string') {
+      store.reset(key)
+    } else {
+      store.clear()
+    }
+  },
+  open: () => store.openInEditor()
 }

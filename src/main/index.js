@@ -9,10 +9,7 @@ import {
   appTmpDir,
   selectOutDir,
   openDirectory,
-  getConfig,
-  setConfig,
-  editConfig,
-  initConfig,
+  configOps,
   resetFormatOptions,
 } from './helpers'
 
@@ -72,14 +69,16 @@ app.whenReady().then(() => {
 
   ipcMain.handle('dialog:selectOutDir', selectOutDir)
   ipcMain.handle('dialog:openDirectory', openDirectory)
-  ipcMain.handle('dialog:getConfig', getConfig)
-  ipcMain.handle('dialog:setConfig', setConfig)
-  ipcMain.handle('dialog:resetConfig', resetConfig)
-  ipcMain.handle('dialog:editConfig', editConfig)
   ipcMain.handle('dialog:handleFile', handleFile)
   ipcMain.handle('dialog:createDirectories', createDirectories)
+  
+  ipcMain.handle('dialog:configOps.get', configOps.get)
+  ipcMain.handle('dialog:configOps.set', configOps.set)
+  ipcMain.handle('dialog:configOps.reset', configOps.reset)
+  ipcMain.handle('dialog:configOps.open', configOps.open)
+  ipcMain.handle('dialog:configOps.init', configOps.init)
 
-  initConfig()
+  configOps.init()
   createWindow()
 
   app.on('activate', function () {
@@ -105,6 +104,6 @@ app.on('before-quit', async(e) => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 function resetConfig() {
-  resetFormatOptions()
+  configOps.reset('formatOptions')
   mainWindow.reload()
 }

@@ -6,6 +6,10 @@ const schema = {
     type: 'string',
     default: '_extra'
   },
+  appendStringUsed: {
+    type: 'boolean',
+    default: false
+  },
   defaultFormat: {
     type: 'string',
     default: 'png'
