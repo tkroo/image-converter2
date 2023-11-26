@@ -106,9 +106,6 @@
 
   function toggle() {
     panelOpen = !panelOpen
-    if (panelOpen) {
-      console.log('open')
-    }
   }
 </script>
 
