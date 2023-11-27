@@ -1,14 +1,16 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import fs from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // import icon from '../../resources/icon.png?asset'
 import icon from '../../build/icons/png/256x256.png?asset'
 
-import { autoUpdater } from 'electron-updater'
+import { showUpdateMessage } from './updater'
 
-autoUpdater.autoDownload = false
-autoUpdater.autoInstallOnAppQuit = false
+// import { autoUpdater } from 'electron-updater'
+
+// autoUpdater.autoDownload = false
+// autoUpdater.autoInstallOnAppQuit = false
 
 import {
   appTmpDir,
@@ -95,22 +97,6 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
-
-  if (app.isPackaged) {
-    autoUpdater.checkForUpdates()
-    autoUpdater.on('update-available', (info) => {
-      showUpdateMessage(`${app.name} ${app.getVersion()}<br/>update available: ${info.version}`)
-      confirmUpdate(info)
-    })
-    autoUpdater.on('update-not-available', (info) => {
-      showUpdateMessage(`${app.name} ${app.getVersion()}`)
-    })
-    autoUpdater.on('update-downloaded', (info) => {
-      showUpdateMessage(`version ${info.version} downloaded.`)
-      autoUpdater.quitAndInstall()
-    })
-  }
-
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -128,25 +114,3 @@ app.on('before-quit', async(e) => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
-
-
-function confirmUpdate(info) {
-  dialog.showMessageBox(mainWindow, {
-    'type': 'question',
-    'title': 'Update available',
-    'message': `Update to ${info.version} ?`,
-    'detail': `current version: ${app.getVersion()}`,
-    'buttons': ['no', 'yes'],
-    'cancelId': 0,
-  })
-  .then((result) => {
-    if (result.response === 0) { return }
-    autoUpdater.autoDownload = true
-    autoUpdater.checkForUpdates()
-  })
-}
-
-function showUpdateMessage(message) {
-  mainWindow.webContents.send('showUpdateMessage', message)
-}
-

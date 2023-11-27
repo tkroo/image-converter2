@@ -56,3 +56,9 @@ export const configOps = {
   },
   open: () => store.openInEditor()
 }
+
+export function getMainWindow() {
+  const allWindows = BrowserWindow.getAllWindows()
+  const win = allWindows[allWindows.length - 1]
+  return win
+}
