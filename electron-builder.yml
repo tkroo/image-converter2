@@ -41,4 +41,5 @@ appImage:
 npmRebuild: false
 publish:
   provider: generic
+  releaseType: 'release'
   url: https://github.com/tkroo/image-converter2

@@ -5,6 +5,11 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // import icon from '../../resources/icon.png?asset'
 import icon from '../../build/icons/png/256x256.png?asset'
 
+import { autoUpdater, AppImageUpdater } from 'electron-updater'
+
+autoUpdater.autoDownload = false
+autoUpdater.autoInstallOnAppQuit = true
+
 import {
   appTmpDir,
   selectOutDir,
@@ -86,6 +91,9 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  autoUpdater.checkForUpdates()
+
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -103,7 +111,7 @@ app.on('before-quit', async(e) => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
-function resetConfig() {
-  configOps.reset('formatOptions')
-  mainWindow.reload()
+
+function showUpdateMessage(message) {
+  mainWindow.webContents.send('updateMessage', message)
 }

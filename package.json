@@ -14,12 +14,14 @@
     "postinstall": "electron-builder install-app-deps",
     "build:win": "npm run build && electron-builder --win --config",
     "build:mac": "npm run build && electron-builder --mac --config",
-    "build:linux": "npm run build && electron-builder --linux --config"
+    "build:linux": "npm run build && electron-builder --linux --config",
+    "release": "electron-builder"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
     "electron-store": "^8.1.0",
+    "electron-updater": "^6.1.7",
     "sharp": "^0.32.6",
     "svelte-file-dropzone": "^2.0.2"
   },
