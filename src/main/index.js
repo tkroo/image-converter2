@@ -89,30 +89,6 @@ app.whenReady().then(() => {
   configOps.init()
   createWindow()
 
-  function confirmUpdate(info) {
-    dialog.showMessageBox(mainWindow, {
-      'type': 'question',
-      'title': 'Update available',
-      'message': `Update to ${info.version} ?`,
-      'detail': `current version: ${app.getVersion()}`,
-      'buttons': ['no', 'yes'],
-      'cancelId': 0,
-    })
-    .then((result) => {
-      console.log('result.response: ', result.response)
-      if (result.response === 0) { return }
-      if (result.response !== 0) {
-        console.log('affirmative clicked')
-        autoUpdater.autoDownload = true
-        autoUpdater.checkForUpdates()
-      }
-    })
-  }
-
-  function showUpdateMessage(message) {
-    mainWindow.webContents.send('showUpdateMessage', message)
-  }
-
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -120,15 +96,14 @@ app.whenReady().then(() => {
   })
 
 
-  if (!is.dev) {
+  if (app.isPackaged) {
     autoUpdater.checkForUpdates()
     autoUpdater.on('update-available', (info) => {
-      showUpdateMessage(`update available: ${info.version}`)
+      showUpdateMessage(`${app.name} ${app.getVersion()}<br/>update available: ${info.version}`)
       confirmUpdate(info)
     })
     autoUpdater.on('update-not-available', (info) => {
-      console.log('update-not-available info: ', info)
-      showUpdateMessage(`${app.name} version ${app.getVersion()} is up to date`)
+      showUpdateMessage(`${app.name} ${app.getVersion()}`)
     })
     autoUpdater.on('update-downloaded', (info) => {
       showUpdateMessage(`version ${info.version} downloaded.`)
@@ -154,4 +129,24 @@ app.on('before-quit', async(e) => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
+
+function confirmUpdate(info) {
+  dialog.showMessageBox(mainWindow, {
+    'type': 'question',
+    'title': 'Update available',
+    'message': `Update to ${info.version} ?`,
+    'detail': `current version: ${app.getVersion()}`,
+    'buttons': ['no', 'yes'],
+    'cancelId': 0,
+  })
+  .then((result) => {
+    if (result.response === 0) { return }
+    autoUpdater.autoDownload = true
+    autoUpdater.checkForUpdates()
+  })
+}
+
+function showUpdateMessage(message) {
+  mainWindow.webContents.send('showUpdateMessage', message)
+}
 
