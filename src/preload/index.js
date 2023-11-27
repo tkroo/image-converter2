@@ -13,7 +13,8 @@ const api = {
     reset: (key) => ipcRenderer.invoke('dialog:configOps.reset', key),
     open: () => ipcRenderer.invoke('dialog:configOps.open'),
     init: () => ipcRenderer.invoke('dialog:configOps.init'),
-  }
+  },
+  showUpdateMessage: (callback) => ipcRenderer.on('showUpdateMessage', callback)
 }
 
 

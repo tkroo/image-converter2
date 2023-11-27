@@ -5,7 +5,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // import icon from '../../resources/icon.png?asset'
 import icon from '../../build/icons/png/256x256.png?asset'
 
-import { autoUpdater, AppImageUpdater } from 'electron-updater'
+import { autoUpdater, AppUpdater } from 'electron-updater'
 
 autoUpdater.autoDownload = false
 autoUpdater.autoInstallOnAppQuit = true
@@ -41,6 +41,7 @@ function createWindow() {
   
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    mainWindow.webContents.send('showUpdateMessage', `${app.name}<br/>version: ${app.getVersion()}`)
     is.dev && mainWindow.webContents.openDevTools()
   })
 
@@ -57,6 +58,8 @@ function createWindow() {
   }
 }
 
+
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -71,8 +74,6 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
   
-  configOps.init()
-
   ipcMain.handle('dialog:selectOutDir', selectOutDir)
   ipcMain.handle('dialog:openDirectory', openDirectory)
   ipcMain.handle('dialog:handleFile', handleFile)
@@ -83,8 +84,14 @@ app.whenReady().then(() => {
   ipcMain.handle('dialog:configOps.reset', configOps.reset)
   ipcMain.handle('dialog:configOps.open', configOps.open)
   ipcMain.handle('dialog:configOps.init', configOps.init)
-
+  ipcMain.handle('dialog:showUpdateMessage', showUpdateMessage)
+  
+  configOps.init()
   createWindow()
+
+  function showUpdateMessage(message) {
+    mainWindow.webContents.send('showUpdateMessage', message)
+  }
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -92,7 +99,27 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
-  autoUpdater.checkForUpdates()
+
+  if (!is.dev) {
+    autoUpdater.checkForUpdates()
+  
+    autoUpdater.on('update-available', (d) => {
+      showUpdateMessage(`update available: ${d.version}`)
+    })
+    autoUpdater.on('update-not-available', (d) => {
+      console.log('update-not-available d: ', d)
+      showUpdateMessage(`running: ${app.getVersion()} latest: ${d.version}`)
+    })
+    autoUpdater.on('update-downloaded', () => {
+      showUpdateMessage('update downloaded')
+    })
+    autoUpdater.on('checking-for-update', (d) => {
+      showUpdateMessage('checking for update')
+    })
+    autoUpdater.on('update-downloaded', (d) => {
+      showUpdateMessage(`version ${d.version} downloaded. will update on next launch`)
+    })
+  }
 
 })
 
@@ -112,6 +139,4 @@ app.on('before-quit', async(e) => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-function showUpdateMessage(message) {
-  mainWindow.webContents.send('updateMessage', message)
-}
+

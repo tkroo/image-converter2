@@ -20,12 +20,19 @@
   let isProcessing = false
   let panelOpen = false
   let workDuration = 0
+  let updateMsg = ''
 
   $: filesOk = convertedFiles.filter((f) => f.status != 'error')
   $: filesError = convertedFiles.filter((f) => f.status == 'error')
 
   onMount(async () => {
     updateConfig()
+
+    window.api.showUpdateMessage((event, message) => {
+      console.log('message', message)
+      updateMsg = message
+    })
+
   })
 
   async function updateConfig() {
@@ -130,7 +137,6 @@
     panelOpen = !panelOpen
   }
 </script>
-
 <div class="container" class:panelOpen={panelOpen}>
   {#if panelOpen}
   <button
@@ -214,12 +220,11 @@
             bind:checked={use_append_string}
             on:change={async () => await window.api.configOps.set('appendStringUsed', use_append_string)}
           />
-          <br />
           <input id="append_string" type="text" bind:value={append_string} />
         </label>
         <br />
         <small>
-          image.jpg will be saved as image{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}
+          image.*** will be saved as image{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}
         </small>
       </div>
       <div class="cols-2">
@@ -227,6 +232,9 @@
         <button type="button" class="btn" on:click={resetConfig}> restore all defaults </button>
       </div>
     </section>
+    <div class="version-info">
+      <small>{@html updateMsg}</small>
+    </div>
   </aside>
 
   <main>
@@ -320,6 +328,7 @@
     padding-right: 2rem;
   }
   main {
+    width: 100%;
     font-size: 0.8em;
     padding: 1rem 0rem 0 4rem;
     height: 100%;
@@ -341,9 +350,15 @@
   aside .options {
     display: none;
   }
+
   .panelOpen aside .options {
-    display: block;
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0;
   }
+
   .panelOpen aside {
     position: fixed;
     top: 0;
@@ -383,13 +398,7 @@
     font-size: 1.2em;
     display: inline-block;
   }
-  .options {
-    padding: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin: 0;
-  }
+  
   .btn {
     font-weight: bold;
     font-family: inherit;
@@ -426,8 +435,9 @@
     border-radius: 0.25rem;
   }
   fieldset {
-    padding: 0em 0.5em 0.5em 0.5em;
-    min-width: fit-content;
+    padding: 0.5em;
+    /* min-width: fit-content; */
+    width: 100%;
     border: 1px solid #aaa;
     border-radius: 0.25rem;
   }
@@ -518,6 +528,11 @@
     flex-wrap: wrap;
     justify-content: flex-start;
   }
+  .cols-2.wide {
+    width: 100%;
+    align-items: baseline;
+    justify-content: space-between;
+  }
   .pt-2 {
     margin-top: 0.5rem;
   }
@@ -556,5 +571,10 @@
     border: 2px dashed #999 !important;
     border-radius: 2px;
     background-color: var(--color-drop) !important;
+  }
+  .version-info {
+    position: absolute;
+    bottom: 1rem;
+    font-size: 0.8rem;
   }
 </style>

@@ -36,10 +36,16 @@ linux:
   maintainer: treatkor.com
   category: Utility
   icon: build/icons/png
+  publish:
+    provider: github
+    owner: tkroo
+    repo: image-converter2
+    host: github.com
+    channel: latest
+
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic
-  releaseType: 'release'
   url: https://github.com/tkroo/image-converter2
