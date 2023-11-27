@@ -1,14 +1,14 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import fs from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // import icon from '../../resources/icon.png?asset'
 import icon from '../../build/icons/png/256x256.png?asset'
 
-import { autoUpdater, AppUpdater } from 'electron-updater'
+import { autoUpdater } from 'electron-updater'
 
 autoUpdater.autoDownload = false
-autoUpdater.autoInstallOnAppQuit = true
+autoUpdater.autoInstallOnAppQuit = false
 
 import {
   appTmpDir,
@@ -89,6 +89,26 @@ app.whenReady().then(() => {
   configOps.init()
   createWindow()
 
+  function confirmUpdate(info) {
+    dialog.showMessageBox(mainWindow, {
+      'type': 'question',
+      'title': 'Update available',
+      'message': `Update to ${info.version} ?`,
+      'detail': `current version: ${app.getVersion()}`,
+      'buttons': ['no', 'yes'],
+      'cancelId': 0,
+    })
+    .then((result) => {
+      console.log('result.response: ', result.response)
+      if (result.response === 0) { return }
+      if (result.response !== 0) {
+        console.log('affirmative clicked')
+        autoUpdater.autoDownload = true
+        autoUpdater.checkForUpdates()
+      }
+    })
+  }
+
   function showUpdateMessage(message) {
     mainWindow.webContents.send('showUpdateMessage', message)
   }
@@ -102,22 +122,17 @@ app.whenReady().then(() => {
 
   if (!is.dev) {
     autoUpdater.checkForUpdates()
-  
-    autoUpdater.on('update-available', (d) => {
-      showUpdateMessage(`update available: ${d.version}`)
+    autoUpdater.on('update-available', (info) => {
+      showUpdateMessage(`update available: ${info.version}`)
+      confirmUpdate(info)
     })
-    autoUpdater.on('update-not-available', (d) => {
-      console.log('update-not-available d: ', d)
-      showUpdateMessage(`running: ${app.getVersion()} latest: ${d.version}`)
+    autoUpdater.on('update-not-available', (info) => {
+      console.log('update-not-available info: ', info)
+      showUpdateMessage(`${app.name} version ${app.getVersion()} is up to date`)
     })
-    autoUpdater.on('update-downloaded', () => {
-      showUpdateMessage('update downloaded')
-    })
-    autoUpdater.on('checking-for-update', (d) => {
-      showUpdateMessage('checking for update')
-    })
-    autoUpdater.on('update-downloaded', (d) => {
-      showUpdateMessage(`version ${d.version} downloaded. will update on next launch`)
+    autoUpdater.on('update-downloaded', (info) => {
+      showUpdateMessage(`version ${info.version} downloaded.`)
+      autoUpdater.quitAndInstall()
     })
   }
 
