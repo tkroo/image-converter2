@@ -10,7 +10,6 @@ import {
   selectOutDir,
   openDirectory,
   configOps,
-  resetFormatOptions,
 } from './helpers'
 
 import { handleFile, createDirectories } from './convert'
@@ -66,6 +65,8 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+  
+  configOps.init()
 
   ipcMain.handle('dialog:selectOutDir', selectOutDir)
   ipcMain.handle('dialog:openDirectory', openDirectory)
@@ -78,7 +79,6 @@ app.whenReady().then(() => {
   ipcMain.handle('dialog:configOps.open', configOps.open)
   ipcMain.handle('dialog:configOps.init', configOps.init)
 
-  configOps.init()
   createWindow()
 
   app.on('activate', function () {

@@ -19,6 +19,7 @@
   let use_append_string
   let isProcessing = false
   let panelOpen = false
+  let workDuration = 0
 
   $: filesOk = convertedFiles.filter((f) => f.status != 'error')
   $: filesError = convertedFiles.filter((f) => f.status == 'error')
@@ -66,6 +67,15 @@
     convertedFiles = []
   }
 
+  function timeFormat(duration) {
+    const m = new Date(duration).getMinutes()
+    const s = new Date(duration).getSeconds()
+    const ms = new Date(duration).getMilliseconds()
+    const minutes = m == 0 ? '' : m + (m > 1 ? ' mins ' : ' min ')
+    const seconds = s == 0 ? '' : s + (s > 1 ? ' seconds ' : ' second ')
+    return minutes + seconds + ms + ' milliseconds'
+  }
+
   async function handleConvert(event) {
     mydragoverClass = ''
     isProcessing = true
@@ -85,10 +95,16 @@
     
     const myfiles = af.map((f) => f.path)
 
+    const startTime = Date.now()
+
     await Promise.all(myfiles.map(async(f) => {
       let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
       convertedFiles = [...convertedFiles, tmp]
     }))
+    const endTime = Date.now()
+
+    // workDuration = new Date(endTime - startTime).getMinutes()+":"+new Date(endTime - startTime).getSeconds()+" "+new Date(endTime - startTime).getMilliseconds()
+    workDuration = timeFormat(endTime - startTime)
 
     isProcessing = false
     convertedFiles = convertedFiles
@@ -233,7 +249,7 @@
           <div class="fgrow">
             <h2>process{isProcessing
                 ? `ing ${convertedFiles.length} of ${files.accepted.length}`
-                : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''}
+                : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} {!isProcessing ? `in ${workDuration}` : ''}
                 {#if filesError.length}
                 {#if !isProcessing}<br />converted {filesOk.length} file{filesOk.length > 1 ? 's' : ''} successfully{/if}
                 
@@ -294,7 +310,8 @@
 
 <style>
   :root {
-    --o: 38%;
+    /* --o: 38%; */
+    --o: min(80%, 376px);
     --c: calc(var(--o)*-1);
   }
   .container {
@@ -315,10 +332,17 @@
     top: 0;
     padding: 1rem 2rem 1rem 1rem;
     background-color: var(--color-bg);
-    overflow: none;
+    overflow: hidden;
     left: var(--c);
     transition: left 400ms ease-out, background-color 300ms ease-in-out;
     border-right: 1px solid var(--color-accent2);
+  }
+
+  aside .options {
+    display: none;
+  }
+  .panelOpen aside .options {
+    display: block;
   }
   .panelOpen aside {
     position: fixed;
