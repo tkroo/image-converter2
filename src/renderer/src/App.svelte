@@ -528,11 +528,11 @@
     flex-wrap: wrap;
     justify-content: flex-start;
   }
-  .cols-2.wide {
+  /* .cols-2.wide {
     width: 100%;
     align-items: baseline;
     justify-content: space-between;
-  }
+  } */
   .pt-2 {
     margin-top: 0.5rem;
   }
