@@ -1,6 +1,7 @@
 import { app, dialog, BrowserWindow } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { getMainWindow } from '../helpers'
+import downicon from '../../../resources/download-circle.png?asset'
 
 let dialogShown = false
 
@@ -10,11 +11,12 @@ autoUpdater.autoInstallOnAppQuit = false
 function confirmUpdate(info) {
   dialog.showMessageBox(getMainWindow(), {
     'type': 'question',
-    'title': 'Update available',
-    'message': `Update to ${info.version} ?`,
+    'title': 'imageconverter2 update available',
+    'message': `Update to version ${info.version} ?`,
     'detail': `current version: ${app.getVersion()}`,
     'buttons': ['no', 'yes'],
     'cancelId': 0,
+    'icon': downicon
   })
   .then((result) => {
     dialogShown = true
