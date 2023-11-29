@@ -43,11 +43,11 @@ async function convert(file, format, outDirectory, appendString, options) {
     await sharp(file).toFormat(format, options).toFile(filepath)
     return { filename, filepath, imageFormat: format, status: 'success' }
   } catch (error) {
-    console.error(`error: ${error} - ${path.basename(filepath)}`)
+    console.error(`err: ${error} - ${path.basename(filepath)}`)
     try {
       fs.unlinkSync(filepath)
     } catch (error) {
-      console.error(`unlinkSync_err: ${error}`)
+      console.error(`unlinkSync err: ${error}`)
     }
     return { filename: path.basename(file), status: 'error', error }
   }
