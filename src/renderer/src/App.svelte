@@ -29,7 +29,6 @@
     updateConfig()
 
     window.api.showUpdateMessage((event, message) => {
-      console.log('message', message)
       updateMsg = message
     })
 
