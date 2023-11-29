@@ -152,11 +152,10 @@
   </button> -->
 
   <aside>
-    <h2>settings
-      <button type="button" class="unbutton toggle-btn" on:click={toggle} title={panelOpen ? "close settings" : "open settings"}>
-        <SettingsIcon />
-      </button>
-    </h2>
+    <button type="button" class="unbutton toggle-btn" on:click={toggle} title={panelOpen ? "close settings" : "open settings"}>
+      <SettingsIcon />
+    </button>
+    <h2>settings</h2>
     <section class="options">
       <button type="button" class="btn" on:click={handleConvert} disabled={files.accepted.length === 0}>convert again</button>
       <fieldset>
@@ -248,52 +247,45 @@
       on:dragover={() => (mydragoverClass = 'custom-dropzone')}
       on:dragleave={() => (mydragoverClass = '')}
     >
-      <p class="message">Drop files here, or click to select files</p>
+      <p class="message">Drop files here<br/>or<br/>click to select files</p>
     </Dropzone>
   
     <section class="results-wrap">
       {#if convertedFiles.length}
         <div class="row">
           <div class="fgrow">
-            <h2>process{isProcessing
-                ? `ing ${convertedFiles.length} of ${files.accepted.length}`
-                : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} {!isProcessing ? `in ${workDuration}` : ''}
+            process{isProcessing ? `ing ${convertedFiles.length} of ${files.accepted.length}` : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} {!isProcessing ? `in ${workDuration}` : ''}
+                {#if isProcessing}
+                  <span class="geartest" transition:fade>
+                    <Gears />
+                  </span>  
+                {/if}
                 {#if filesError.length}
-                {#if !isProcessing}<br />converted {filesOk.length} file{filesOk.length > 1 ? 's' : ''} successfully{/if}
-                
-                <details class="error-list">
-                  <summary>
-                    <span class="error">
-                      {filesError.length} error{filesError.length > 1 ? 's' : ''}:
-                    </span>
-                  </summary>
-                  <ol>
-                    {#each filesError as file}
+                  {#if !isProcessing}<br />converted {filesOk.length} file{filesOk.length > 1 ? 's' : ''} successfully{/if}  
+                  <details class="error-list">
+                    <summary>
+                      <span class="error">
+                        {filesError.length} error{filesError.length > 1 ? 's' : ''}:
+                      </span>
+                    </summary>
+                    <ol>{#each filesError as file}
                       <li>file: {file.filename}<br />
                         <small>{file.error}</small>
                       </li>
-                    {/each}
-                  </ol>
-                </details>
+                    {/each}</ol>
+                  </details>
                 {/if}
-            </h2>
+            
             <br />
             <span>Click to download or drag and drop to a file manager window</span>
           </div>
-          {#if isProcessing}
-          <span class="geartest" transition:fade>
-            <Gears />
-          </span>  
-          {/if}
-          <button
-            type="button"
-            class="btn"
-            on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}
-          >
+          
+          <button type="button" class="btn" on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}>
             open output directory
           </button>
-  
-          <button type="button" class="btn" on:click|preventDefault={clearFiles}> clear results list </button>
+          <button type="button" class="btn" on:click|preventDefault={clearFiles}>
+            clear results list
+          </button>
         </div>
         <ul class="results-list">
           {#each convertedFiles as file}
@@ -319,7 +311,7 @@
 <style>
   :root {
     /* --o: 38%; */
-    --o: min(80%, 376px);
+    --o: min(80%, 305px);
     --c: calc(var(--o)*-1);
   }
   .container {
@@ -383,9 +375,15 @@
   }
   .toggle-btn {
     position: absolute;
-    top: 1rem;
-    right: 0.25rem;
+    top: 0;
+    right: 0rem;
     cursor: pointer;
+    /* height: 90%; */
+    bottom: 0;
+    padding-top: 1rem !important;
+    padding-right: 0.25rem !important;
+    display: flex;
+    align-items: flex-start;
   }
   h1 {
     text-transform: uppercase;
@@ -452,9 +450,9 @@
   .results-wrap {
     margin-top: 1rem;
   }
-  .results-wrap .row h2 {
+  /* .results-wrap .row h2 {
     margin: 0;
-  }
+  } */
   .results-wrap .row {
     margin-top: 1rem;
     display: flex;
@@ -519,8 +517,9 @@
     font-size: 1.2rem;
     font-weight: bold;
     margin: 0;
-    padding: 3rem;
+    padding: 1rem;
     user-select: none;
+    text-align: center;
   }
   .cols-2 {
     display: flex;
@@ -568,7 +567,7 @@
     width: 4rem;
   }
   :global(.custom-dropzone) {
-    border: 2px dashed #999 !important;
+    border: 2px dashed #5a5a5a !important;
     border-radius: 2px;
     background-color: var(--color-drop) !important;
   }

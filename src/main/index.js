@@ -1,26 +1,23 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
-import fs from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../build/icons/png/256x256.png?asset'
-
+import fs from 'node:fs'
 import { showUpdateMessage } from './updater'
-import {
-  appTmpDir,
-  selectOutDir,
-  openDirectory,
-  configOps,
-} from './helpers'
-
+import { appTmpDir, selectOutDir, openDirectory, configOps } from './helpers'
 import { handleFile, createDirectories } from './convert'
+import icon from '../../build/icons/png/256x256.png?asset'
 
 let mainWindow
 
 function createWindow() {
+  // const w = 900
+  // const h = 670
+  const w = 800
+  const h = Math.round(w / 1.618)
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: w,
+    height: h,
     show: false,
     autoHideMenuBar: true,
     icon: process.platform === 'linux' ? { icon } : {},
@@ -86,16 +83,13 @@ app.whenReady().then(() => {
   createWindow()
 
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
+    // On macOS it's common to re-create a window in the app when the dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// Quit when all windows are closed, except on macOS. There, it's common for applications and their menu bar to stay active until the user quits explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
@@ -106,5 +100,4 @@ app.on('before-quit', async(e) => {
   fs.rmSync(appTmpDir, { recursive: true, force: true })
 })
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+// In this file you can include the rest of your app"s specific main process code. You can also put them in separate files and require them here.
