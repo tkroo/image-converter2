@@ -47,9 +47,9 @@ async function convert(file, format, outDirectory, appendString, options) {
     try {
       fs.unlinkSync(filepath)
     } catch (error) {
-      console.error(`unlinkSync error: ${error}`)
+      console.error(`unlinkSync_err: ${error}`)
     }
-    return { filename: path.basename(file), status: 'error', error: err }
+    return { filename: path.basename(file), status: 'error', error }
   }
 }
 
