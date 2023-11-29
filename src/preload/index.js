@@ -3,16 +3,16 @@ import { contextBridge, ipcRenderer } from 'electron'
 
 // Custom APIs for renderer
 const api = {
-  openDirectory: (path) => ipcRenderer.invoke('dialog:openDirectory', path),
-  selectOutDir: () => ipcRenderer.invoke('dialog:selectOutDir'),
-  handleFile: (_,...args) => ipcRenderer.invoke('dialog:handleFile', _, ...args),
-  createDirectories: (path) => ipcRenderer.invoke('dialog:createDirectories', path),
+  openDirectory: (path) => ipcRenderer.invoke('openDirectory', path),
+  selectOutDir: () => ipcRenderer.invoke('selectOutDir'),
+  handleFile: (_,...args) => ipcRenderer.invoke('handleFile', _, ...args),
+  createDirectories: (path) => ipcRenderer.invoke('createDirectories', path),
   configOps: {
-    get: (key) => ipcRenderer.invoke('dialog:configOps.get', key),
-    set: (key, value) => ipcRenderer.invoke('dialog:configOps.set', key, value),
-    reset: (key) => ipcRenderer.invoke('dialog:configOps.reset', key),
-    open: () => ipcRenderer.invoke('dialog:configOps.open'),
-    init: () => ipcRenderer.invoke('dialog:configOps.init'),
+    init: () => ipcRenderer.invoke('configOps.init'),
+    get: (key) => ipcRenderer.invoke('configOps.get', key),
+    set: (key, value) => ipcRenderer.invoke('configOps.set', key, value),
+    reset: (key) => ipcRenderer.invoke('configOps.reset', key),
+    open: () => ipcRenderer.invoke('configOps.open'),
   },
   showUpdateMessage: (callback) => ipcRenderer.on('showUpdateMessage', callback)
 }

@@ -69,17 +69,18 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
   
-  ipcMain.handle('dialog:selectOutDir', selectOutDir)
-  ipcMain.handle('dialog:openDirectory', openDirectory)
-  ipcMain.handle('dialog:handleFile', handleFile)
-  ipcMain.handle('dialog:createDirectories', createDirectories)
+  ipcMain.handle('selectOutDir', selectOutDir)
+  ipcMain.handle('openDirectory', openDirectory)
+  ipcMain.handle('handleFile', handleFile)
+  ipcMain.handle('createDirectories', createDirectories)
   
-  ipcMain.handle('dialog:configOps.get', configOps.get)
-  ipcMain.handle('dialog:configOps.set', configOps.set)
-  ipcMain.handle('dialog:configOps.reset', configOps.reset)
-  ipcMain.handle('dialog:configOps.open', configOps.open)
-  ipcMain.handle('dialog:configOps.init', configOps.init)
-  ipcMain.handle('dialog:showUpdateMessage', showUpdateMessage)
+  ipcMain.handle('configOps.init', configOps.init)
+  ipcMain.handle('configOps.get', configOps.get)
+  ipcMain.handle('configOps.set', configOps.set)
+  ipcMain.handle('configOps.reset', configOps.reset)
+  ipcMain.handle('configOps.open', configOps.open)
+
+  ipcMain.handle('showUpdateMessage', showUpdateMessage)
   
   configOps.init()
   createWindow()
