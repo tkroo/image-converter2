@@ -12,7 +12,7 @@ let mainWindow
 function createWindow() {
   // const w = 900
   // const h = 670
-  const w = 800
+  const w = 916
   const h = Math.round(w / 1.618)
   // Create the browser window.
   mainWindow = new BrowserWindow({
