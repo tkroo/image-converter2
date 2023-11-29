@@ -30,6 +30,18 @@ function createWindow() {
       additionalArguments: []
     }
   })
+
+  // ipc handlers
+  ipcMain.handle('selectOutDir', selectOutDir)
+  ipcMain.handle('openDirectory', openDirectory)
+  ipcMain.handle('handleFile', handleFile)
+  ipcMain.handle('createDirectories', createDirectories)
+  ipcMain.handle('configOps.init', configOps.init)
+  ipcMain.handle('configOps.get', configOps.get)
+  ipcMain.handle('configOps.set', configOps.set)
+  ipcMain.handle('configOps.reset', configOps.reset)
+  ipcMain.handle('configOps.open', configOps.open)
+  ipcMain.handle('showUpdateMessage', showUpdateMessage)
   
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -65,19 +77,6 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-  
-  ipcMain.handle('selectOutDir', selectOutDir)
-  ipcMain.handle('openDirectory', openDirectory)
-  ipcMain.handle('handleFile', handleFile)
-  ipcMain.handle('createDirectories', createDirectories)
-  
-  ipcMain.handle('configOps.init', configOps.init)
-  ipcMain.handle('configOps.get', configOps.get)
-  ipcMain.handle('configOps.set', configOps.set)
-  ipcMain.handle('configOps.reset', configOps.reset)
-  ipcMain.handle('configOps.open', configOps.open)
-
-  ipcMain.handle('showUpdateMessage', showUpdateMessage)
   
   configOps.init()
   createWindow()
