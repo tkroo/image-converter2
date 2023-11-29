@@ -5,7 +5,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 const api = {
   openDirectory: (path) => ipcRenderer.invoke('openDirectory', path),
   selectOutDir: () => ipcRenderer.invoke('selectOutDir'),
-  handleFile: (_,...args) => ipcRenderer.invoke('handleFile', _, ...args),
+  handleFile: (...args) => ipcRenderer.invoke('handleFile', ...args),
   createDirectories: (path) => ipcRenderer.invoke('createDirectories', path),
   configOps: {
     init: () => ipcRenderer.invoke('configOps.init'),
