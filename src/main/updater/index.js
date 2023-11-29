@@ -1,4 +1,4 @@
-import { app, dialog, BrowserWindow } from 'electron'
+import { app, dialog } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { getMainWindow } from '../helpers'
 import downicon from '../../../resources/download-circle.png?asset'
