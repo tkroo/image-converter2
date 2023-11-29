@@ -22,7 +22,7 @@ function createWindow() {
     autoHideMenuBar: true,
     icon: process.platform === 'linux' ? { icon } : {},
     webPreferences: {
-      webSecurity: is.dev ? false : true,
+      webSecurity: !is.dev,
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
