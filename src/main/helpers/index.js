@@ -10,7 +10,7 @@ export const appTmpDir = join(app.getPath('temp'), app.name)
 export const thumbnailsDir = join(appTmpDir, 'thumbnails')
 
 export async function selectOutDir() {
-  const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
+  const { canceled, filePaths } = await dialog.showOpenDialog(getMainWindow(), {
     properties: ['openDirectory']
   })
   if (!canceled) {
