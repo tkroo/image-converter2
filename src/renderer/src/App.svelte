@@ -4,6 +4,8 @@
   import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import Gears from './components/GearsSVG.svelte'
   import SettingsIcon from './components/SettingsIcon.svelte'
+  // import Dropper from './components/Dropper.svelte'
+  // let cfiles = [];
   
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   let imageFormat = 'png'
@@ -29,6 +31,7 @@
     updateConfig()
 
     window.api.showUpdateMessage((event, message) => {
+      // console.log('showUpdateMessage', message)
       updateMsg = message
     })
 
@@ -103,13 +106,14 @@
 
     const startTime = Date.now()
 
+    // console.log('myfiles: ', myfiles)
     await Promise.all(myfiles.map(async(f) => {
       let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
       convertedFiles = [...convertedFiles, tmp]
     }))
+
     const endTime = Date.now()
 
-    // workDuration = new Date(endTime - startTime).getMinutes()+":"+new Date(endTime - startTime).getSeconds()+" "+new Date(endTime - startTime).getMilliseconds()
     workDuration = timeFormat(endTime - startTime)
 
     isProcessing = false
@@ -191,7 +195,7 @@
             read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid
             values.
           </p>
-          <button on:click={() => {resetConfig('formatOptions')}} type="button" class="btn btn-small pt-2"> restore format defaults </button>
+          <button on:click={() => {resetConfig('formatOptions')}} type="button" class="btn btn-small mt-2"> restore format defaults </button>
         </details>
       </fieldset>
       <div class="saveto">
@@ -202,7 +206,7 @@
         <br />
         <button
           type="button"
-          class="btn pt-2"
+          class="btn mt-2"
           on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}
         >
           open output directory
@@ -236,8 +240,18 @@
   </aside>
 
   <main>
-    <h1 class="uppercase">image format converter</h1>
-    <p class="pb-3">image.*** will be saved to <strong>{out_directory}</strong> as image{#if use_append_string}<em>{append_string}</em>{/if}.<em>{imageFormat}</em></p>
+    <h1 class="uppercase">Image Format Converter</h1>
+    <p class="mt-3">image.xxx will be saved to <strong>{out_directory}</strong>/image<strong>{#if use_append_string}<em>{append_string}</em>{/if}.<em>{imageFormat}</em></strong></p>
+
+    <!-- <div>
+      {#each cfiles as cfile}
+      <img src={cfile} alt={cfile} />
+      <span>{cfile}</span>
+      {/each}
+    </div>
+    
+    <Dropper bind:cfiles={cfiles} /> -->
+
     <Dropzone
       on:drop={handleConvert}
       accept={["image/*"]}
@@ -531,10 +545,13 @@
     align-items: baseline;
     justify-content: space-between;
   } */
-  .pt-2 {
+  /* .mt-1 {
+    margin-top: 0.25rem;
+  } */
+  .mt-2 {
     margin-top: 0.5rem;
   }
-  .pb-3 {
+  .mt-3 {
     margin-bottom: 1rem;
   }
   a {
