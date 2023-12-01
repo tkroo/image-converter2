@@ -4,7 +4,7 @@ import Store from 'electron-store'
 import schema from '../schema'
 export const myStore = new Store({ schema })
 
-export const extraPath = 'imgConverter'
+export const extraPath = 'foo'
 export const fallbackPath = join(app.getPath('temp'), extraPath)
 export const appTmpDir = join(app.getPath('temp'), app.name)
 export const thumbnailsDir = join(appTmpDir, 'thumbnails')

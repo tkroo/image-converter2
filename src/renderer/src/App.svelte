@@ -1,11 +1,11 @@
 <script>
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
-  import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
+  // import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import Gears from './components/GearsSVG.svelte'
   import SettingsIcon from './components/SettingsIcon.svelte'
-  // import Dropper from './components/Dropper.svelte'
-  // let cfiles = [];
+  import Dropper from './components/Dropper.svelte'
+  let cfiles = [];
   
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   let imageFormat = 'png'
@@ -106,7 +106,6 @@
 
     const startTime = Date.now()
 
-    // console.log('myfiles: ', myfiles)
     await Promise.all(myfiles.map(async(f) => {
       let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
       convertedFiles = [...convertedFiles, tmp]
@@ -139,7 +138,29 @@
   function toggle() {
     panelOpen = !panelOpen
   }
+
+  async function handleConvert2 (e) {
+    mydragoverClass = ''
+    isProcessing = true
+    convertedFiles = []
+    await window.api.createDirectories(out_directory)
+    const myfiles = e.detail.files
+    files.accepted = e.detail.files
+    const startTime = Date.now()
+    await Promise.all(myfiles.map(async(f) => {
+      let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
+      convertedFiles = [...convertedFiles, tmp]
+    }))
+
+    const endTime = Date.now()
+
+    workDuration = timeFormat(endTime - startTime)
+
+    isProcessing = false
+    convertedFiles = convertedFiles
+  }
 </script>
+
 <div class="container" class:panelOpen={panelOpen}>
   {#if panelOpen}
   <button
@@ -243,16 +264,18 @@
     <h1 class="uppercase">Image Format Converter</h1>
     <p class="mt-3">image.xxx will be saved to <strong>{out_directory}</strong>/image<strong>{#if use_append_string}<em>{append_string}</em>{/if}.<em>{imageFormat}</em></strong></p>
 
-    <!-- <div>
+    <div>
       {#each cfiles as cfile}
-      <img src={cfile} alt={cfile} />
+      <img src="file://{cfile}" alt={cfile} />
       <span>{cfile}</span>
       {/each}
     </div>
     
-    <Dropper bind:cfiles={cfiles} /> -->
+    <Dropper on:gotFiles={handleConvert2}>
+      <p class="message">Drop files and/or folders here<br/>or<br/>click to select files</p>
+    </Dropper>
 
-    <Dropzone
+    <!-- <Dropzone
       on:drop={handleConvert}
       accept={["image/*"]}
       containerStyles="transition: background-color 200ms ease-in-out;"
@@ -261,7 +284,7 @@
       on:dragleave={() => (mydragoverClass = '')}
     >
       <p class="message">Drop files here<br/>or<br/>click to select files</p>
-    </Dropzone>
+    </Dropzone> -->
   
     <section class="results-wrap">
       {#if convertedFiles.length}
@@ -345,7 +368,7 @@
     height: 100%;
     top: 0;
     padding: 1rem 2rem 1rem 1rem;
-    background-color: var(--color-bg);
+    background-color: var(--color-settings-bg);
     overflow: hidden;
     left: var(--c);
     transition: left 400ms ease-out, background-color 300ms ease-in-out;

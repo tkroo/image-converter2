@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import fs from 'node:fs'
 import { showUpdateMessage } from './updater'
-import { appTmpDir, selectOutDir, openDirectory, configOps } from './helpers'
+import { appTmpDir, selectOutDir, openDirectory, selectFilesOrDirs, configOps } from './helpers'
 import { handleFile, createDirectories } from './convert'
 import icon from '../../build/icons/png/256x256.png?asset'
 
@@ -69,7 +69,7 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.tkroo.imageconverter2')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

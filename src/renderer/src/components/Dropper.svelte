@@ -1,145 +1,68 @@
 <script>
-  export let name
-  export let inputElement
-  export let cfiles = []
+  import { fromEvent } from 'file-selector'
+  import { createEventDispatcher } from 'svelte'
+  import accepts from './attr-accept'
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }
+  const dispatch = createEventDispatcher()
+  const acceptTheseTypes = ['image/*']
+
+  let inputElement
+  let dragoverClass = ''
 
   const handleDrop = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    let files =[];
-
-    const fileHandlesPromises = [...e.dataTransfer.items]
-      .filter((item) => item.kind === 'file')
-      .map((item) => item.getAsFileSystemHandle())
-
-    for await (const handle of fileHandlesPromises) {
-      if (handle.kind === 'directory') {
-        const getListing = await getDirectoryListing(handle)
-        console.log('getListing :', getListing)
-        files = [...files, ...getListing]
-      } else {
-        files = [...files, handle]
-      }
-    }
-
-    console.log("==========")
-    console.log('files: ')
-    console.log(files)
-    console.log("==========")
-    for (const file of files) {
-      console.log('file.webkitRelativePath: ', file.webkitRelativePath)
-      console.log('file.directoryHandle: ', file.directoryHandle)
-      console.log('file.handle: ', file.handle)
-      // let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
-    }
-    cfiles = files.map((f) => f.webkitRelativePath)
-
+    e.preventDefault()
+    dragoverClass = ''
+    const eventFiles = await fromEvent(e)
+    const acceptedFiles = eventFiles.filter((f) => accepts(f, acceptTheseTypes))
+    const files = acceptedFiles.map((f) => f.path)
+    dispatch('gotFiles', { files })
   }
 
-
-  const getDirectoryListing = async(dirHandle) => {
-    let directoryStructure = undefined;
-
-    const getFiles = async (dirHandle, path = dirHandle.name) => {
-      const dirs = [];
-      const files = [];
-      for await (const entry of dirHandle.values()) {
-        const nestedPath = `${path}/${entry.name}`;
-        if (entry.kind === "file") {
-          files.push(
-            entry.getFile().then((file) => {
-              file.directoryHandle = dirHandle;
-              file.handle = entry;
-              return Object.defineProperty(file, "webkitRelativePath", {
-                configurable: true,
-                enumerable: true,
-                get: () => nestedPath,
-              });
-            })
-          );
-        } else if (entry.kind === "directory") {
-          dirs.push(getFiles(entry, nestedPath));
-        }
-      }
-      return [
-        ...(await Promise.all(dirs)).flat(),
-        ...(await Promise.all(files)),
-      ];
-    };
-
-    try {
-      const handle = dirHandle;
-      directoryStructure = getFiles(handle, undefined);
-    } catch (err) {
-      if (err.name !== "AbortError") {
-        console.error(err.name, err.message);
-      }
-    }
-    return directoryStructure;
-
-  }
-
-
-  function openFileDialog() {
-    if (inputElement) {
-      inputElement.value = null; // TODO check if null needs to be set
-      // state.isFileDialogActive = true;
-      inputElement.click();
+  const handleKeyDown = (e) => {
+    if (e.keyCode === 32 || e.keyCode === 13) {
+      inputElement.click()
     }
   }
-
-  function onClickCb() {
-    openFileDialog();
-  }
-
-  const onInputElementClick = (event) => {
-    event.stopPropagation();
-  }
-
-  function onKeyDownCb(event) {
-    // Ignore keyboard events bubbling up the DOM tree
-    // if (!rootRef || !rootRef.isEqualNode(event.target)) {
-    //   return;
-    // }
-
-    if (event.keyCode === 32 || event.keyCode === 13) {
-      event.preventDefault();
-      openFileDialog();
-    }
-  }
-
-
 </script>
 
-
-<div id="holder" role="button" tabindex="0"
-  on:dragover={handleDragOver}
+<div
+  id="dropzone"
+  role="button"
+  tabindex="0"
+  class="{dragoverClass}"
   on:drop={handleDrop}
-  on:click={onClickCb}
-  on:keydown={onKeyDownCb}
+  on:click={() => {inputElement.click()}}
+  on:keydown|preventDefault={handleKeyDown}
+  on:dragover|preventDefault|stopPropagation={() => (dragoverClass = 'dragover')}
+  on:dragleave={() => (dragoverClass = '')}
 >
-<input accept="image/*" multiple type="file" {name}
-    autocomplete="off"
+  <input
+    accept="*"
+    type="file"
+    multiple
+    name='dropper'
     tabindex="-1"
-    bind:this={inputElement}
-    style="display: none;"
     on:change={handleDrop}
-    on:click={onInputElementClick}
+    bind:this={inputElement}
   />
-  <slot> Drop test </slot>
+  <slot>Drop files here</slot>
 </div>
 
 <style>
-  #holder {
+  #dropzone {
     border-radius: 0.5rem;
-    padding: 2rem;
-    color: #fff;
-    background-color: #000;
+    border: 4px dashed var(--color-drop-bg);
+    padding: 1rem;
+    color: #222;
+    background-color: var(--color-drop-bg);
     margin: 1rem auto;
+    transition: background-color 200ms ease-in-out, border-color 200ms ease-in-out;
+  }
+  #dropzone input {
+    display: none;
+  }
+  .dragover {
+    border: 4px dashed #66666666 !important;
+    background-color: var(--color-drop) !important;
   }
 </style>
