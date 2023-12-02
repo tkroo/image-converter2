@@ -5,19 +5,21 @@ import fs from 'node:fs'
 import { showUpdateMessage } from './updater'
 import { appTmpDir, selectOutDir, openDirectory, selectFilesOrDirs, configOps } from './helpers'
 import { handleFile, createDirectories } from './convert'
+import { rememberWindowBounds, getWindowBounds } from './windowState'
 import icon from '../../build/icons/png/256x256.png?asset'
+
+let prevOrDefaultBounds = getWindowBounds()
+let magicNumber = process.platform === 'linux' ? 37 : 0 // titlebar height adjustment, see this issue: https://github.com/electron/electron/issues/10388
 
 let mainWindow
 
 function createWindow() {
-  // const w = 900
-  // const h = 670
-  const w = 916
-  const h = Math.round(w / 1.618)
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: w,
-    height: h,
+    width: prevOrDefaultBounds.width,
+    height: prevOrDefaultBounds.height,
+    x: prevOrDefaultBounds.x,
+    y: prevOrDefaultBounds.y-magicNumber,
     show: false,
     autoHideMenuBar: true,
     icon: process.platform === 'linux' ? { icon } : {},
@@ -80,6 +82,7 @@ app.whenReady().then(() => {
   
   configOps.init()
   createWindow()
+  rememberWindowBounds(mainWindow)
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the dock icon is clicked and there are no other windows open.
