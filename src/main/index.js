@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import fs from 'node:fs'
-import { showUpdateMessage } from './updater'
+import { checkForUpdates } from './updater'
 import { appTmpDir, selectOutDir, openDirectory, selectFilesOrDirs, configOps } from './helpers'
 import { handleFile, createDirectories } from './convert'
 import { rememberWindowBounds, getWindowBounds } from './windowState'
@@ -43,11 +43,9 @@ function createWindow() {
   ipcMain.handle('configOps.set', configOps.set)
   ipcMain.handle('configOps.reset', configOps.reset)
   ipcMain.handle('configOps.open', configOps.open)
-  ipcMain.handle('showUpdateMessage', showUpdateMessage)
   
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
-    mainWindow.webContents.send('showUpdateMessage', `${app.name}<br/>version: ${app.getVersion()}`)
     is.dev && mainWindow.webContents.openDevTools()
   })
 
@@ -80,6 +78,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
   
+  if (app.isPackaged) checkForUpdates()
   configOps.init()
   createWindow()
   rememberWindowBounds(mainWindow)
