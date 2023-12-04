@@ -6,6 +6,7 @@
   import SettingsIcon from './components/SettingsIcon.svelte'
   import Dropper from './components/Dropper.svelte'
   
+  import UpdateDialog from './components/UpdateDialog.svelte'
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   let imageFormat = 'png'
   let mydragoverClass = ''
@@ -16,10 +17,6 @@
   let isProcessing = false
   let panelOpen = false
   let workDuration = 0
-  let updateMsg = ''
-  let updateAvailable = false
-  let downloadingUpdate = false
-  let updateInfo = {}
 
 
   let filesReceived = []
@@ -27,6 +24,10 @@
   $: filesOk = convertedFiles.filter((f) => f.status != 'error')
   $: filesError = convertedFiles.filter((f) => f.status == 'error')
 
+  let updateMsg = ''
+  let updateAvailable = false
+  let downloadingUpdate = false
+  let updateInfo = {}
   onMount(async () => {
     updateConfig()
 
@@ -159,6 +160,7 @@
 {/if}
 
 <div class="container" class:panelOpen={panelOpen}>
+<UpdateDialog {updateInfo} {updateAvailable} {downloadingUpdate} />
   {#if panelOpen}
   <button
     class="unbutton close-overlay"
