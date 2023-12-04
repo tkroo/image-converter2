@@ -18,6 +18,7 @@
   let workDuration = 0
   let updateMsg = ''
   let updateAvailable = false
+  let downloadingUpdate = false
   let updateInfo = {}
 
 
@@ -29,16 +30,18 @@
   onMount(async () => {
     updateConfig()
 
-    window.api.showUpdateMessage((event, message) => {
-      // console.log('showUpdateMessage', message)
-      updateMsg = message
-    })
+    // window.api.showUpdateMessage((event, message) => {
+    //   // console.log('showUpdateMessage', message)
+    //   updateMsg = message
+    // })
 
     window.api.sendUpDateInfo((event, info) => {
       updateInfo = info
       if(info.currentVersion >= info.version) {
+        updateMsg = `${info.appName} ${info.currentVersion}`
         updateAvailable = false
       } else {
+        updateMsg = `${info.appName} ${info.currentVersion} <br/><span class="ok">version ${info.version} available</span>`
         updateAvailable = true
       }
     })
@@ -133,23 +136,24 @@
   }
 </script>
 {#if updateAvailable }
-<div
-  class="popover-container"
-  transition:fade={{ delay: 200, duration: 300 }}
->
-  <div
-    class="popover-dialog"
-    transition:fade={{ duration: 100 }}
-  >
+<div class="popover-container" transition:fade={{ delay: 200, duration: 300 }}>
+  <div class="popover-dialog" transition:fade={{ duration: 100 }}>
+    {#if downloadingUpdate}
+    <div class="message">
+      <p>downloading update ...</p>
+      <p>please wait</p>
+    </div>
+    {:else}
     <div class="message">
       <h3>update available</h3>
-      <p>new version {updateInfo.version} available</p>
+      <p>version {updateInfo.version} available</p>
       <small>current version {updateInfo.currentVersion}</small>
     </div>
     <div class="buttons">
-      <button class="btn" on:click={() => {window.api.checkForUpdates(true)}}>update to {updateInfo.version}</button>
+      <button class="btn" on:click={() => {downloadingUpdate = true; window.api.checkForUpdates(true)}}>update to {updateInfo.version}</button>
       <button class="btn" on:click={() => (updateAvailable = false)}>cancel</button>
     </div>
+    {/if}
   </div>
 </div>
 {/if}
@@ -357,7 +361,7 @@
   .popover-dialog {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
     width: 40vw;
     min-height: 40vh;
@@ -638,5 +642,8 @@
     position: absolute;
     bottom: 1rem;
     font-size: 0.8rem;
+  }
+  .ok {
+    color: var(--color-accent)
   }
 </style>
