@@ -5,15 +5,9 @@
   import Gears from './components/GearsSVG.svelte'
   import SettingsIcon from './components/SettingsIcon.svelte'
   import Dropper from './components/Dropper.svelte'
-  let cfiles = [];
   
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   let imageFormat = 'png'
-  let convertedFiles = []
-  let files = {
-    accepted: [],
-    rejected: []
-  }
   let mydragoverClass = ''
   let out_directory
   let append_string = '_converted'
@@ -24,6 +18,8 @@
   let workDuration = 0
   let updateMsg = ''
 
+  let filesReceived = []
+  let convertedFiles = []
   $: filesOk = convertedFiles.filter((f) => f.status != 'error')
   $: filesError = convertedFiles.filter((f) => f.status == 'error')
 
@@ -72,7 +68,7 @@
   }
 
   async function clearFiles() {
-    files.accepted = []
+    filesReceived = []
     convertedFiles = []
   }
 
@@ -84,41 +80,6 @@
     const seconds = s == 0 ? '' : s + (s > 1 ? ' seconds ' : ' second ')
     return minutes + seconds + ms + ' milliseconds'
   }
-
-  async function handleConvert(event) {
-    mydragoverClass = ''
-    isProcessing = true
-    convertedFiles = []
-
-    let af
-    if (event.detail.acceptedFiles) {
-      files.accepted = af = event.detail.acceptedFiles
-    } else if (files.accepted.length) {
-      af = files.accepted
-    } else {
-      af = []
-    }
-
-    // create directories if they don't exist
-    await window.api.createDirectories(out_directory)
-    
-    const myfiles = af.map((f) => f.path)
-
-    const startTime = Date.now()
-
-    await Promise.all(myfiles.map(async(f) => {
-      let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
-      convertedFiles = [...convertedFiles, tmp]
-    }))
-
-    const endTime = Date.now()
-
-    workDuration = timeFormat(endTime - startTime)
-
-    isProcessing = false
-    convertedFiles = convertedFiles
-  }
-
 
   async function selectPath() {
     const filePath = await window.api.selectOutDir()
@@ -144,10 +105,9 @@
     isProcessing = true
     convertedFiles = []
     await window.api.createDirectories(out_directory)
-    const myfiles = e.detail.files
-    files.accepted = e.detail.files
+    filesReceived = e.detail.files ?? filesReceived
     const startTime = Date.now()
-    await Promise.all(myfiles.map(async(f) => {
+    await Promise.all(filesReceived.map(async(f) => {
       let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
       convertedFiles = [...convertedFiles, tmp]
     }))
@@ -181,7 +141,7 @@
     </button>
     <h2>settings</h2>
     <section class="options">
-      <button type="button" class="btn" on:click={handleConvert} disabled={files.accepted.length === 0}>convert again</button>
+      <button type="button" class="btn" on:click={handleConvert2} disabled={filesReceived.length === 0}>convert again</button>
       <fieldset>
         <legend>&nbsp;convert to&nbsp;</legend>
         {#each formats as format}
@@ -263,13 +223,6 @@
   <main>
     <h1 class="uppercase">Image Format Converter</h1>
     <p class="mt-3">image.xxx will be saved to <strong>{out_directory}</strong>/image<strong>{#if use_append_string}<em>{append_string}</em>{/if}.<em>{imageFormat}</em></strong></p>
-
-    <div>
-      {#each cfiles as cfile}
-      <img src="file://{cfile}" alt={cfile} />
-      <span>{cfile}</span>
-      {/each}
-    </div>
     
     <Dropper on:gotFiles={handleConvert2}>
       <p class="message">Drop files and/or folders here<br/>or<br/>click to select files</p>
@@ -290,7 +243,7 @@
       {#if convertedFiles.length}
         <div class="row">
           <div class="fgrow">
-            process{isProcessing ? `ing ${convertedFiles.length} of ${files.accepted.length}` : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} {!isProcessing ? `in ${workDuration}` : ''}
+            process{isProcessing ? `ing ${convertedFiles.length} of ${filesReceived.length}` : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} {!isProcessing ? `in ${workDuration}` : ''}
                 {#if isProcessing}
                   <span class="geartest" transition:fade>
                     <Gears />
