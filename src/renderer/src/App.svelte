@@ -17,6 +17,9 @@
   let panelOpen = false
   let workDuration = 0
   let updateMsg = ''
+  let updateAvailable = false
+  let updateInfo = {}
+
 
   let filesReceived = []
   let convertedFiles = []
@@ -29,6 +32,15 @@
     window.api.showUpdateMessage((event, message) => {
       // console.log('showUpdateMessage', message)
       updateMsg = message
+    })
+
+    window.api.sendUpDateInfo((event, info) => {
+      updateInfo = info
+      if(info.currentVersion >= info.version) {
+        updateAvailable = false
+      } else {
+        updateAvailable = true
+      }
     })
 
   })
@@ -120,6 +132,27 @@
     convertedFiles = convertedFiles
   }
 </script>
+{#if updateAvailable }
+<div
+  class="popover-container"
+  transition:fade={{ delay: 200, duration: 300 }}
+>
+  <div
+    class="popover-dialog"
+    transition:fade={{ duration: 100 }}
+  >
+    <div class="message">
+      <h3>update available</h3>
+      <p>new version {updateInfo.version} available</p>
+      <small>current version {updateInfo.currentVersion}</small>
+    </div>
+    <div class="buttons">
+      <button class="btn" on:click={() => {window.api.checkForUpdates(true)}}>update to {updateInfo.version}</button>
+      <button class="btn" on:click={() => (updateAvailable = false)}>cancel</button>
+    </div>
+  </div>
+</div>
+{/if}
 
 <div class="container" class:panelOpen={panelOpen}>
   {#if panelOpen}
@@ -308,6 +341,44 @@
     height: 100%;
     padding-right: 2rem;
   }
+
+  .popover-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: hsla(0, 0%, 0%, 0.75);
+    z-index: 999;
+  }
+  .popover-dialog {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 40vw;
+    min-height: 40vh;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    background-color: var(--color-settings-bg);
+  }
+  .popover-dialog .message {
+    color: var(--color-fg);
+    padding: 1rem;
+  }
+  .popover-dialog .message h3 {
+    margin: 0;
+  }
+  .popover-dialog .buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 1rem;
+  }
+
   main {
     width: 100%;
     font-size: 0.8em;

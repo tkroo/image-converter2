@@ -13,7 +13,9 @@ const api = {
     reset: (key) => ipcRenderer.invoke('configOps.reset', key),
     open: () => ipcRenderer.invoke('configOps.open'),
   },
-  showUpdateMessage: (callback) => ipcRenderer.on('showUpdateMessage', callback)
+  showUpdateMessage: (callback) => ipcRenderer.on('showUpdateMessage', callback),
+  sendUpDateInfo: (callback) => ipcRenderer.on('sendUpDateInfo', callback),
+  checkForUpdates: (callback) => ipcRenderer.invoke('checkForUpdates', callback)
 }
 
 if (process.contextIsolated) {
