@@ -4,6 +4,7 @@
   export let updateAvailable
   export let downloadingUpdate
   export let updateInfo
+  export let downloadProgress
 </script>
 
 {#if updateAvailable}
@@ -12,7 +13,7 @@
       {#if downloadingUpdate}
         <div class="message">
           <p>downloading update ...</p>
-          <p>please wait</p>
+          <p>{downloadProgress}</p>
         </div>
       {:else}
         <div class="message">

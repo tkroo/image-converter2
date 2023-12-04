@@ -1,15 +1,14 @@
 <script>
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
-  // import Dropzone from 'svelte-file-dropzone/Dropzone.svelte'
   import Gears from './components/GearsSVG.svelte'
   import SettingsIcon from './components/SettingsIcon.svelte'
   import Dropper from './components/Dropper.svelte'
   
   import UpdateDialog from './components/UpdateDialog.svelte'
+
   let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   let imageFormat = 'png'
-  let mydragoverClass = ''
   let out_directory
   let append_string = '_converted'
   let format_options = []
@@ -25,20 +24,16 @@
   $: filesError = convertedFiles.filter((f) => f.status == 'error')
 
   let updateMsg = ''
+  let downloadProgress = ''
   let updateAvailable = false
   let downloadingUpdate = false
   let updateInfo = {}
+
   onMount(async () => {
     updateConfig()
-
-    // window.api.showUpdateMessage((event, message) => {
-    //   // console.log('showUpdateMessage', message)
-    //   updateMsg = message
-    // })
-
     window.api.sendUpDateInfo((event, info) => {
       updateInfo = info
-      if(info.currentVersion >= info.version) {
+      if (info.currentVersion >= info.version) {
         updateMsg = `${info.appName} ${info.currentVersion}`
         updateAvailable = false
       } else {
@@ -46,7 +41,9 @@
         updateAvailable = true
       }
     })
-
+    window.api.sendUpDateDownloadProgress((event, log_message) => {
+      downloadProgress = log_message
+    })
   })
 
   async function updateConfig() {
@@ -116,17 +113,18 @@
     panelOpen = !panelOpen
   }
 
-  async function handleConvert2 (e) {
-    mydragoverClass = ''
+  async function convertImages(e) {
     isProcessing = true
     convertedFiles = []
     await window.api.createDirectories(out_directory)
     filesReceived = e.detail.files ?? filesReceived
     const startTime = Date.now()
-    await Promise.all(filesReceived.map(async(f) => {
-      let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
-      convertedFiles = [...convertedFiles, tmp]
-    }))
+    await Promise.all(
+      filesReceived.map(async(f) => {
+        let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
+        convertedFiles = [...convertedFiles, tmp]
+      })
+    )
 
     const endTime = Date.now()
 
@@ -136,39 +134,18 @@
     convertedFiles = convertedFiles
   }
 </script>
-{#if updateAvailable }
-<div class="popover-container" transition:fade={{ delay: 200, duration: 300 }}>
-  <div class="popover-dialog" transition:fade={{ duration: 100 }}>
-    {#if downloadingUpdate}
-    <div class="message">
-      <p>downloading update ...</p>
-      <p>please wait</p>
-    </div>
-    {:else}
-    <div class="message">
-      <h3>update available</h3>
-      <p>version {updateInfo.version} available</p>
-      <small>current version {updateInfo.currentVersion}</small>
-    </div>
-    <div class="buttons">
-      <button class="btn" on:click={() => {downloadingUpdate = true; window.api.checkForUpdates(true)}}>update to {updateInfo.version}</button>
-      <button class="btn" on:click={() => (updateAvailable = false)}>cancel</button>
-    </div>
-    {/if}
-  </div>
-</div>
-{/if}
+
+<UpdateDialog {updateInfo} {updateAvailable} {downloadingUpdate} {downloadProgress} />
 
 <div class="container" class:panelOpen={panelOpen}>
-<UpdateDialog {updateInfo} {updateAvailable} {downloadingUpdate} />
   {#if panelOpen}
-  <button
-    class="unbutton close-overlay"
-    in:fade={{ delay: 100, duration: 300 }}
-    out:fade={{ delay: 250, duration: 300 }}
-    on:click={() => (panelOpen = false)}
-    on:mousewheel={(e) => (e.preventDefault(), e.stopPropagation())}
-  ></button>
+    <button
+      class="unbutton close-overlay"
+      in:fade={{ delay: 100, duration: 300 }}
+      out:fade={{ delay: 250, duration: 300 }}
+      on:click={() => (panelOpen = false)}
+      on:mousewheel={(e) => (e.preventDefault(), e.stopPropagation())}
+    ></button>
   {/if}
   <!-- <button type="button" class=" unbutton open-panel" on:click={(e) => (e.preventDefault(),panelOpen = true)} title="open settings">
     <img class="icon" src={openIcon} alt="settings" />
@@ -180,7 +157,7 @@
     </button>
     <h2>settings</h2>
     <section class="options">
-      <button type="button" class="btn" on:click={handleConvert2} disabled={filesReceived.length === 0}>convert again</button>
+      <button type="button" class="btn" on:click={convertImages} disabled={filesReceived.length === 0}>convert again</button>
       <fieldset>
         <legend>&nbsp;convert to&nbsp;</legend>
         {#each formats as format}
@@ -263,21 +240,10 @@
     <h1 class="uppercase">Image Format Converter</h1>
     <p class="mt-3">image.xxx will be saved to <strong>{out_directory}</strong>/image<strong>{#if use_append_string}<em>{append_string}</em>{/if}.<em>{imageFormat}</em></strong></p>
     
-    <Dropper on:gotFiles={handleConvert2}>
+    <Dropper on:gotFiles={convertImages}>
       <p class="message">Drop files and/or folders here<br/>or<br/>click to select files</p>
     </Dropper>
 
-    <!-- <Dropzone
-      on:drop={handleConvert}
-      accept={["image/*"]}
-      containerStyles="transition: background-color 200ms ease-in-out;"
-      containerClasses={mydragoverClass}
-      on:dragover={() => (mydragoverClass = 'custom-dropzone')}
-      on:dragleave={() => (mydragoverClass = '')}
-    >
-      <p class="message">Drop files here<br/>or<br/>click to select files</p>
-    </Dropzone> -->
-  
     <section class="results-wrap">
       {#if convertedFiles.length}
         <div class="row">
@@ -346,43 +312,6 @@
     min-height: 100%;
     height: 100%;
     padding-right: 2rem;
-  }
-
-  .popover-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: hsla(0, 0%, 0%, 0.75);
-    z-index: 999;
-  }
-  .popover-dialog {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    width: 40vw;
-    min-height: 40vh;
-    padding: 1rem 2rem;
-    border-radius: 0.5rem;
-    background-color: var(--color-settings-bg);
-  }
-  .popover-dialog .message {
-    color: var(--color-fg);
-    padding: 1rem;
-  }
-  .popover-dialog .message h3 {
-    margin: 0;
-  }
-  .popover-dialog .buttons {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    gap: 1rem;
   }
 
   main {
@@ -644,8 +573,5 @@
     position: absolute;
     bottom: 1rem;
     font-size: 0.8rem;
-  }
-  .ok {
-    color: var(--color-accent)
   }
 </style>

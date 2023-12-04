@@ -15,6 +15,7 @@ const api = {
   },
   // showUpdateMessage: (callback) => ipcRenderer.on('showUpdateMessage', callback),
   sendUpDateInfo: (callback) => ipcRenderer.on('sendUpDateInfo', callback),
+  sendUpDateDownloadProgress: (callback) => ipcRenderer.on('sendUpDateDownloadProgress', callback),
   checkForUpdates: (callback) => ipcRenderer.invoke('checkForUpdates', callback)
 }
 
