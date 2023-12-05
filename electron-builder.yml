@@ -11,6 +11,8 @@ files:
 asarUnpack:
   - resources/**
   - node_modules/sharp
+electronLanguages:
+  - en-US
 win:
   executableName: imageconverter2
 nsis:
