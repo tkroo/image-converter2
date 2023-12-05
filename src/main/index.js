@@ -18,6 +18,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: prevOrDefaultBounds.width,
     height: prevOrDefaultBounds.height,
+    minWidth: 400,
+    minHeight: 600,
     x: prevOrDefaultBounds.x,
     y: prevOrDefaultBounds.y-magicNumber,
     show: false,
