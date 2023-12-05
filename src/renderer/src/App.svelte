@@ -212,19 +212,17 @@
       </div>
       <div class="append">
         <label for="use_append_string">
-          append string to file name
+          <p>append string to file name
           <input
             id="use_append_string"
             type="checkbox"
             bind:checked={use_append_string}
             on:change={async () => await window.api.configOps.set('appendStringUsed', use_append_string)}
-          />
+          /></p>
           <input id="append_string" type="text" bind:value={append_string} />
+          <br/>
+          <small>image.*** will be saved as image{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}</small>
         </label>
-        <br />
-        <small>
-          image.*** will be saved as image{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}
-        </small>
       </div>
       <div class="cols-2">
         <button type="button" class="btn" on:click={openConfig}> open settings file </button>
@@ -241,7 +239,7 @@
     <p class="mt-3">image.xxx will be saved to <strong>{out_directory}</strong>/image<strong>{#if use_append_string}<em>{append_string}</em>{/if}.<em>{imageFormat}</em></strong></p>
     
     <Dropper on:gotFiles={convertImages}>
-      <p class="message">Drop files and/or folders here<br/>or<br/>click to select files</p>
+      <p class="message">Drop files / folders here<br/>or<br/>click to select files</p>
     </Dropper>
 
     <section class="results-wrap">
@@ -274,12 +272,10 @@
             <span>Click to download or drag and drop to a file manager window</span>
           </div>
           
-          <button type="button" class="btn" on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}>
-            open output directory
-          </button>
-          <button type="button" class="btn" on:click|preventDefault={clearFiles}>
-            clear results list
-          </button>
+          <div class="f-end">
+            <button type="button" class="btn" on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}>open output directory</button>
+            <button type="button" class="btn" on:click|preventDefault={clearFiles}>clear results list</button>
+          </div>
         </div>
         <ul class="results-list">
           {#each convertedFiles as file}
@@ -304,8 +300,8 @@
 
 <style>
   :root {
-    /* --o: 38%; */
-    --o: min(80%, 305px);
+    --o: min(80%, 600px);
+    /* --o: min(80%, 400px); */
     --c: calc(var(--o)*-1);
   }
   .container {
@@ -422,8 +418,8 @@
     margin-bottom: 0.5rem;
   }
   .append input {
-    margin: 0 0 0.5rem 0;
-    padding: 0.25rem 0.5rem;
+    margin: 0.25rem 0;
+    padding: 0.5rem;
     border: 1px solid #aaa;
     border-radius: 0.25rem;
   }
@@ -442,28 +438,41 @@
   fieldset label:last-child {
     margin-right: 0;
   }
-  .results-wrap {
-    margin-top: 1rem;
-  }
+  /* .results-wrap {
+    margin-top: 0;
+  } */
   /* .results-wrap .row h2 {
     margin: 0;
   } */
   .results-wrap .row {
-    margin-top: 1rem;
+    margin: 3rem auto 1rem;
     display: flex;
-    align-items: flex-end;
+    flex-wrap: wrap;
     width: 100%;
-    gap: 2rem;
+    gap: 1rem;
     justify-content: space-between;
+    align-items: center;
+    /* background-color: hsla(200, 100%, 50%, 0.25); */
   }
   .fgrow {
     flex-grow: 2;
+    /* background-color: hsla(290, 100%, 50%, 0.25); */
+  }
+  .f-end {
+    /* background-color: hsla(240, 100%, 50%, 0.25); */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    flex-grow: 1;
+    gap: 2rem;
   }
   .results-wrap img {
     background: repeating-conic-gradient(#666 0 90deg, #999 0 180deg) 0 0/20px 20px round;
   }
   .results-list {
-    padding: 1rem 0;
+    padding: 0;
+    margin: 0;
     list-style: none;
     display: grid;
     gap: 1rem;
