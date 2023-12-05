@@ -6,7 +6,7 @@ import { checkForUpdates } from './updater'
 import { appTmpDir, selectOutDir, openDirectory, selectFilesOrDirs, configOps } from './helpers'
 import { handleFile, createDirectories } from './convert'
 import { rememberWindowBounds, getWindowBounds } from './windowState'
-import icon from '../../build/icons/png/256x256.png?asset'
+import icon from '../../build/icons/png/512x512.png?asset'
 
 let prevOrDefaultBounds = getWindowBounds()
 let magicNumber = process.platform === 'linux' ? 37 : 0 // titlebar height adjustment, see this issue: https://github.com/electron/electron/issues/10388
