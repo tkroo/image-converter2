@@ -27,14 +27,12 @@ export function getWindowBounds () {
 }
 
 function saveWindowBounds (bounds) {
-  console.log('saveWinBounds', bounds)
   storage.set('WinBounds', bounds)
 }
 
 const debouncedSave = debounceFunction(
   (win) => {
     const bounds = win.getBounds()
-    console.log('debouncedSave bounds: ', bounds)
     saveWindowBounds(bounds)
   }, {wait: 200}
 )
