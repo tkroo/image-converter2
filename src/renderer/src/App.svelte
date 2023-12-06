@@ -1,22 +1,21 @@
 <script>
   import { onMount } from 'svelte'
+  import { optionsStore } from './stores/optionsStore.js'
+  // import { writable } from 'svelte/store'
+  
+
   import { fade } from 'svelte/transition'
   import Gears from './components/GearsSVG.svelte'
-  import SettingsIcon from './components/SettingsIcon.svelte'
   import Dropper from './components/Dropper.svelte'
   
   import UpdateDialog from './components/UpdateDialog.svelte'
+  import SettingsPanel from './components/SettingsPanel.svelte'
 
-  let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
-  let imageFormat = 'png'
-  let out_directory
-  let append_string = '_converted'
-  let format_options = []
-  let use_append_string
   let isProcessing = false
-  let panelOpen = false
   let workDuration = 0
 
+  // let out_directory
+  // let optionsStore
 
   let filesReceived = []
   let convertedFiles = []
@@ -28,9 +27,14 @@
   let updateAvailable = false
   let downloadingUpdate = false
   let updateInfo = {}
+  let isMounted = false
 
   onMount(async () => {
-    updateConfig()
+    console.log('onMount')
+    isMounted = true
+    // const { fOptionsStore } = await window.api.configOps.get()
+    // optionsStore = writable({...fOptionsStore})
+
     window.api.sendUpDateInfo((event, info) => {
       updateInfo = info
       if (info.currentVersion >= info.version) {
@@ -46,40 +50,6 @@
     })
   })
 
-  async function updateConfig() {
-    let { defaultFormat, outputDirectory, appendString, formatOptions, appendStringUsed } = await window.api.configOps.get()
-    imageFormat = defaultFormat
-    out_directory = outputDirectory
-    append_string = appendString
-    format_options = formatOptions
-    use_append_string = appendStringUsed
-  }
-
-  let timer
-  $: append_string && debounceUpdate('appendString', append_string)
-  $: imageFormat && debounceUpdate('defaultFormat', imageFormat, 250)
-  $: format_options && debounceUpdate('formatOptions', format_options)
-  
-  function debounceUpdate(key, val, timeout = 750) {
-    clearTimeout(timer)
-    if (key == 'formatOptions') {
-      format_options = val
-    }
-    timer = setTimeout(() => window.api.configOps.set(key, val), timeout)
-  }
-
-  function coerceValue(value) {
-    if (value == 'true') {
-      return true
-    } else if (value == 'false') {
-      return false
-    } else if (Number(value)) {
-      return Number(value)
-    } else {
-      return value
-    }
-  }
-
   async function clearFiles() {
     filesReceived = []
     convertedFiles = []
@@ -94,34 +64,23 @@
     return minutes + seconds + ms + ' milliseconds'
   }
 
-  async function selectPath() {
-    const filePath = await window.api.selectOutDir()
-    out_directory = filePath
-  }
-
-  async function resetConfig(key) {
-    await window.api.configOps.reset(key)
-    await window.api.configOps.init()
-    updateConfig()
-  }
-
-  async function openConfig() {
-    await window.api.configOps.open()
-  }
-
-  function toggle() {
-    panelOpen = !panelOpen
-  }
+  
 
   async function convertImages(e) {
     isProcessing = true
     convertedFiles = []
-    await window.api.createDirectories(out_directory)
+    await window.api.createDirectories($optionsStore.settingsOptions.outputDirectory)
     filesReceived = e.detail.files ?? filesReceived
     const startTime = Date.now()
     await Promise.all(
       filesReceived.map(async(f) => {
-        let tmp = await window.api.handleFile(f, imageFormat, out_directory, use_append_string ? append_string : '')
+        let tmp = await window.api.handleFile(
+          f,
+          $optionsStore.settingsOptions.defaultFormat,
+          $optionsStore.settingsOptions.outputDirectory,
+          $optionsStore.settingsOptions.appendStringUsed ? $optionsStore.settingsOptions.appendString : '',
+          $optionsStore.resizeOptions
+        )
         convertedFiles = [...convertedFiles, tmp]
       })
     )
@@ -135,175 +94,83 @@
   }
 </script>
 
-<UpdateDialog {updateInfo} {updateAvailable} {downloadingUpdate} {downloadProgress} />
+{#if isMounted && $optionsStore}
+  <UpdateDialog {updateInfo} {updateAvailable} {downloadingUpdate} {downloadProgress} />
 
-<div class="container" class:panelOpen={panelOpen}>
-  {#if panelOpen}
-    <button
-      class="unbutton close-overlay"
-      in:fade={{ delay: 100, duration: 300 }}
-      out:fade={{ delay: 250, duration: 300 }}
-      on:click={() => (panelOpen = false)}
-      on:mousewheel={(e) => (e.preventDefault(), e.stopPropagation())}
-    ></button>
-  {/if}
-  <!-- <button type="button" class=" unbutton open-panel" on:click={(e) => (e.preventDefault(),panelOpen = true)} title="open settings">
-    <img class="icon" src={openIcon} alt="settings" />
-  </button> -->
+  <div class="container">
 
-  <aside>
-    <button type="button" class="unbutton toggle-btn" on:click={toggle} title={panelOpen ? "close settings" : "open settings"}>
-      <SettingsIcon />
-    </button>
-    <h2>settings</h2>
-    <section class="options">
-      <button type="button" class="btn" on:click={convertImages} disabled={filesReceived.length === 0}>convert again</button>
-      <fieldset>
-        <legend>&nbsp;convert to&nbsp;</legend>
-        {#each formats as format}
-          <label for={format}>
-            <input bind:group={imageFormat} type="radio" id={format} name="imageFormat" value={format} />
-            {format}
-          </label>
-        {/each}
-        <details class="format-options">
-          <summary>format options</summary>
-          <ul>
-            {#each format_options as option}
-              <li>
-                <fieldset>
-                  <legend>&nbsp;{option.format}&nbsp;</legend>
-                  {#each Object.entries(option.options) as [key, v]}
-                    <label for={key}>
-                      {key}:
-                      <input
-                        id={key}
-                        type="text"
-                        bind:value={option.options[key]}
-                        on:change={() => (option.options[key] = coerceValue(v))}
-                      />
-                    </label>
-                  {/each}
-                </fieldset>
-              </li>
+    <SettingsPanel
+      bind:optionsStore={$optionsStore}
+      {filesReceived}
+      {updateMsg}
+      {convertImages} />
+
+    <main>
+      <h1 class="uppercase">Image Format Converter</h1>
+      <p class="mt-3">image.xxx will be saved to <strong>{$optionsStore.settingsOptions.outputDirectory}</strong>/image<strong>{#if $optionsStore.settingsOptions.appendStringUsed}<em>{$optionsStore.settingsOptions.appendString}</em>{/if}.<em>{$optionsStore.settingsOptions.defaultFormat}</em></strong></p>
+
+      <Dropper on:gotFiles={convertImages}>
+        <p class="message">Drop files / folders here<br/>or<br/>click to select files</p>
+      </Dropper>
+
+      <section class="results-wrap">
+        {#if convertedFiles.length}
+          <div class="row">
+            <div class="fgrow">
+              process{isProcessing ? `ing ${convertedFiles.length} of ${filesReceived.length}` : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} {!isProcessing ? `in ${workDuration}` : ''}
+                  {#if isProcessing}
+                    <span class="geartest" transition:fade>
+                      <Gears />
+                    </span>  
+                  {/if}
+                  {#if filesError.length}
+                    {#if !isProcessing}<br />converted {filesOk.length} file{filesOk.length > 1 ? 's' : ''} successfully{/if}  
+                    <details class="error-list">
+                      <summary>
+                        <span class="error">
+                          {filesError.length} error{filesError.length > 1 ? 's' : ''}:
+                        </span>
+                      </summary>
+                      <ol>{#each filesError as file}
+                        <li>file: {file.filename}<br />
+                          <small>{file.error}</small>
+                        </li>
+                      {/each}</ol>
+                    </details>
+                  {/if}
+              
+              <br />
+              <span>Click to download or drag and drop to a file manager window</span>
+            </div>
+            
+            <div class="f-end">
+              <button type="button" class="btn" on:click|preventDefault={async () => await window.api.openDirectory($optionsStore.settingsOptions.outputDirectory)}>open output directory</button>
+              <button type="button" class="btn" on:click|preventDefault={clearFiles}>clear results list</button>
+            </div>
+          </div>
+          <ul class="results-list">
+            {#each convertedFiles as file}
+              {#if file.status === 'success'}
+                <li>
+                  <a download="file://{file.filepath}" href="file://{file.filepath}" title="click to download, or drag and drop" target="_blank">
+                    <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
+                    <span class="filename">{file.filename}</span>
+                  </a>
+                </li>
+              {/if}
             {/each}
           </ul>
-          <p>
-            read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid
-            values.
-          </p>
-          <button on:click={() => {resetConfig('formatOptions')}} type="button" class="btn btn-small mt-2"> restore format defaults </button>
-        </details>
-      </fieldset>
-      <div class="saveto">
-        <p>save images to</p>
-        <button type="button" on:click|preventDefault={selectPath} class="btn">
-          {out_directory}
-        </button>
-        <br />
-        <button
-          type="button"
-          class="btn mt-2"
-          on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}
-        >
-          open output directory
-        </button>
-        <!-- <p class="warning">existing files with the same name will be overwritten!</p> -->
-      </div>
-      <div class="append">
-        <label for="use_append_string">
-          <p>append string to file name
-          <input
-            id="use_append_string"
-            type="checkbox"
-            bind:checked={use_append_string}
-            on:change={async () => await window.api.configOps.set('appendStringUsed', use_append_string)}
-          /></p>
-          <input id="append_string" type="text" bind:value={append_string} />
-          <br/>
-          <small>image.*** will be saved as image{#if use_append_string}<em>{append_string}</em>{/if}.{imageFormat}</small>
-        </label>
-      </div>
-      <div class="cols-2">
-        <button type="button" class="btn" on:click={openConfig}> open settings file </button>
-        <button type="button" class="btn" on:click={resetConfig}> restore all defaults </button>
-      </div>
-    </section>
-    <div class="version-info">
-      <small>{@html updateMsg}</small>
-    </div>
-  </aside>
-
-  <main>
-    <h1 class="uppercase">Image Format Converter</h1>
-    <p class="mt-3">image.xxx will be saved to <strong>{out_directory}</strong>/image<strong>{#if use_append_string}<em>{append_string}</em>{/if}.<em>{imageFormat}</em></strong></p>
+        {:else if isProcessing}
+          <p>working on it...</p>
+        {/if}
+      </section>
+    </main>
     
-    <Dropper on:gotFiles={convertImages}>
-      <p class="message">Drop files / folders here<br/>or<br/>click to select files</p>
-    </Dropper>
-
-    <section class="results-wrap">
-      {#if convertedFiles.length}
-        <div class="row">
-          <div class="fgrow">
-            process{isProcessing ? `ing ${convertedFiles.length} of ${filesReceived.length}` : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} {!isProcessing ? `in ${workDuration}` : ''}
-                {#if isProcessing}
-                  <span class="geartest" transition:fade>
-                    <Gears />
-                  </span>  
-                {/if}
-                {#if filesError.length}
-                  {#if !isProcessing}<br />converted {filesOk.length} file{filesOk.length > 1 ? 's' : ''} successfully{/if}  
-                  <details class="error-list">
-                    <summary>
-                      <span class="error">
-                        {filesError.length} error{filesError.length > 1 ? 's' : ''}:
-                      </span>
-                    </summary>
-                    <ol>{#each filesError as file}
-                      <li>file: {file.filename}<br />
-                        <small>{file.error}</small>
-                      </li>
-                    {/each}</ol>
-                  </details>
-                {/if}
-            
-            <br />
-            <span>Click to download or drag and drop to a file manager window</span>
-          </div>
-          
-          <div class="f-end">
-            <button type="button" class="btn" on:click|preventDefault={async () => await window.api.openDirectory(out_directory)}>open output directory</button>
-            <button type="button" class="btn" on:click|preventDefault={clearFiles}>clear results list</button>
-          </div>
-        </div>
-        <ul class="results-list">
-          {#each convertedFiles as file}
-            {#if file.status === 'success'}
-              <li>
-                <a download="file://{file.filepath}" href="file://{file.filepath}" title="click to download, or drag and drop" target="_blank">
-                  <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
-                  <span class="filename">{file.filename}</span>
-                </a>
-              </li>
-            {/if}
-          {/each}
-        </ul>
-      {:else if isProcessing}
-        <p>working on it...</p>
-      {/if}
-    </section>
-  </main>
-  
-</div>
+  </div>
+{/if}
 
 
 <style>
-  :root {
-    --o: min(80%, 600px);
-    /* --o: min(80%, 400px); */
-    --c: calc(var(--o)*-1);
-  }
   .container {
     min-height: 100%;
     height: 100%;
@@ -316,77 +183,18 @@
     padding: 1rem 0rem 0 4rem;
     height: 100%;
   }
-  aside {
-    font-size: 0.8em;
-    position: fixed;
-    width: calc(var(--o) + 2rem);
-    height: 100%;
-    top: 0;
-    padding: 1rem 2rem 1rem 1rem;
-    background-color: var(--color-settings-bg);
-    overflow: hidden;
-    left: var(--c);
-    transition: left 400ms ease-out, background-color 300ms ease-in-out;
-    border-right: 1px solid var(--color-accent2);
-  }
 
-  aside .options {
-    display: none;
-  }
-
-  .panelOpen aside .options {
-    padding: 1rem 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin: 0;
-  }
-
-  .panelOpen aside {
-    position: fixed;
-    top: 0;
-    left: 0;
-    box-shadow: rgba(0, 0, 0, 0.75) 0px 5px 15px;
-    overflow: auto;
-    background-color: var(--color-settings-bg);
-    border-right: 1px solid var(--color-settings-bg);
-    transition: left 300ms ease-in-out, background-color 300ms ease-in-out;
-  }
-  .close-overlay {
-    cursor: pointer !important;
-    display: block;
-    overflow: hidden;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    height: 100%;
-    background-color: hsla(45, 100%, 0%, 0.75) !important;
-  }
-  .toggle-btn {
-    position: absolute;
-    top: 0;
-    right: 0rem;
-    cursor: pointer;
-    /* height: 90%; */
-    bottom: 0;
-    padding-top: 1rem !important;
-    padding-right: 0.25rem !important;
-    display: flex;
-    align-items: flex-start;
-  }
   h1 {
     text-transform: uppercase;
     font-size: 1.6em;
     margin: 0;
     user-select: none;
   }
-  h2 {
+  /* h2 {
     margin: 0;
     font-size: 1.2em;
     display: inline-block;
-  }
+  } */
   
   .btn {
     font-weight: bold;
@@ -408,42 +216,7 @@
   .btn:disabled:hover {
     background-color: #eee;
   }
-  .btn-small {
-    font-size: 0.8em;
-    padding: 0.125rem 0.25rem;
-  }
-  .saveto p {
-    line-height: 1.1;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  }
-  .append input {
-    margin: 0.25rem 0;
-    padding: 0.5rem;
-    border: 1px solid #aaa;
-    border-radius: 0.25rem;
-  }
-  fieldset {
-    padding: 0.5em;
-    /* min-width: fit-content; */
-    width: 100%;
-    border: 1px solid #aaa;
-    border-radius: 0.25rem;
-  }
-  fieldset label {
-    user-select: none;
-    cursor: pointer;
-    margin-right: 0.5rem;
-  }
-  fieldset label:last-child {
-    margin-right: 0;
-  }
-  /* .results-wrap {
-    margin-top: 0;
-  } */
-  /* .results-wrap .row h2 {
-    margin: 0;
-  } */
+  
   .results-wrap .row {
     margin: 3rem auto 1rem;
     display: flex;
@@ -484,37 +257,9 @@
   .results-list .filename {
     overflow-wrap: anywhere;
   }
-  .format-options ul {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 1rem 0;
-  }
-  .format-options input {
-    width: 50px;
-    margin-left: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    border: 1px solid #aaa;
-    border-radius: 0.25rem;
-  }
-  .format-options summary {
-    cursor: pointer;
-    user-select: none;
-    margin: 0.5rem 0 0 0.5rem;
-  }
+  
   .uppercase {
     text-transform: uppercase;
-  }
-  .unbutton {
-    background-color: transparent;
-    color: inherit;
-    border: none;
-    margin: 0;
-    padding: 0;
-    text-align: inherit;
-    font: inherit;
-    border-radius: 0;
-    appearance: none;
-    cursor: pointer;
   }
   .message {
     color: #222;
@@ -524,23 +269,6 @@
     padding: 1rem;
     user-select: none;
     text-align: center;
-  }
-  .cols-2 {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-  /* .cols-2.wide {
-    width: 100%;
-    align-items: baseline;
-    justify-content: space-between;
-  } */
-  /* .mt-1 {
-    margin-top: 0.25rem;
-  } */
-  .mt-2 {
-    margin-top: 0.5rem;
   }
   .mt-3 {
     margin-bottom: 1rem;
@@ -578,9 +306,10 @@
     border-radius: 2px;
     background-color: var(--color-drop) !important;
   }
-  .version-info {
-    position: absolute;
-    bottom: 1rem;
-    font-size: 0.8rem;
+
+  .test {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
   }
 </style>

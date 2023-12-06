@@ -14,7 +14,7 @@ export async function selectOutDir() {
     properties: ['openDirectory']
   })
   if (!canceled) {
-    myStore.set('outputDirectory', filePaths[0])
+    myStore.set('fOptionsStore.settingsOptions.outputDirectory', filePaths[0])
     return filePaths[0]
   }
   return getDefaultOutDir()
@@ -22,10 +22,10 @@ export async function selectOutDir() {
 
 function getDefaultOutDir() {
   try {
-    const out = myStore.get('outputDirectory')
+    const out = myStore.get('fOptionsStore.settingsOptions.outputDirectory')
     if (out) { return out }
     const tmp = join(app.getPath('desktop'), extraPath)
-    myStore.set('outputDirectory', tmp)
+    myStore.set('fOptionsStore.settingsOptions.outputDirectory', tmp)
     return tmp
   } catch (err) {
     console.log(`error: ${err}`)
