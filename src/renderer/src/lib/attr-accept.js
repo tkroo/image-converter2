@@ -1,4 +1,8 @@
 /**
+ * this code is from: https://github.com/thecodejack/svelte-file-dropzone
+ * https://github.com/thecodejack/svelte-file-dropzone/blob/master/src/lib/utils/attr-accept.js
+*/
+/**
  * Check if the provided file type should be accepted by the input with accept attribute.
  * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input#attr-accept
  *
