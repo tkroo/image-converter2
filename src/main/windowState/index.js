@@ -34,5 +34,5 @@ const debouncedSave = debounceFunction(
   (win) => {
     const bounds = win.getBounds()
     saveWindowBounds(bounds)
-  }, {wait: 200}
+  }, {wait: 750}
 )

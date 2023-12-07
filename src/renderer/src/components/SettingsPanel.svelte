@@ -304,10 +304,12 @@
   .mt-2 {
     margin-top: 0.5rem;
   }
+  /*
   .btn-small {
     font-size: 0.8em;
     padding: 0.125rem 0.25rem;
   }
+  */
   .saveto p {
     line-height: 1.1;
     margin-top: 0;
