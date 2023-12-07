@@ -7,8 +7,9 @@
   export let filesReceived
   export let isProcessing
   export let workDuration
-  export let filesError
-  export let filesOk
+  
+  $: filesOk = convertedFiles.filter((f) => f.status != 'error')
+  $: filesError = convertedFiles.filter((f) => f.status == 'error')
 
   async function clearFiles() {
     filesReceived = []

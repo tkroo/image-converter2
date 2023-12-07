@@ -1,12 +1,11 @@
 <script>
   import { onMount } from 'svelte'
   import { writable } from 'svelte/store'
-  import { fade } from 'svelte/transition'
-  // import Gears from './components/GearsSVG.svelte'
   import Dropper from './components/Dropper.svelte'
   import UpdateDialog from './components/UpdateDialog.svelte'
   import SettingsPanel from './components/SettingsPanel.svelte'
   import ResultsGrid from './components/ResultsGrid.svelte'
+  import formatTime from './lib/formatTime'
 
   let isMounted = false
   let isProcessing = false
@@ -16,44 +15,16 @@
 
   let filesReceived = []
   let convertedFiles = []
-  $: filesOk = convertedFiles.filter((f) => f.status != 'error')
-  $: filesError = convertedFiles.filter((f) => f.status == 'error')
 
   let updateMsg = ''
-  let downloadProgress = ''
-  let updateAvailable = false
-  let downloadingUpdate = false
-  let updateInfo = {}
 
   onMount(async () => {
     // create a writable store from the schema file
     const { fOptionsStore } = await window.api.configOps.get()
     optionsStore = writable({...fOptionsStore})
     
-    window.api.sendUpDateInfo((event, info) => {
-      updateInfo = info
-      if (info.currentVersion >= info.version) {
-        updateMsg = `${info.appName} ${info.currentVersion}`
-        updateAvailable = false
-      } else {
-        updateMsg = `${info.appName} ${info.currentVersion} <br/><span class="ok">version ${info.version} available</span>`
-        updateAvailable = true
-      }
-    })
-    window.api.sendUpDateDownloadProgress((event, log_message) => {
-      downloadProgress = log_message
-    })
     isMounted = true
   })
-
-  function timeFormat(duration) {
-    const m = new Date(duration).getMinutes()
-    const s = new Date(duration).getSeconds()
-    const ms = new Date(duration).getMilliseconds()
-    const minutes = m == 0 ? '' : m + (m > 1 ? ' mins ' : ' min ')
-    const seconds = s == 0 ? '' : s + (s > 1 ? ' seconds ' : ' second ')
-    return minutes + seconds + ms + ' milliseconds'
-  }
 
   async function convertImages(e) {
     isProcessing = true
@@ -75,16 +46,14 @@
     )
 
     const endTime = Date.now()
-
-    workDuration = timeFormat(endTime - startTime)
-
+    workDuration = formatTime(endTime - startTime)
     isProcessing = false
     convertedFiles = convertedFiles
   }
 </script>
 
 {#if isMounted && $optionsStore}
-  <UpdateDialog {updateInfo} {updateAvailable} {downloadingUpdate} {downloadProgress} />
+  <UpdateDialog bind:updateMsg={updateMsg} />
 
   <div class="container">
 
@@ -104,14 +73,12 @@
         optionsStore={$optionsStore}
         {isProcessing}
         {workDuration}
-        {filesError}
-        {filesOk}
       />
+
     </main>
     
   </div>
 {/if}
-
 
 <style>
   .container {
@@ -145,11 +112,5 @@
   }
   .mt-3 {
     margin-bottom: 1rem;
-  }
-  
-  :global(.custom-dropzone) {
-    border: 2px dashed #5a5a5a !important;
-    border-radius: 2px;
-    background-color: var(--color-drop) !important;
   }
 </style>

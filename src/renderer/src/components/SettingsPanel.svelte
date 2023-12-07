@@ -9,25 +9,19 @@
   export let filesReceived
 
   const formats = optionsStore.formatOptions.map((f) => f.format)
-  console.log('formats: ', formats)
 
   let panelOpen = false
-  // let formats = ['png', 'jpg', 'webp', 'avif', 'gif']
   
   onMount(async () => {
-    updateConfig()
-
+    const { fOptionsStore } = await window.api.configOps.get()
+    optionsStore = fOptionsStore
   })
 
   let timer
   $: optionsStore && debounceUpdate('fOptionsStore', optionsStore)
-  // $: optionsStore.formatOptions && debounceUpdate('fOptionsStore.formatOptions', optionsStore.formatOptions)
   
   function debounceUpdate(key, val, timeout = 750) {
     clearTimeout(timer)
-    // if (key == 'optionsStore.formatOptions') {
-    //   optionsStore.formatOptions = val
-    // }
     timer = setTimeout(() => window.api.configOps.set(key, val), timeout)
   }
 
@@ -41,13 +35,6 @@
     } else {
       return value
     }
-  }
-
-  async function updateConfig() {
-    let { fOptionsStore } = await window.api.configOps.get()
-    
-    optionsStore = fOptionsStore
-
   }
 
   async function selectPath() {

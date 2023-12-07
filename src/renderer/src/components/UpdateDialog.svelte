@@ -1,10 +1,36 @@
 <script>
+  import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
-  export let updateAvailable
-  export let downloadingUpdate
-  export let updateInfo
-  export let downloadProgress
+  // export let updateAvailable
+  // export let downloadingUpdate
+  // export let updateInfo
+  // export let downloadProgress
+
+  export let updateMsg
+
+  let updateAvailable = false
+  let downloadingUpdate = false
+  let updateInfo = {}
+  let downloadProgress = ''
+
+
+  onMount(async () => {
+    window.api.sendUpDateInfo((event, info) => {
+      updateInfo = info
+      if (info.currentVersion >= info.version) {
+        updateMsg = `${info.appName} ${info.currentVersion}`
+        updateAvailable = false
+      } else {
+        updateMsg = `${info.appName} ${info.currentVersion} <br/><span class="ok">version ${info.version} available</span>`
+        updateAvailable = true
+      }
+    })
+    window.api.sendUpDateDownloadProgress((event, log_message) => {
+      downloadProgress = log_message
+    })
+  })
+
 </script>
 
 {#if updateAvailable}

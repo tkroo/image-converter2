@@ -1,7 +1,7 @@
 <script>
   import { fromEvent } from 'file-selector'
   import { createEventDispatcher } from 'svelte'
-  import accepts from './attr-accept'
+  import accepts from '../lib/attr-accept'
 
   const dispatch = createEventDispatcher()
   const acceptTheseTypes = ['image/*']
@@ -63,6 +63,11 @@
   }
   .dragover {
     border: 4px dashed #66666666 !important;
+    background-color: var(--color-drop) !important;
+  }
+  :global(.custom-dropzone) {
+    border: 2px dashed #5a5a5a !important;
+    border-radius: 2px;
     background-color: var(--color-drop) !important;
   }
 </style>
