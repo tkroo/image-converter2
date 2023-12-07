@@ -14,6 +14,9 @@ const schema = {
           fit: {
             type: "string",
             enum: ["cover", "contain", "fill", "inside", "outside"],
+          },
+          background: {
+            type: "string",
           }
         }
       },
@@ -84,7 +87,8 @@ const schema = {
       resizeOptions: {
         width: null,
         height: null,
-        fit: "contain"
+        fit: "contain",
+        background: "rgba(255,0,0,0.5)"
       },
       settingsOptions: {
         outputDirectory: "",

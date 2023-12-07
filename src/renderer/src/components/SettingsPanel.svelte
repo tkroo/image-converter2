@@ -174,6 +174,10 @@
             <option value="outside">outside</option>
           </select>
         </label>
+        <label for="background">
+          background color when contain is used:
+          <input id="background" type="text" bind:value={optionsStore.resizeOptions.background} />
+        </label>
       </section>
     </details>
     
@@ -249,6 +253,13 @@
   a:hover {
     text-decoration: underline !important;
   }
+  input[type="number"], input[type="text"] {
+    margin: 0.25rem 0;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #aaa;
+    border-radius: 0.25rem;
+  }
+
   .btn {
     font-weight: bold;
     font-family: inherit;
@@ -259,6 +270,7 @@
     border-radius: 0.25rem;
     background-color: #eee;
     cursor: pointer;
+    word-break: break-all;
   }
   .btn:hover {
     background-color: #ddd;
@@ -302,12 +314,7 @@
     margin-top: 0;
     margin-bottom: 0.5rem;
   }
-  .append input {
-    margin: 0.25rem 0;
-    padding: 0.5rem;
-    border: 1px solid #aaa;
-    border-radius: 0.25rem;
-  }
+  
   fieldset {
     padding: 0.5em;
     /* min-width: fit-content; */
@@ -343,9 +350,6 @@
   .format-options input {
     width: 50px;
     margin-left: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    border: 1px solid #aaa;
-    border-radius: 0.25rem;
   }
   .format-options summary {
     cursor: pointer;
