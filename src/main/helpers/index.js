@@ -41,7 +41,7 @@ export const configOps = {
     const _ = getDefaultOutDir()
     myStore.store = { ...myStore.store }
   },
-  get: () => myStore.store,
+  get: (_, key) => myStore.get(key) ?? myStore.store,
   set: (_, key, value) => myStore.set(key, value),
   reset: (_, key) => {
     if(typeof key === 'string') {
