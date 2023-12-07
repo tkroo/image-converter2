@@ -13,8 +13,8 @@
 
   let optionsStore = null
 
-  let filesReceived = []
-  let convertedFiles = []
+  let filesDropped = []
+  let filesConverted = []
 
   let updateMsg = ''
 
@@ -28,12 +28,12 @@
 
   async function convertImages(e) {
     isProcessing = true
-    convertedFiles = []
+    filesConverted = []
     await window.api.createDirectories($optionsStore.settingsOptions.outputDirectory)
-    filesReceived = e.detail.files ?? filesReceived
+    filesDropped = e.detail.files ?? filesDropped
     const startTime = Date.now()
     await Promise.all(
-      filesReceived.map(async(f) => {
+      filesDropped.map(async(f) => {
         let tmp = await window.api.handleFile(
           f,
           $optionsStore.settingsOptions.defaultFormat,
@@ -41,14 +41,14 @@
           $optionsStore.settingsOptions.appendStringUsed ? $optionsStore.settingsOptions.appendString : '',
           $optionsStore.resizeOptions
         )
-        convertedFiles = [...convertedFiles, tmp]
+        filesConverted = [...filesConverted, tmp]
       })
     )
 
     const endTime = Date.now()
     workDuration = formatTime(endTime - startTime)
     isProcessing = false
-    convertedFiles = convertedFiles
+    filesConverted = filesConverted
   }
 </script>
 
@@ -57,7 +57,7 @@
 
   <div class="container">
 
-    <SettingsPanel bind:optionsStore={$optionsStore} {filesReceived} {updateMsg} {convertImages} />
+    <SettingsPanel bind:optionsStore={$optionsStore} {filesDropped} {updateMsg} {convertImages} />
 
     <main>
       <h1 class="uppercase">Image Format Converter</h1>
@@ -68,8 +68,8 @@
       </Dropper>
 
       <ResultsGrid
-        bind:convertedFiles={convertedFiles}
-        bind:filesReceived={filesReceived}
+        bind:filesConverted={filesConverted}
+        bind:filesDropped={filesDropped}
         optionsStore={$optionsStore}
         {isProcessing}
         {workDuration}

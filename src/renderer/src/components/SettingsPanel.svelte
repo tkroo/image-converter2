@@ -6,7 +6,7 @@
   export let optionsStore  
   export let updateMsg
   export let convertImages
-  export let filesReceived
+  export let filesDropped
 
   const formats = optionsStore.formatOptions.map((f) => f.format)
 
@@ -79,7 +79,7 @@
     <details open>
       <summary><h2>settings</h2></summary>
       <section class="options">
-        <button type="button" class="btn" on:click={convertImages} disabled={filesReceived.length === 0}>convert again</button>
+        <button type="button" class="btn" on:click={convertImages} disabled={filesDropped.length === 0}>convert again</button>
         <fieldset>
           <legend>&nbsp;convert to&nbsp;</legend>
           {#each formats as format}

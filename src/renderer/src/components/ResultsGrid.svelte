@@ -3,25 +3,25 @@
   import Gears from './GearsSVG.svelte'
 
   export let optionsStore
-  export let convertedFiles
-  export let filesReceived
+  export let filesConverted
+  export let filesDropped
   export let isProcessing
   export let workDuration
   
-  $: filesOk = convertedFiles.filter((f) => f.status != 'error')
-  $: filesError = convertedFiles.filter((f) => f.status == 'error')
+  $: filesOk = filesConverted.filter((f) => f.status != 'error')
+  $: filesError = filesConverted.filter((f) => f.status == 'error')
 
   async function clearFiles() {
-    filesReceived = []
-    convertedFiles = []
+    filesDropped = []
+    filesConverted = []
   }
 
 </script>
 <section class="results-wrap">
-  {#if convertedFiles.length}
+  {#if filesConverted.length}
     <div class="row">
       <div class="fgrow">
-        process{isProcessing ? `ing ${convertedFiles.length} of ${filesReceived.length}` : `ed ${convertedFiles.length}`} file{convertedFiles.length > 1 ? 's' : ''} {!isProcessing ? `in ${workDuration}` : ''}
+        process{isProcessing ? `ing ${filesConverted.length} of ${filesDropped.length}` : `ed ${filesConverted.length}`} file{filesConverted.length > 1 ? 's' : ''} {!isProcessing ? `in ${workDuration}` : ''}
             {#if isProcessing}
               <span class="geartest" transition:fade>
                 <Gears />
@@ -53,7 +53,7 @@
       </div>
     </div>
     <ul class="results-list">
-      {#each convertedFiles as file}
+      {#each filesConverted as file}
         {#if file.status === 'success'}
           <li>
             <a download="file://{file.filepath}" href="file://{file.filepath}" title="click to download, or drag and drop" target="_blank">
