@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
-  import SettingsIcon from './SettingsIcon.svelte'
+  import SettingsIcon from './svg/SettingsIcon.svelte'
 
   export let optionsStore  
   export let updateMsg

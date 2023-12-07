@@ -1,6 +1,6 @@
 <script>
   import { fade } from 'svelte/transition'
-  import Gears from './GearsSVG.svelte'
+  import Gears from './svg/GearsSVG.svelte'
 
   export let optionsStore
   export let filesConverted
