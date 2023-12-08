@@ -24,15 +24,15 @@ function getDefaultOutDir() {
   try {
     const out = myStore.get('fOptionsStore.settingsOptions.outputDirectory')
     if (out) { return out }
-    const tmp = join(app.getPath('desktop'), extraPath)
-    myStore.set('fOptionsStore.settingsOptions.outputDirectory', tmp)
-    return tmp
+    // const tmp = join(app.getPath('desktop'), extraPath)
+    myStore.set('fOptionsStore.settingsOptions.outputDirectory', fallbackPath)
+    return fallbackPath
   } catch (err) {
-    console.log(`error: ${err}`)
+    console.error(`error: ${err}`)
   }
 }
 
-export async function openDirectory(event, path) {
+export function openDirectory(event, path) {
   shell.openPath(path)
 }
 

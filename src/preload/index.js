@@ -23,7 +23,7 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('api', api)
   } catch (err) {
-    console.log(`error: ${err}`)
+    console.error(`error: ${err}`)
   }
 } else {
   console.error('Window context isolation is disabled, set contextIsolation: true to enable it.')

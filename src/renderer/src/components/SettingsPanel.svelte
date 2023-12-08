@@ -13,8 +13,7 @@
   let panelOpen = false
   
   onMount(async () => {
-    const { fOptionsStore } = await window.api.configOps.get()
-    optionsStore = fOptionsStore
+    updateConfig()
   })
 
   let timer
@@ -23,6 +22,11 @@
   function debounceUpdate(key, val, timeout = 750) {
     clearTimeout(timer)
     timer = setTimeout(() => window.api.configOps.set(key, val), timeout)
+  }
+
+  async function updateConfig() {
+    const { fOptionsStore } = await window.api.configOps.get()
+    optionsStore = fOptionsStore
   }
 
   function coerceValue(value) {
@@ -71,15 +75,17 @@
     <button type="button" class="unbutton toggle-btn" on:click={toggle} title={panelOpen ? "close settings" : "open settings"}>
       <SettingsIcon />
     </button>
-
-    <div class="test">
-      
-    </div>
-
+    <button type="button" class="btn" on:click={convertImages} disabled={filesDropped.length === 0}>convert again</button>
+    <button
+      type="button"
+      class="btn mt-2"
+      on:click|preventDefault={async () => await window.api.openDirectory(optionsStore.settingsOptions.outputDirectory)}
+    >
+      open output directory
+    </button>
     <details open>
       <summary><h2>settings</h2></summary>
       <section class="options">
-        <button type="button" class="btn" on:click={convertImages} disabled={filesDropped.length === 0}>convert again</button>
         <fieldset>
           <legend>&nbsp;convert to&nbsp;</legend>
           {#each formats as format}
@@ -114,25 +120,16 @@
               read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid
               values.
             </p>
-            <!-- <button on:click={() => {resetConfig('optionsStore.formatOptions')}} type="button" class="btn btn-small mt-2"> restore format defaults </button> -->
+            <!-- <button on:click={() => {resetConfig('fOptionsStore.formatOptions')}} type="button" class="btn btn-small mt-2"> restore format defaults </button> -->
           </details>
         </fieldset>
-        <div class="saveto">
+        <div>
           <p>save images to</p>
           <button type="button" on:click|preventDefault={selectPath} class="btn">
             {optionsStore.settingsOptions.outputDirectory}
           </button>
-          <br />
-          <button
-            type="button"
-            class="btn mt-2"
-            on:click|preventDefault={async () => await window.api.openDirectory(optionsStore.settingsOptions.outputDirectory)}
-          >
-            open output directory
-          </button>
-          <!-- <p class="warning">existing files with the same name will be overwritten!</p> -->
         </div>
-        <div class="append">
+        <div>
           <label for="use_append">
             <p>append string to file name
             <input
@@ -145,27 +142,19 @@
             <small>image.*** will be saved as image{#if optionsStore.settingsOptions.appendStringUsed}<em>{optionsStore.settingsOptions.appendString}</em>{/if}.{optionsStore.settingsOptions.defaultFormat}</small>
           </label>
         </div>
-        <div class="cols-2">
-          <button type="button" class="btn" on:click={openConfig}> open settings file </button>
-          <button type="button" class="btn" on:click={resetConfig}> restore all defaults </button>
-        </div>
       </section>
     </details>
 
     <details>
       <summary><h2>resize options</h2></summary>
-      <section class="options">
         <p>leave height and width blank to keep original size</p>
-        <label for="width">
-          width
+        <label for="width">width
           <input id="width" type="number" bind:value={optionsStore.resizeOptions.width} />
         </label>
-        <label for="height">
-          height
+        <label for="height">height
           <input id="height" type="number" bind:value={optionsStore.resizeOptions.height} />
         </label>
-        <label for="fit">
-          fit
+        <label for="fit">fit 
           <select id="fit" bind:value={optionsStore.resizeOptions.fit}>
             <option value="cover">cover</option>
             <option value="contain">contain</option>
@@ -175,10 +164,14 @@
           </select>
         </label>
         <label for="background">
-          background color when contain is used:
+          <p>background color when contain is used:</p>
           <input id="background" type="text" bind:value={optionsStore.resizeOptions.background} />
         </label>
-      </section>
+    </details>
+    <details>
+      <summary><h2>advanced</h2></summary>
+      <button type="button" class="btn" on:click={openConfig}> open settings file </button>
+      <button type="button" class="btn" on:click={resetConfig}> reset all defaults </button>
     </details>
     
     <div class="version-info">
@@ -190,7 +183,7 @@
 <style>
   :root {
     /* --o: min(80%, 600px); */
-    --o: min(80%, 330px);
+    --o: min(80%, 400px);
     --c: calc(var(--o)*-1);
   }
   aside {
@@ -212,11 +205,24 @@
   }
 
   .panelOpen aside .options {
-    padding: 1rem 0;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.25rem;
     margin: 0;
+  }
+
+  aside details[open] {
+    margin-bottom: 2rem;
+  }
+  aside summary {
+    cursor: pointer;
+    user-select: none;
+    padding: 0.25rem 0;
+    /* background-color: cornflowerblue; */
+  }
+  aside details[open] summary {
+    margin-bottom: 0.5rem;
+    color: var(--color-accent);
   }
 
   .panelOpen aside {
@@ -253,11 +259,24 @@
   a:hover {
     text-decoration: underline !important;
   }
-  input[type="number"], input[type="text"] {
+  input[type="number"], input[type="text"], select {
     margin: 0.25rem 0;
     padding: 0.25rem 0.5rem;
     border: 1px solid #aaa;
     border-radius: 0.25rem;
+  }
+
+  label select, label>input[type="number"]:first-child, label>input[type="text"]:first-child {
+    margin-left: 0.25rem;
+    /* background-color: aqua; */
+  }
+
+  label>input[type="number"]:first-child {
+    width: 5rem;
+  }
+
+  input[type="checkbox"], input[type="radio"] {
+    accent-color: var(--color-accent);
   }
 
   .btn {
@@ -294,26 +313,32 @@
     appearance: none;
     cursor: pointer;
   }
-  .cols-2 {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+  details {
+    margin-bottom: 0rem;
+  }
+  details:first-of-type {
+    margin-top: 1rem;
   }
   .mt-2 {
     margin-top: 0.5rem;
   }
+  /* .cols-2 {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  } */
   /*
   .btn-small {
     font-size: 0.8em;
     padding: 0.125rem 0.25rem;
   }
   */
-  .saveto p {
+  /* .saveto p {
     line-height: 1.1;
     margin-top: 0;
     margin-bottom: 0.5rem;
-  }
+  } */
   
   fieldset {
     padding: 0.5em;
@@ -349,12 +374,16 @@
   }
   .format-options input {
     width: 50px;
-    margin-left: 0.25rem;
   }
   .format-options summary {
     cursor: pointer;
     user-select: none;
-    margin: 0.5rem 0 0 0.5rem;
+    margin: 0.5rem 0 0 0.5rem !important;
+    color: unset !important;
+  }
+
+  .format-options[open] summary {
+    color: var(--color-accent) !important;
   }
   .version-info {
     position: absolute;

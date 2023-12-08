@@ -54,7 +54,6 @@ async function convert(file, format, outDirectory, appendString, options, resize
 }
 
 export async function handleFile(_, ...args) {
-  console.log('handleFile: ', args)
   const options = myStore.get('fOptionsStore.formatOptions').find((o) => o.format === args[1]).options
   let resizeOptions = args[args.length-1]
   // if width or height are 0, set them to null
