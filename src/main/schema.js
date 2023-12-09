@@ -81,6 +81,18 @@ const schema = {
             }
           }
         }
+      },
+      theme: {
+        type: "object",
+        properties: {
+          accentColor: {
+            type: "string",
+          },
+          themeName: {
+            type: "string",
+            enum: ["light", "dark", "system"]
+          }
+        }
       }
     },
     default: {
@@ -131,7 +143,11 @@ const schema = {
             dither: 1
           }
         }
-      ]
+      ],
+      theme: {
+        accentColor: "#85e0a0",
+        themeName: "system"
+      }
     }
   }
 }

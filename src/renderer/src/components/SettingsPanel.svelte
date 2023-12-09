@@ -3,14 +3,16 @@
   import { fade } from 'svelte/transition'
   import SettingsIcon from './svg/SettingsIcon.svelte'
 
+  export let rootElement
   export let optionsStore  
   export let updateMsg
   export let convertImages
   export let filesDropped
 
   const formats = optionsStore.formatOptions.map((f) => f.format)
+  const themeNames = ['system', 'light', 'dark']
 
-  let panelOpen = false
+  let panelOpen = true
   
   onMount(async () => {
     updateConfig()
@@ -61,7 +63,7 @@
   }
 </script>
 
-<div class="panel-wrapper" class:panelOpen={panelOpen}>
+<div class="panel-wrapper" class:panelOpen={panelOpen} bind:this={rootElement}>
   {#if panelOpen}
     <button
       class="unbutton close-overlay"
@@ -78,105 +80,119 @@
     <button type="button" class="unbutton toggle-btn" on:click={toggle} title={panelOpen ? "close settings" : "open settings"}>
       <SettingsIcon />
     </button>
-    <div class="cols-">
+    <div class="flex-row">
       <button type="button" class="btn" on:click={convertImages} disabled={filesDropped.length === 0}>convert again</button>
-      <button
-        type="button"
-        class="btn mt-2"
+      <button type="button" class="btn"
         on:click|preventDefault={async () => await window.api.openDirectory(optionsStore.settingsOptions.outputDirectory)}
       >
         open output directory
       </button>
     </div>
-    <details open>
-      <summary><h2>settings</h2></summary>
-      <section class="options">
-        <fieldset>
-          <legend>&nbsp;convert to&nbsp;</legend>
-          {#each formats as format}
-            <label for={format}>
-              <input bind:group={optionsStore.settingsOptions.defaultFormat} type="radio" id={format} value={format} />
-              {format}
-            </label>
-          {/each}
-          <details class="format-options">
-            <summary>format options</summary>
-            <ul>
-              {#each optionsStore.formatOptions as option}
-                <li>
-                  <fieldset>
-                    <legend>&nbsp;{option.format}&nbsp;</legend>
-                    {#each Object.entries(option.options) as [key, v]}
-                      <label for={key}>
-                        {key}:
-                        <input
-                          id={key}
-                          type="text"
-                          bind:value={option.options[key]}
-                          on:change={() => (option.options[key] = coerceValue(v))}
-                        />
-                      </label>
-                    {/each}
-                  </fieldset>
-                </li>
-              {/each}
-            </ul>
-            <p>
-              read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid
-              values.
-            </p>
-          </details>
-        </fieldset>
-        <div>
-          <p>save images to</p>
-          <button type="button" on:click|preventDefault={selectPath} class="btn">
-            {optionsStore.settingsOptions.outputDirectory}
-          </button>
-        </div>
-        <div>
-          <label for="use_append">
-            <p>append string to file name
-            <input
-              id="use_append"
-              type="checkbox"
-              bind:checked={optionsStore.settingsOptions.appendStringUsed}
-            /></p>
-            <input id="append_string" type="text" bind:value={optionsStore.settingsOptions.appendString} />
-            <br/>
-            <small>image.*** will be saved as image{#if optionsStore.settingsOptions.appendStringUsed}<em>{optionsStore.settingsOptions.appendString}</em>{/if}.{optionsStore.settingsOptions.defaultFormat}</small>
+    <hr class="hr">
+    <h2>conversion settings</h2>
+    <section class="options">
+      <fieldset>
+        <legend>&nbsp;convert to&nbsp;</legend>
+        {#each formats as format}
+          <label for={format}>
+            <input bind:group={optionsStore.settingsOptions.defaultFormat} type="radio" id={format} value={format} />
+            {format}
           </label>
-        </div>
-      </section>
-    </details>
-
-    <details>
-      <summary><h2>resize options</h2></summary>
-        <p>leave height and width blank to keep original size</p>
-        <label for="width">width
-          <input id="width" type="number" bind:value={optionsStore.resizeOptions.width} />
+        {/each}
+        <details class="format-options">
+          <summary>format options</summary>
+          <ul>
+            {#each optionsStore.formatOptions as option}
+              <li>
+                <fieldset>
+                  <legend>&nbsp;{option.format}&nbsp;</legend>
+                  {#each Object.entries(option.options) as [key, v]}
+                    <label for={key}>
+                      {key}:
+                    </label>
+                    <input
+                      id={key}
+                      type="text"
+                      bind:value={option.options[key]}
+                      on:change={() => (option.options[key] = coerceValue(v))}
+                    />
+                  {/each}
+                </fieldset>
+              </li>
+            {/each}
+          </ul>
+          <p>
+            read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid
+            values.
+          </p>
+        </details>
+      </fieldset>
+      <div>
+        <p>save images to</p>
+        <button type="button" on:click|preventDefault={selectPath} class="btn">
+          {optionsStore.settingsOptions.outputDirectory}
+        </button>
+      </div>
+      <div>
+        <label for="use_append">
+          <p>append string to file name
+          <input
+            id="use_append"
+            type="checkbox"
+            bind:checked={optionsStore.settingsOptions.appendStringUsed}
+          /></p>
+          <input id="append_string" type="text" bind:value={optionsStore.settingsOptions.appendString} />
+          <br/>
+          <small>image.*** will be saved as image{#if optionsStore.settingsOptions.appendStringUsed}<em>{optionsStore.settingsOptions.appendString}</em>{/if}.{optionsStore.settingsOptions.defaultFormat}</small>
         </label>
-        <label for="height">height
-          <input id="height" type="number" bind:value={optionsStore.resizeOptions.height} />
-        </label>
-        <label for="fit">fit 
-          <select id="fit" bind:value={optionsStore.resizeOptions.fit}>
-            <option value="cover">cover</option>
-            <option value="contain">contain</option>
-            <option value="fill">fill</option>
-            <option value="inside">inside</option>
-            <option value="outside">outside</option>
-          </select>
-        </label>
-        <label for="background">
-          <p>background color when contain is used:</p>
-          <input id="background" type="text" bind:value={optionsStore.resizeOptions.background} />
-        </label>
-    </details>
-    <details>
-      <summary><h2>advanced</h2></summary>
+      </div>
+    </section>
+    <hr class="hr">
+    <h2>resize settings</h2>
+    <p>leave height and width blank to keep original size</p>
+    <div class="gridme">
+    <label for="width">width</label>
+    <input id="width" type="number" bind:value={optionsStore.resizeOptions.width} />
+    <label for="height">height</label>
+    <input id="height" type="number" bind:value={optionsStore.resizeOptions.height} />
+    <label for="fit">fit</label>
+      <select id="fit" bind:value={optionsStore.resizeOptions.fit}>
+        <option value="cover">cover</option>
+        <option value="contain">contain</option>
+        <option value="fill">fill</option>
+        <option value="inside">inside</option>
+        <option value="outside">outside</option>
+      </select>
+    </div>
+    <label for="background">
+      <p>background color when contain is used:</p>
+      <input id="background" type="text" bind:value={optionsStore.resizeOptions.background} />
+    </label>
+    <hr class="hr">
+    <h2>theme settings</h2>
+    <div class="flex-row">
+      <fieldset>
+        <legend>&nbsp;light/dark mode&nbsp;</legend>
+        {#each themeNames as themeName}
+          <label for={themeName}>
+            <input bind:group={optionsStore.theme.themeName} type="radio" id={themeName} value={themeName} />
+            {themeName}
+          </label>
+        {/each}
+      </fieldset>
+      <fieldset>
+        <legend>&nbsp;accent color&nbsp;</legend>
+      <label for="accentColor">
+        <input type="color" id="accentColor" bind:value={optionsStore.theme.accentColor} />
+      </label>
+      </fieldset>
+    </div>
+    <hr class="hr">
+    <h2>extra settings</h2>
+    <div class="flex-row">
       <button type="button" class="btn" on:click={openConfig}> open settings file </button>
       <button type="button" class="btn" on:click={resetConfig}> reset all defaults </button>
-    </details>
+    </div>
   </aside>
 </div>
 
@@ -184,6 +200,13 @@
   :root {
     --o: min(80%, 400px);
     --c: calc(var(--o)*-1);
+  }
+  .hr {
+    margin: 3rem -2rem 1rem -1.5rem;
+    border-color: var(--color-accent2);
+  }
+  .hr:first-of-type {
+    margin: 2rem -2rem 1rem -1.5rem;
   }
   aside {
     font-size: 0.8em;
@@ -247,9 +270,30 @@
     background-color: hsla(45, 100%, 0%, 0.75) !important;
   }
   h2 {
-    margin: 0;
+    color: var(--color-fg);
     font-size: 1.2em;
-    display: inline-block;
+    /* display: inline-block; */
+    margin: 1rem 0 1rem 0;
+  }
+  /* h2:before, h2:after{
+    color: var(--color-bg);
+    content: "";
+    flex: 1 1;
+    border-bottom: 1px solid;
+    margin: auto;
+    padding-top: 0.25rem;
+  }
+  h2:before {
+    margin-right: 1rem;
+  }
+  h2:after {
+    margin-left: 1rem;
+  } */
+  p {
+    margin: 0 0 0.25rem 0;
+  }
+  p:first-child {
+    margin: 1rem 0 0.25rem 0;
   }
   a {
     color: var(--color-accent);
@@ -265,9 +309,13 @@
     border-radius: 0.25rem;
   }
 
+  input[type="color"] {
+    margin-left: 0.25rem;
+    border-radius: 0.25rem;
+  }
+
   label select, label>input[type="number"]:first-child, label>input[type="text"]:first-child {
     margin-left: 0.25rem;
-    /* background-color: aqua; */
   }
 
   label>input[type="number"]:first-child {
@@ -276,6 +324,11 @@
 
   input[type="checkbox"], input[type="radio"] {
     accent-color: var(--color-accent);
+  }
+
+  #accentColor {
+    margin: 0;
+    width: 100%;
   }
 
   .btn {
@@ -318,18 +371,19 @@
   details:first-of-type {
     margin-top: 1rem;
   }
-  .mt-2 {
-    margin-top: 0.5rem;
-  }
-  /* .cols-2 {
+  .flex-row {
     display: flex;
-    gap: 1rem;
+    gap: 2rem;
     flex-wrap: wrap;
     justify-content: flex-start;
-  } */
+  }
+  .flex-row label p {
+    margin: 0 0 0.5rem 0;
+
+  }
   fieldset {
-    padding: 0.5em;
-    width: 100%;
+    padding: 0.5em 0.75em 0.5em 0.5;
+    width: fit-content;
     border: 1px solid #aaa;
     border-radius: 0.25rem;
   }
@@ -346,12 +400,15 @@
     top: 0;
     right: 0rem;
     cursor: pointer;
-    /* height: 90%; */
     bottom: 0;
     padding-top: 1rem !important;
     padding-right: 0.25rem !important;
     display: flex;
     align-items: flex-start;
+    background-color: var(--color-settings-bg);
+  }
+  .panelOpen .toggle-btn {
+    background-color: unset;
   }
   .format-options ul {
     list-style: none;
@@ -367,11 +424,26 @@
     margin: 0.5rem 0 0 0.5rem !important;
     color: unset !important;
   }
-
   .format-options[open] summary {
     color: var(--color-accent) !important;
   }
   .version-info {
     margin-bottom: 1rem;
+  }
+  .format-options fieldset {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 2fr;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .gridme {
+    width: 120px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 1rem;
+  }
+  .gridme input {
+    max-width: 6rem;
   }
 </style>

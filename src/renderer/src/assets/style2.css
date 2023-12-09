@@ -4,21 +4,11 @@
 *::after {
   box-sizing: border-box;
 }
-
-body {
-  line-height: 1.5;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Open Sans', 'Helvetica Neue', sans-serif;
-  min-height: 100%;
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-
+:root {
   @media (prefers-color-scheme: dark) {
     --color-bg: hsl(250, 11%, 22%);
     --color-fg: hsl(0, 0%, 93%);
     --color-accent: hsl(138, 60%, 80%);
-    /* --color-accent: hsl(38, 100%, 61%); */
     --color-drop: hsl(138, 60%, 80%);
     --color-drop-bg: hsl(250, 11%, 98%);
     --color-accent2: #222;
@@ -38,7 +28,40 @@ body {
     --color-btn-bg-hover: hsl(138, 40%, 23%);
     --color-settings-bg: hsl(250, 11%, 90%);
   }
-  background: var(--color-bg); color: var(--color-fg);
+
+  [data-theme="dark"] {
+    --color-bg: hsl(250, 11%, 22%);
+    --color-fg: hsl(0, 0%, 93%);
+    --color-accent: hsl(138, 60%, 80%);
+    --color-drop: hsl(138, 60%, 80%);
+    --color-drop-bg: hsl(250, 11%, 98%);
+    --color-accent2: #222;
+    --color-btn-bg: hsl(138, 40%, 90%);
+    --color-btn-bg-hover: hsl(138, 40%, 70%);
+    --color-settings-bg: hsl(250, 11%, 30%);
+  }
+  [data-theme="light"] {
+    --color-bg: hsl(250, 11%, 98%);
+    --color-fg: hsl(250, 11%, 22%);
+    --color-accent: hsl(138, 60%, 33%);
+    --color-drop: hsl(138, 60%, 80%);
+    --color-drop-bg: hsl(250, 11%, 88%);
+    --color-accent2: #eee;
+    --color-btn-bg: hsl(138, 40%, 33%);
+    --color-btn-bg-hover: hsl(138, 40%, 23%);
+    --color-settings-bg: hsl(250, 11%, 90%);
+  }
+}
+body {
+  line-height: 1.5;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Open Sans', 'Helvetica Neue', sans-serif;
+  min-height: 100%;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-fg);
 }
 
 ::-webkit-scrollbar {

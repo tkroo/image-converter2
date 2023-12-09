@@ -18,6 +18,8 @@
 
   let updateMsg = ''
   // let panelOpen
+  let rootElement
+  $:rootElement && rootElement.style.setProperty('--color-accent', $optionsStore.theme.accentColor)
 
   onMount(async () => {
     // create a writable store from the schema file
@@ -51,13 +53,28 @@
     isProcessing = false
     filesConverted = filesConverted
   }
+
+  console.log("window.matchMedia('(prefers-color-scheme: dark)').matches")
+  console.log(window.matchMedia('(prefers-color-scheme: dark)').matches)
+  const userPrefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+  const getPreferredScheme = () => window?.matchMedia?.('(prefers-color-scheme:dark)')?.matches ? 'dark' : 'light';
+
+  // if (userPrefersDarkMode) {
+  //   rootElement.classList.add('dark')
+  // }
+
+  // const setTheme = (theme) => {
+  //   rootElement.classList.remove('dark', 'light')
+  // }
+  // rootElement.data.setProperty('theme', $optionsStore.theme.themeName)
+
 </script>
 {#if isMounted && $optionsStore}
   <UpdateDialog bind:updateMsg={updateMsg} />
 
-  <div class="container">
+  <div class="container" bind:this={rootElement} data-theme={$optionsStore.theme.themeName}>
 
-    <SettingsPanel bind:optionsStore={$optionsStore} {filesDropped} {updateMsg} {convertImages} />
+    <SettingsPanel bind:optionsStore={$optionsStore} {rootElement} {filesDropped} {updateMsg} {convertImages} />
 
     <main>
       <h1 class="accent uppercase">Image Format Converter</h1>
@@ -82,10 +99,12 @@
 
 <style>
   .container {
-    min-height: 100%;
+    min-height: 100vh;
     height: 100%;
     width: 100%;
     padding-right: 2rem;
+    background-color: var(--color-bg);
+    color: var(--color-fg);
   }
   main {
     width: 100%;
