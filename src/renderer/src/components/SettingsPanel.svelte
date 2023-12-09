@@ -130,13 +130,13 @@
           </button>
         </div>
         <div>
-          <label for="use_append">
-            <p>append string to file name
+          <label class="use_append" for="use_append">
+            append string to file name
             <input
               id="use_append"
               type="checkbox"
               bind:checked={optionsStore.settingsOptions.appendStringUsed}
-            /></p>
+            /><br/>
             <input id="append_string" type="text" bind:value={optionsStore.settingsOptions.appendString} />
             <br/>
             <small>image.*** will be saved as image{#if optionsStore.settingsOptions.appendStringUsed}<em>{optionsStore.settingsOptions.appendString}</em>{/if}.{optionsStore.settingsOptions.defaultFormat}</small>
@@ -148,13 +148,15 @@
     <details>
       <summary><h2>resize options</h2></summary>
         <p>leave height and width blank to keep original size</p>
-        <label for="width">width
-          <input id="width" type="number" bind:value={optionsStore.resizeOptions.width} />
-        </label>
-        <label for="height">height
-          <input id="height" type="number" bind:value={optionsStore.resizeOptions.height} />
-        </label>
-        <label for="fit">fit 
+        <div class="fwrap">
+          <label for="width">width: 
+            <input id="width" type="number" bind:value={optionsStore.resizeOptions.width} />
+          </label>
+          <label for="height">height: 
+            <input id="height" type="number" bind:value={optionsStore.resizeOptions.height} />
+          </label>
+        </div>
+        <label for="fit">fit: 
           <select id="fit" bind:value={optionsStore.resizeOptions.fit}>
             <option value="cover">cover</option>
             <option value="contain">contain</option>
@@ -164,8 +166,10 @@
           </select>
         </label>
         <label for="background">
-          <p>background color when contain is used:</p>
+          <p>fill color when fit='contain':</p>
           <input id="background" type="text" bind:value={optionsStore.resizeOptions.background} />
+          <br/>
+          <small>you can use hex(a), rgb(a), hsl(a), or color names like 'purple' or 'transparent'</small>
         </label>
     </details>
     <details>
@@ -199,18 +203,15 @@
     transition: left 400ms ease-out, background-color 300ms ease-in-out;
     border-right: 1px solid var(--color-accent2);
   }
-
   aside .options {
     display: none;
   }
-
   .panelOpen aside .options {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     margin: 0;
   }
-
   aside details[open] {
     margin-bottom: 2rem;
   }
@@ -224,7 +225,6 @@
     margin-bottom: 0.5rem;
     color: var(--color-accent);
   }
-
   .panelOpen aside {
     position: fixed;
     top: 0;
@@ -265,42 +265,15 @@
     border: 1px solid #aaa;
     border-radius: 0.25rem;
   }
-
   label select, label>input[type="number"]:first-child, label>input[type="text"]:first-child {
     margin-left: 0.25rem;
-    /* background-color: aqua; */
   }
-
   label>input[type="number"]:first-child {
     width: 5rem;
   }
-
   input[type="checkbox"], input[type="radio"] {
     accent-color: var(--color-accent);
   }
-
-  .btn {
-    font-weight: bold;
-    font-family: inherit;
-    width: fit-content;
-    padding: 0.25rem 0.5rem;
-    margin: 0;
-    border: 1px solid #aaa;
-    border-radius: 0.25rem;
-    background-color: #eee;
-    cursor: pointer;
-    word-break: break-all;
-  }
-  .btn:hover {
-    background-color: #ddd;
-  }
-  .btn:disabled {
-    cursor: auto;
-  }
-  .btn:disabled:hover {
-    background-color: #eee;
-  }
-
   .unbutton {
     background-color: transparent;
     color: inherit;
@@ -321,28 +294,9 @@
   }
   .mt-2 {
     margin-top: 0.5rem;
-  }
-  /* .cols-2 {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  } */
-  /*
-  .btn-small {
-    font-size: 0.8em;
-    padding: 0.125rem 0.25rem;
-  }
-  */
-  /* .saveto p {
-    line-height: 1.1;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  } */
-  
+  }  
   fieldset {
     padding: 0.5em;
-    /* min-width: fit-content; */
     width: 100%;
     border: 1px solid #aaa;
     border-radius: 0.25rem;
@@ -360,7 +314,6 @@
     top: 0;
     right: 0rem;
     cursor: pointer;
-    /* height: 90%; */
     bottom: 0;
     padding-top: 1rem !important;
     padding-right: 0.25rem !important;
@@ -381,7 +334,6 @@
     margin: 0.5rem 0 0 0.5rem !important;
     color: unset !important;
   }
-
   .format-options[open] summary {
     color: var(--color-accent) !important;
   }
@@ -389,5 +341,14 @@
     position: absolute;
     bottom: 1rem;
     font-size: 0.8rem;
+  }
+  .use_append input[type="checkbox"] {
+    margin: 0 0 0 0.25rem;
+  }
+
+  .fwrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
   }
 </style>

@@ -59,5 +59,6 @@ export async function handleFile(_, ...args) {
   // if width or height are 0, set them to null
   if (resizeOptions.width === 0) resizeOptions.width = null
   if (resizeOptions.height === 0) resizeOptions.height = null
+  if (resizeOptions.background === '') resizeOptions.background = '#000000'
   return await convert(args[0], args[1], args[2], args[3] ? args[3] : '', options, resizeOptions)
 }

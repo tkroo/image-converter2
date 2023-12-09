@@ -88,7 +88,7 @@ const schema = {
         width: null,
         height: null,
         fit: "contain",
-        background: "rgba(255,0,0,0.5)"
+        background: "#FFFFFF"
       },
       settingsOptions: {
         outputDirectory: "",

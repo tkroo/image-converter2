@@ -17,6 +17,7 @@
   let filesConverted = []
 
   let updateMsg = ''
+  // let panelOpen
 
   onMount(async () => {
     // create a writable store from the schema file
@@ -51,7 +52,6 @@
     filesConverted = filesConverted
   }
 </script>
-
 {#if isMounted && $optionsStore}
   <UpdateDialog bind:updateMsg={updateMsg} />
 
@@ -60,7 +60,7 @@
     <SettingsPanel bind:optionsStore={$optionsStore} {filesDropped} {updateMsg} {convertImages} />
 
     <main>
-      <h1 class="uppercase">Image Format Converter</h1>
+      <h1 class="accent uppercase">Image Format Converter</h1>
       <p class="mt-3">image.xxx will be saved to <strong>{$optionsStore.settingsOptions.outputDirectory}</strong>/image<strong>{#if $optionsStore.settingsOptions.appendStringUsed}<em>{$optionsStore.settingsOptions.appendString}</em>{/if}.<em>{$optionsStore.settingsOptions.defaultFormat}</em></strong></p>
 
       <Dropper on:gotFiles={convertImages}>
@@ -84,6 +84,7 @@
   .container {
     min-height: 100%;
     height: 100%;
+    width: 100%;
     padding-right: 2rem;
   }
   main {
@@ -100,6 +101,9 @@
   }
   .uppercase {
     text-transform: uppercase;
+  }
+  .accent {
+    color: var(--color-accent);
   }
   .message {
     color: #222;
