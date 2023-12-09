@@ -18,6 +18,7 @@ body {
     --color-bg: hsl(250, 11%, 22%);
     --color-fg: hsl(0, 0%, 93%);
     --color-accent: hsl(138, 60%, 80%);
+    /* --color-accent: hsl(38, 100%, 61%); */
     --color-drop: hsl(138, 60%, 80%);
     --color-drop-bg: hsl(250, 11%, 98%);
     --color-accent2: #222;

@@ -72,17 +72,22 @@
     ></button>
   {/if}
   <aside>
+    <div class="version-info">
+      <small>{@html updateMsg}</small>
+    </div>
     <button type="button" class="unbutton toggle-btn" on:click={toggle} title={panelOpen ? "close settings" : "open settings"}>
       <SettingsIcon />
     </button>
-    <button type="button" class="btn" on:click={convertImages} disabled={filesDropped.length === 0}>convert again</button>
-    <button
-      type="button"
-      class="btn mt-2"
-      on:click|preventDefault={async () => await window.api.openDirectory(optionsStore.settingsOptions.outputDirectory)}
-    >
-      open output directory
-    </button>
+    <div class="cols-">
+      <button type="button" class="btn" on:click={convertImages} disabled={filesDropped.length === 0}>convert again</button>
+      <button
+        type="button"
+        class="btn mt-2"
+        on:click|preventDefault={async () => await window.api.openDirectory(optionsStore.settingsOptions.outputDirectory)}
+      >
+        open output directory
+      </button>
+    </div>
     <details open>
       <summary><h2>settings</h2></summary>
       <section class="options">
@@ -120,7 +125,6 @@
               read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid
               values.
             </p>
-            <!-- <button on:click={() => {resetConfig('fOptionsStore.formatOptions')}} type="button" class="btn btn-small mt-2"> restore format defaults </button> -->
           </details>
         </fieldset>
         <div>
@@ -130,13 +134,13 @@
           </button>
         </div>
         <div>
-          <label class="use_append" for="use_append">
-            append string to file name
+          <label for="use_append">
+            <p>append string to file name
             <input
               id="use_append"
               type="checkbox"
               bind:checked={optionsStore.settingsOptions.appendStringUsed}
-            /><br/>
+            /></p>
             <input id="append_string" type="text" bind:value={optionsStore.settingsOptions.appendString} />
             <br/>
             <small>image.*** will be saved as image{#if optionsStore.settingsOptions.appendStringUsed}<em>{optionsStore.settingsOptions.appendString}</em>{/if}.{optionsStore.settingsOptions.defaultFormat}</small>
@@ -148,15 +152,13 @@
     <details>
       <summary><h2>resize options</h2></summary>
         <p>leave height and width blank to keep original size</p>
-        <div class="fwrap">
-          <label for="width">width: 
-            <input id="width" type="number" bind:value={optionsStore.resizeOptions.width} />
-          </label>
-          <label for="height">height: 
-            <input id="height" type="number" bind:value={optionsStore.resizeOptions.height} />
-          </label>
-        </div>
-        <label for="fit">fit: 
+        <label for="width">width
+          <input id="width" type="number" bind:value={optionsStore.resizeOptions.width} />
+        </label>
+        <label for="height">height
+          <input id="height" type="number" bind:value={optionsStore.resizeOptions.height} />
+        </label>
+        <label for="fit">fit 
           <select id="fit" bind:value={optionsStore.resizeOptions.fit}>
             <option value="cover">cover</option>
             <option value="contain">contain</option>
@@ -166,10 +168,8 @@
           </select>
         </label>
         <label for="background">
-          <p>fill color when fit='contain':</p>
+          <p>background color when contain is used:</p>
           <input id="background" type="text" bind:value={optionsStore.resizeOptions.background} />
-          <br/>
-          <small>you can use hex(a), rgb(a), hsl(a), or color names like 'purple' or 'transparent'</small>
         </label>
     </details>
     <details>
@@ -177,16 +177,11 @@
       <button type="button" class="btn" on:click={openConfig}> open settings file </button>
       <button type="button" class="btn" on:click={resetConfig}> reset all defaults </button>
     </details>
-    
-    <div class="version-info">
-      <small>{@html updateMsg}</small>
-    </div>
   </aside>
 </div>
 
 <style>
   :root {
-    /* --o: min(80%, 600px); */
     --o: min(80%, 400px);
     --c: calc(var(--o)*-1);
   }
@@ -196,22 +191,25 @@
     width: calc(var(--o) + 2rem);
     height: 100%;
     top: 0;
-    padding: 1rem 2rem 1rem 1rem;
+    padding: 1rem 2rem 4rem 1rem;
     background-color: var(--color-settings-bg);
     overflow: hidden;
     left: var(--c);
     transition: left 400ms ease-out, background-color 300ms ease-in-out;
-    border-right: 1px solid var(--color-accent2);
+    border-right: 2px solid var(--color-accent2);
   }
+
   aside .options {
     display: none;
   }
+
   .panelOpen aside .options {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     margin: 0;
   }
+
   aside details[open] {
     margin-bottom: 2rem;
   }
@@ -225,6 +223,7 @@
     margin-bottom: 0.5rem;
     color: var(--color-accent);
   }
+
   .panelOpen aside {
     position: fixed;
     top: 0;
@@ -265,15 +264,42 @@
     border: 1px solid #aaa;
     border-radius: 0.25rem;
   }
+
   label select, label>input[type="number"]:first-child, label>input[type="text"]:first-child {
     margin-left: 0.25rem;
+    /* background-color: aqua; */
   }
+
   label>input[type="number"]:first-child {
     width: 5rem;
   }
+
   input[type="checkbox"], input[type="radio"] {
     accent-color: var(--color-accent);
   }
+
+  .btn {
+    font-weight: bold;
+    font-family: inherit;
+    width: fit-content;
+    padding: 0.25rem 0.5rem;
+    margin: 0;
+    border: 1px solid #aaa;
+    border-radius: 0.25rem;
+    background-color: #eee;
+    cursor: pointer;
+    word-break: break-all;
+  }
+  .btn:hover {
+    background-color: #ddd;
+  }
+  .btn:disabled {
+    cursor: auto;
+  }
+  .btn:disabled:hover {
+    background-color: #eee;
+  }
+
   .unbutton {
     background-color: transparent;
     color: inherit;
@@ -294,7 +320,13 @@
   }
   .mt-2 {
     margin-top: 0.5rem;
-  }  
+  }
+  /* .cols-2 {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  } */
   fieldset {
     padding: 0.5em;
     width: 100%;
@@ -314,6 +346,7 @@
     top: 0;
     right: 0rem;
     cursor: pointer;
+    /* height: 90%; */
     bottom: 0;
     padding-top: 1rem !important;
     padding-right: 0.25rem !important;
@@ -334,21 +367,11 @@
     margin: 0.5rem 0 0 0.5rem !important;
     color: unset !important;
   }
+
   .format-options[open] summary {
     color: var(--color-accent) !important;
   }
   .version-info {
-    position: absolute;
-    bottom: 1rem;
-    font-size: 0.8rem;
-  }
-  .use_append input[type="checkbox"] {
-    margin: 0 0 0 0.25rem;
-  }
-
-  .fwrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
+    margin-bottom: 1rem;
   }
 </style>
