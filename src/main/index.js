@@ -24,6 +24,8 @@ function createWindow() {
     minHeight: 600,
     x: prevOrDefaultBounds.x,
     y: prevOrDefaultBounds.y-magicNumber,
+    backgroundColor: '#00000000',
+    // frame: false,
     show: false,
     autoHideMenuBar: true,
     icon: process.platform === 'linux' ? { icon } : {},
