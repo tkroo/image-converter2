@@ -54,20 +54,6 @@
     filesConverted = filesConverted
   }
 
-  console.log("window.matchMedia('(prefers-color-scheme: dark)').matches")
-  console.log(window.matchMedia('(prefers-color-scheme: dark)').matches)
-  const userPrefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
-  const getPreferredScheme = () => window?.matchMedia?.('(prefers-color-scheme:dark)')?.matches ? 'dark' : 'light';
-
-  // if (userPrefersDarkMode) {
-  //   rootElement.classList.add('dark')
-  // }
-
-  // const setTheme = (theme) => {
-  //   rootElement.classList.remove('dark', 'light')
-  // }
-  // rootElement.data.setProperty('theme', $optionsStore.theme.themeName)
-
 </script>
 {#if isMounted && $optionsStore}
   <UpdateDialog bind:updateMsg={updateMsg} />

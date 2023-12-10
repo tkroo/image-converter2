@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
   import SettingsIcon from './svg/SettingsIcon.svelte'
+  import schema from '../../../main/schema'
 
   export let rootElement
   export let optionsStore  
@@ -10,9 +11,12 @@
   export let filesDropped
 
   const formats = optionsStore.formatOptions.map((f) => f.format)
-  const themeNames = ['system', 'light', 'dark']
+  // const themeNames = ['system', 'light', 'dark']
+  const themeNames = schema.fOptionsStore.properties.theme.properties.themeName.enum
 
-  let panelOpen = true
+  let panelOpen = false
+
+  console.log('themeNames', themeNames)
   
   onMount(async () => {
     updateConfig()

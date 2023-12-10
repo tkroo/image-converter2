@@ -90,7 +90,7 @@ const schema = {
           },
           themeName: {
             type: "string",
-            enum: ["light", "dark", "system"]
+            enum: ["system", "light", "dark"]
           }
         }
       }
