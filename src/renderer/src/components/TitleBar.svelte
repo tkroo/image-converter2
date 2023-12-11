@@ -5,11 +5,11 @@
   import Minimize from './svg/titlebar/minimize.svelte'
 </script>
 
-<div class="titlebar Xdraggable">
+<div class="titlebar draggable">
   <div class="title">Image Format Converter</div>
   <div class="spacer"></div>
   <!-- <Icon /> -->
-  <div class="controls Xno-draggable">
+  <div class="controls no-draggable">
     <button class="unbutton" on:click={() => {window.api.winMinimize()}}><Minimize /></button>
     <button class="unbutton" on:click={() => {window.api.winMaximize()}}><Maximize /></button>
     <button class="unbutton" on:click={() => {window.api.winClose()}}><Close /></button>
