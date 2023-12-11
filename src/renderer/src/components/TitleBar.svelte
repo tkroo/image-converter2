@@ -6,7 +6,7 @@
 </script>
 
 <div class="titlebar draggable">
-  <div class="title">Image Format Converter</div>
+  <div class="title">{window.document.title}</div>
   <div class="spacer"></div>
   <!-- <Icon /> -->
   <div class="controls no-draggable">
