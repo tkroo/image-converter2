@@ -56,7 +56,7 @@
       {#each filesConverted as file}
         {#if file.status === 'success'}
           <li>
-            <a download="file://{file.filepath}" href="file://{file.filepath}" title="click to download, or drag and drop" target="_blank">
+            <a download="file://{file.filename}" href="file://{file.filepath}" title="click to download, or drag and drop" target="_blank">
               <img src="file://{file.filepath}" alt={file.filename} loading="lazy" /><br />
               <span class="filename">{file.filename}</span>
             </a>
@@ -94,7 +94,7 @@
     background: repeating-conic-gradient(#666 0 90deg, #999 0 180deg) 0 0/20px 20px round;
   }
   .results-list {
-    padding: 0;
+    padding: 0 0 4rem 0;
     margin: 0;
     list-style: none;
     display: grid;
