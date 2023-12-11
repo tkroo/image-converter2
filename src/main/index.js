@@ -11,8 +11,6 @@ import icon from '../../build/icons/png/512x512.png?asset'
 let prevOrDefaultBounds = getWindowBounds()
 let magicNumber = process.platform === 'linux' ? 37 : 0 // titlebar height adjustment, see this issue: https://github.com/electron/electron/issues/10388
 
-const showDevTools = false;
-
 let mainWindow
 let isMaximized = false
 
@@ -64,7 +62,7 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
-    if (showDevTools) is.dev && mainWindow.webContents.openDevTools()
+    is.dev && mainWindow.webContents.openDevTools()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

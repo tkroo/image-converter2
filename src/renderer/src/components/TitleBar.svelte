@@ -1,16 +1,18 @@
 <script>
-  import Icon from './svg/appIcon.svelte'
+  // import Icon from './svg/appIcon.svelte'
   import Close from './svg/titlebar/close.svelte'
   import Maximize from './svg/titlebar/maximize.svelte'
   import Minimize from './svg/titlebar/minimize.svelte'
 </script>
-<div class="titlebar draggable">
-  <Icon />
+
+<div class="titlebar Xdraggable">
+  <div class="title">Image Format Converter</div>
   <div class="spacer"></div>
-  <div class="controls no-draggable">
-    <button class="unbutton" on:click={() => window.api.winMinimize()}><Minimize /></button>
-    <button class="unbutton" on:click={() => window.api.winMaximize()}><Maximize /></button>
-    <button class="unbutton" on:click={() => window.api.winClose()}><Close /></button>
+  <!-- <Icon /> -->
+  <div class="controls Xno-draggable">
+    <button class="unbutton" on:click={() => {window.api.winMinimize()}}><Minimize /></button>
+    <button class="unbutton" on:click={() => {window.api.winMaximize()}}><Maximize /></button>
+    <button class="unbutton" on:click={() => {window.api.winClose()}}><Close /></button>
   </div>
 </div>
 
@@ -29,7 +31,16 @@
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
   }
+  .title {
+    position: absolute;
+    width: 100%;
+    color: var(--color-fg);
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+  }
   .spacer {
+    /* padding-left: 1rem; */
     flex-grow: 1;
   }
   .controls {
@@ -38,8 +49,6 @@
     gap: 1.25rem;
     align-items: center;
     justify-content: space-between;
-  }
-  .title-icon path {
-    fill: red;
+    z-index: 900;
   }
 </style>

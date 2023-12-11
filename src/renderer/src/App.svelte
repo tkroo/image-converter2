@@ -94,8 +94,8 @@
     border-top-right-radius: 0.95rem;
   }
   .container {
-    /* min-height: 100vh; */
-    /* height: 100%; */
+    height: 100%;
+    overflow: auto;
     width: 100%;
     padding-right: 2rem;
     background-color: var(--color-bg);

@@ -16,8 +16,6 @@
 
   let panelOpen = false
 
-  console.log('themeNames', themeNames)
-  
   onMount(async () => {
     updateConfig()
   })
@@ -78,12 +76,12 @@
     ></button>
   {/if}
   <aside>
-    <div class="version-info">
-      <small>{@html updateMsg}</small>
-    </div>
     <button type="button" class="unbutton toggle-btn" on:click={toggle} title={panelOpen ? "close settings" : "open settings"}>
       <SettingsIcon />
     </button>
+    <div class="version-info">
+      <small>{@html updateMsg}</small>
+    </div>
     <div class="flex-row">
       <button type="button" class="btn" on:click={convertImages} disabled={filesDropped.length === 0}>convert again</button>
       <button type="button" class="btn"
@@ -206,11 +204,12 @@
     --c: calc(var(--o)*-1);
   }
   .hr {
-    margin: 3rem -2rem 1rem -1.5rem;
+    z-index: 2;
+    margin: 2rem -2rem 2rem -1rem;
     border-color: var(--color-accent2);
   }
   .hr:first-of-type {
-    margin: 2rem -2rem 1rem -1.5rem;
+    margin: 2rem -2rem 2rem -1rem;
   }
   aside {
     font-size: 0.8em;
@@ -218,13 +217,15 @@
     width: calc(var(--o) + 2rem);
     height: 100%;
     top: var(--titlebar-height);
-    padding: 1rem 2rem 4rem 1rem;
+    padding: 1rem 2rem 4rem 2rem;
     background-color: var(--color-settings-bg);
     overflow: hidden;
     left: var(--c);
     transition: left 400ms ease-out, background-color 300ms ease-in-out;
-    border-right: 2px solid var(--color-accent2);
+    /* border-right: 2px solid var(--color-accent2); */
     padding-right: 4rem;
+    z-index: 1;
+    height: 100%;
   }
 
   aside .options {
@@ -259,7 +260,7 @@
     box-shadow: rgba(0, 0, 0, 0.75) 0px 5px 15px;
     overflow: auto;
     background-color: var(--color-settings-bg);
-    border-right: 1px solid var(--color-settings-bg);
+    /* border-right: 1px solid var(--color-settings-bg); */
     transition: left 300ms ease-in-out, background-color 300ms ease-in-out;
   }
   .close-overlay {
@@ -319,13 +320,13 @@
     border-radius: 0.25rem;
   }
 
-  label select, label>input[type="number"]:first-child, label>input[type="text"]:first-child {
+  /* label select, label>input[type="number"]:first-child, label>input[type="text"]:first-child {
     margin-left: 0.25rem;
   }
 
   label>input[type="number"]:first-child {
     width: 5rem;
-  }
+  } */
 
   input[type="checkbox"], input[type="radio"] {
     accent-color: var(--color-accent);
@@ -388,19 +389,22 @@
     margin-right: 0;
   }
   .toggle-btn {
+    z-index: 4;
     position: absolute;
     top: 0;
-    right: 0rem;
-    cursor: pointer;
+    right: 0;
     bottom: 0;
     padding-top: 1rem !important;
-    padding-right: 0.25rem !important;
+    width: 2rem;
     display: flex;
+    justify-content: center;
     align-items: flex-start;
     background-color: var(--color-settings-bg);
+    cursor: pointer;
   }
   .panelOpen .toggle-btn {
-    background-color: unset;
+    /* background-color: unset; */
+    height: 200%;
   }
   .format-options ul {
     list-style: none;
