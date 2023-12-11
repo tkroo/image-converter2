@@ -15,6 +15,7 @@
     --color-btn-bg: hsl(138, 40%, 90%);
     --color-btn-bg-hover: hsl(138, 40%, 70%);
     --color-settings-bg: hsl(250, 11%, 30%);
+    --color-titlebar-bg: hsl(250, 11%, 20%);
   }
   
   @media (prefers-color-scheme: light) {
@@ -27,6 +28,7 @@
     --color-btn-bg: hsl(138, 40%, 33%);
     --color-btn-bg-hover: hsl(138, 40%, 23%);
     --color-settings-bg: hsl(250, 11%, 90%);
+    --color-titlebar-bg: hsl(250, 11%, 80%);
   }
 
   [data-theme="dark"] {
@@ -39,6 +41,7 @@
     --color-btn-bg: hsl(138, 40%, 90%);
     --color-btn-bg-hover: hsl(138, 40%, 70%);
     --color-settings-bg: hsl(250, 11%, 30%);
+    --color-titlebar-bg: hsl(250, 11%, 20%);
   }
   [data-theme="light"] {
     --color-bg: hsl(250, 11%, 98%);
@@ -50,7 +53,11 @@
     --color-btn-bg: hsl(138, 40%, 33%);
     --color-btn-bg-hover: hsl(138, 40%, 23%);
     --color-settings-bg: hsl(250, 11%, 90%);
+    --color-titlebar-bg: hsl(250, 11%, 80%);
   }
+
+  --titlebar-height: 37px;
+
 }
 body {
   line-height: 1.5;
@@ -60,8 +67,8 @@ body {
   width: 100%;
   margin: 0;
   padding: 0;
-  background: var(--color-bg);
-  color: var(--color-fg);
+  /* background: var(--color-bg); */
+  /* color: var(--color-fg); */
 }
 
 ::-webkit-scrollbar {
@@ -78,7 +85,19 @@ body {
   background: rgba(0, 0, 0, 0.25);
 }
 
-
+.draggable {
+  -webkit-app-region: drag;
+}
+.no-draggable {
+  -webkit-app-region: no-drag;
+}
+.titlebar-icon {
+  max-width: 16px;
+  height: auto;
+}
+.titlebar-icon path {
+  fill: var(--color-fg);
+}
 
 /* Inherit fonts for inputs and buttons */
 input, button,
@@ -123,6 +142,19 @@ a:hover {
 }
 .btn:disabled:hover {
   background-color: #eee;
+}
+
+.unbutton {
+  background-color: transparent;
+  color: inherit;
+  border: none;
+  margin: 0;
+  padding: 0;
+  text-align: inherit;
+  font: inherit;
+  border-radius: 0;
+  appearance: none;
+  cursor: pointer;
 }
 
 .noscroll {

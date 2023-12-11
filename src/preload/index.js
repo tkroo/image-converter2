@@ -16,7 +16,10 @@ const api = {
   // showUpdateMessage: (callback) => ipcRenderer.on('showUpdateMessage', callback),
   sendUpDateInfo: (callback) => ipcRenderer.on('sendUpDateInfo', callback),
   sendUpDateDownloadProgress: (callback) => ipcRenderer.on('sendUpDateDownloadProgress', callback),
-  checkForUpdates: (callback) => ipcRenderer.invoke('checkForUpdates', callback)
+  checkForUpdates: (callback) => ipcRenderer.invoke('checkForUpdates', callback),
+  winMinimize: () => ipcRenderer.invoke('winMinimize'),
+  winMaximize: () => ipcRenderer.invoke('winMaximize'),
+  winClose: () => ipcRenderer.invoke('winClose')
 }
 
 if (process.contextIsolated) {

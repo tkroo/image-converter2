@@ -217,13 +217,14 @@
     position: fixed;
     width: calc(var(--o) + 2rem);
     height: 100%;
-    top: 0;
+    top: var(--titlebar-height);
     padding: 1rem 2rem 4rem 1rem;
     background-color: var(--color-settings-bg);
     overflow: hidden;
     left: var(--c);
     transition: left 400ms ease-out, background-color 300ms ease-in-out;
     border-right: 2px solid var(--color-accent2);
+    padding-right: 4rem;
   }
 
   aside .options {
@@ -253,7 +254,7 @@
 
   .panelOpen aside {
     position: fixed;
-    top: 0;
+    top: var(--titlebar-height);
     left: 0;
     box-shadow: rgba(0, 0, 0, 0.75) 0px 5px 15px;
     overflow: auto;
@@ -266,7 +267,7 @@
     display: block;
     overflow: hidden;
     position: fixed;
-    top: 0;
+    top: var(--titlebar-height);
     left: 0;
     bottom: 0;
     right: 0;
@@ -355,19 +356,6 @@
   }
   .btn:disabled:hover {
     background-color: #eee;
-  }
-
-  .unbutton {
-    background-color: transparent;
-    color: inherit;
-    border: none;
-    margin: 0;
-    padding: 0;
-    text-align: inherit;
-    font: inherit;
-    border-radius: 0;
-    appearance: none;
-    cursor: pointer;
   }
   details {
     margin-bottom: 0rem;

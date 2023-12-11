@@ -14,6 +14,7 @@ let magicNumber = process.platform === 'linux' ? 37 : 0 // titlebar height adjus
 const showDevTools = false;
 
 let mainWindow
+let isMaximized = false
 
 function createWindow() {
   // Create the browser window.
@@ -25,7 +26,8 @@ function createWindow() {
     x: prevOrDefaultBounds.x,
     y: prevOrDefaultBounds.y-magicNumber,
     backgroundColor: '#00000000',
-    // frame: false,
+    frame: false,
+    transparent: true,
     show: false,
     autoHideMenuBar: true,
     icon: process.platform === 'linux' ? { icon } : {},
@@ -49,7 +51,17 @@ function createWindow() {
   ipcMain.handle('configOps.set', configOps.set)
   ipcMain.handle('configOps.reset', configOps.reset)
   ipcMain.handle('configOps.open', configOps.open)
+  ipcMain.handle('winMinimize', () => { mainWindow.minimize() })
+  ipcMain.handle('winMaximize', () => { isMaximized ? mainWindow.unmaximize() : mainWindow.maximize() })
+  ipcMain.handle('winClose', () => { mainWindow.close() })
   
+  mainWindow.on('maximize', () => {
+    isMaximized = true
+  })
+  mainWindow.on('unmaximize', () => {
+    isMaximized = false
+  })
+
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
     if (showDevTools) is.dev && mainWindow.webContents.openDevTools()

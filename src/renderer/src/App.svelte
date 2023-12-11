@@ -6,6 +6,7 @@
   import SettingsPanel from './components/SettingsPanel.svelte'
   import ResultsGrid from './components/ResultsGrid.svelte'
   import formatTime from './lib/formatTime'
+  import TitleBar from './components/TitleBar.svelte'
 
   let isMounted = false
   let isProcessing = false
@@ -56,37 +57,45 @@
 
 </script>
 {#if isMounted && $optionsStore}
-  <UpdateDialog bind:updateMsg={updateMsg} />
-
-  <div class="container" bind:this={rootElement} data-theme={$optionsStore.theme.themeName}>
-
-    <SettingsPanel bind:optionsStore={$optionsStore} {rootElement} {filesDropped} {updateMsg} {convertImages} />
-
-    <main>
-      <h1 class="accent uppercase">Image Format Converter</h1>
-      <p class="mt-3">image.xxx will be saved to <strong>{$optionsStore.settingsOptions.outputDirectory}</strong>/image<strong>{#if $optionsStore.settingsOptions.appendStringUsed}<em>{$optionsStore.settingsOptions.appendString}</em>{/if}.<em>{$optionsStore.settingsOptions.defaultFormat}</em></strong></p>
-
-      <Dropper on:gotFiles={convertImages}>
-        <p class="message">Drop files / folders here<br/>or<br/>click to select files</p>
-      </Dropper>
-
-      <ResultsGrid
-        bind:filesConverted={filesConverted}
-        bind:filesDropped={filesDropped}
-        optionsStore={$optionsStore}
-        {isProcessing}
-        {workDuration}
-      />
-
-    </main>
+  <div id="outer" bind:this={rootElement} data-theme={$optionsStore.theme.themeName}>
+    <UpdateDialog bind:updateMsg={updateMsg} />
+    <TitleBar />
+    <div class="container">
+      <SettingsPanel bind:optionsStore={$optionsStore} {rootElement} {filesDropped} {updateMsg} {convertImages} />
+      <main>
+        <h1 class="accent uppercase">Image Format Converter</h1>
+        <p class="mt-3">image.xxx will be saved to <strong>{$optionsStore.settingsOptions.outputDirectory}</strong>/image<strong>{#if $optionsStore.settingsOptions.appendStringUsed}<em>{$optionsStore.settingsOptions.appendString}</em>{/if}.<em>{$optionsStore.settingsOptions.defaultFormat}</em></strong></p>
+        <Dropper on:gotFiles={convertImages}>
+          <p class="message">Drop files / folders here<br/>or<br/>click to select files</p>
+        </Dropper>
+        <ResultsGrid
+          bind:filesConverted={filesConverted}
+          bind:filesDropped={filesDropped}
+          optionsStore={$optionsStore}
+          {isProcessing}
+          {workDuration}
+        />
+      </main>
     
+    </div>
   </div>
 {/if}
 
 <style>
+  #outer {
+    padding: 0;
+    padding-top: var(--titlebar-height);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--color-bg);
+    border-top-left-radius: 0.95rem;
+    border-top-right-radius: 0.95rem;
+  }
   .container {
-    min-height: 100vh;
-    height: 100%;
+    /* min-height: 100vh; */
+    /* height: 100%; */
     width: 100%;
     padding-right: 2rem;
     background-color: var(--color-bg);
