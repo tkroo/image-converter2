@@ -77,7 +77,7 @@
   {/if}
   <aside>
     <button type="button" class="unbutton toggle-btn" on:click={toggle} title={panelOpen ? "close settings" : "open settings"}>
-      <SettingsIcon />
+      <div class="icon"><SettingsIcon /></div>
     </button>
     <div class="version-info">
       <small>{@html updateMsg}</small>
@@ -401,6 +401,12 @@
     align-items: flex-start;
     background-color: var(--color-settings-bg);
     cursor: pointer;
+    height: 200%;
+  }
+  .icon {
+    position: sticky;
+    top: 0;
+    left: 0;
   }
   .panelOpen .toggle-btn {
     /* background-color: unset; */
