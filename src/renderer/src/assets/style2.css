@@ -92,7 +92,7 @@ body {
   -webkit-app-region: no-drag;
 }
 .titlebar-icon {
-  max-width: 16px;
+  max-width: 12px;
   height: auto;
 }
 .titlebar-icon path {
