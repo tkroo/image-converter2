@@ -63,11 +63,11 @@
     <div class="container">
       <SettingsPanel bind:optionsStore={$optionsStore} {rootElement} {filesDropped} {updateMsg} {convertImages} />
       <main>
-        <h1 class="accent uppercase">Image Format Converter</h1>
-        <p class="mt-3">image.xxx will be saved to <strong>{$optionsStore.settingsOptions.outputDirectory}</strong>/image<strong>{#if $optionsStore.settingsOptions.appendStringUsed}<em>{$optionsStore.settingsOptions.appendString}</em>{/if}.<em>{$optionsStore.settingsOptions.defaultFormat}</em></strong></p>
+        <!-- <h1 class="accent uppercase">{window.document.title}</h1> -->
         <Dropper on:gotFiles={convertImages}>
           <p class="message">Drop files / folders here<br/>or<br/>click to select files</p>
         </Dropper>
+        <p class="mt-3">image.xxx will be saved to <strong>{$optionsStore.settingsOptions.outputDirectory}</strong>/image<strong>{#if $optionsStore.settingsOptions.appendStringUsed}<em>{$optionsStore.settingsOptions.appendString}</em>{/if}.<em>{$optionsStore.settingsOptions.defaultFormat}</em></strong></p>
         <ResultsGrid
           bind:filesConverted={filesConverted}
           bind:filesDropped={filesDropped}
@@ -104,7 +104,7 @@
   main {
     width: 100%;
     font-size: 0.8em;
-    padding: 1rem 0rem 0 4rem;
+    padding: 1rem 0 0 4rem;
     height: 100%;
   }
   h1 {
