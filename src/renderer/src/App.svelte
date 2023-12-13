@@ -7,6 +7,7 @@
   import ResultsGrid from './components/ResultsGrid.svelte'
   import formatTime from './lib/formatTime'
   import TitleBar from './components/TitleBar.svelte'
+  import QuickSettings from './components/QuickSettings.svelte'
 
   let isMounted = false
   let isProcessing = false
@@ -61,13 +62,16 @@
     <UpdateDialog bind:updateMsg={updateMsg} />
     <TitleBar />
     <div class="container">
-      <SettingsPanel bind:optionsStore={$optionsStore} {rootElement} {filesDropped} {updateMsg} {convertImages} />
+      <SettingsPanel bind:optionsStore={$optionsStore} {filesDropped} {updateMsg} {convertImages} />
       <main>
         <!-- <h1 class="accent uppercase">{window.document.title}</h1> -->
+        {#if $optionsStore.theme.showQuickSettings}
+          <QuickSettings bind:optionsStore={$optionsStore} />
+        {/if}
         <Dropper on:gotFiles={convertImages}>
           <p class="message">Drop files / folders here<br/>or<br/>click to select files</p>
         </Dropper>
-        <p class="mt-3">image.xxx will be saved to <strong>{$optionsStore.settingsOptions.outputDirectory}</strong>/image<strong>{#if $optionsStore.settingsOptions.appendStringUsed}<em>{$optionsStore.settingsOptions.appendString}</em>{/if}.<em>{$optionsStore.settingsOptions.defaultFormat}</em></strong></p>
+        <!-- <p class="mt-3">image.xxx will be saved to <strong>{$optionsStore.settingsOptions.outputDirectory}</strong>/image<strong>{#if $optionsStore.settingsOptions.appendStringUsed}<em>{$optionsStore.settingsOptions.appendString}</em>{/if}.<em>{$optionsStore.settingsOptions.defaultFormat}</em></strong></p> -->
         <ResultsGrid
           bind:filesConverted={filesConverted}
           bind:filesDropped={filesDropped}
@@ -107,7 +111,7 @@
     padding: 1rem 0 0 4rem;
     height: 100%;
   }
-  h1 {
+  /* h1 {
     text-transform: uppercase;
     font-size: 1.6em;
     margin: 0;
@@ -118,7 +122,7 @@
   }
   .accent {
     color: var(--color-accent);
-  }
+  } */
   .message {
     color: #222;
     font-size: 1.2rem;
@@ -128,7 +132,7 @@
     user-select: none;
     text-align: center;
   }
-  .mt-3 {
+  /* .mt-3 {
     margin-bottom: 1rem;
-  }
+  } */
 </style>

@@ -4,7 +4,6 @@
   import SettingsIcon from './svg/SettingsIcon.svelte'
   import schema from '../../../main/schema'
 
-  export let rootElement
   export let optionsStore  
   export let updateMsg
   export let convertImages
@@ -45,11 +44,6 @@
     }
   }
 
-  async function selectPath() {
-    const filePath = await window.api.selectOutDir()
-    optionsStore.settingsOptions.outputDirectory = filePath
-  }
-
   async function resetConfig(key) {
     await window.api.configOps.reset(key)
     await window.api.configOps.init()
@@ -65,7 +59,7 @@
   }
 </script>
 
-<div class="panel-wrapper" class:panelOpen={panelOpen} bind:this={rootElement}>
+<div class="panel-wrapper" class:panelOpen={panelOpen}>
   {#if panelOpen}
     <button
       class="unbutton close-overlay"
@@ -131,7 +125,7 @@
       </fieldset>
       <div>
         <p>save images to</p>
-        <button type="button" on:click|preventDefault={selectPath} class="btn">
+        <button type="button" on:click|preventDefault={async () => {optionsStore.settingsOptions.outputDirectory = await window.api.selectOutDir()}} class="btn">
           {optionsStore.settingsOptions.outputDirectory}
         </button>
       </div>
@@ -188,6 +182,9 @@
         <input type="color" id="accentColor" bind:value={optionsStore.theme.accentColor} />
       </label>
       </fieldset>
+      <label for="showQuickSettings">show quick settings on main window
+        <input type="checkbox" id="showQuickSettings" bind:checked={optionsStore.theme.showQuickSettings} />
+      </label>
     </div>
     <hr class="hr">
     <h2>extra settings</h2>
@@ -437,6 +434,7 @@
     grid-template-columns: 1fr 2fr 1fr 2fr;
     width: 100%;
     margin-bottom: 0.5rem;
+    align-items: center;
   }
   .gridme {
     width: 120px;

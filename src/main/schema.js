@@ -91,6 +91,10 @@ const schema = {
           themeName: {
             type: "string",
             enum: ["system", "light", "dark"]
+          },
+          showQuickSettings: {
+            type: "boolean",
+            default: true
           }
         }
       }
@@ -110,16 +114,16 @@ const schema = {
       },
       formatOptions: [
         {
-          format: 'png',
-          options: {
-            compressionLevel: 6
-          }
-        },
-        {
           format: 'jpg',
           options: {
             quality: 80,
             mozjpeg: false
+          }
+        },
+        {
+          format: 'png',
+          options: {
+            compressionLevel: 6
           }
         },
         {
@@ -146,7 +150,8 @@ const schema = {
       ],
       theme: {
         accentColor: "#85e0a0",
-        themeName: "system"
+        themeName: "system",
+        showQuickSettings: true
       }
     }
   }
