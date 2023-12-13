@@ -1,6 +1,6 @@
 {
   "name": "imageconverter2",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Image format converter. An Electron app built with electron-vite.org, svelte.dev and sharp.pixelplumbing.com",
   "main": "./out/main/index.js",
   "author": "David Sullivan <treatkor@gmail.com>",
