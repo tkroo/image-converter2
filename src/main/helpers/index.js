@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, dialog } from 'electron'
 import { join } from 'path'
 import Store from 'electron-store'
 import schema from '../schema'
-export const myStore = new Store({ schema })
+export const myStore = new Store({ schema: schema, clearInvalidConfig: true })
 
 export const extraPath = 'foo'
 export const fallbackPath = join(app.getPath('temp'), extraPath)
