@@ -34,6 +34,20 @@ function getDefaultOutDir() {
 
 export function openDirectory(event, path) {
   shell.openPath(path)
+  .then((response) => {
+    if(response == 'The action failed') {
+      console.error('response: ', response)
+      console.log('attempting to open parent directory')
+      try {
+        shell.showItemInFolder(path)
+      } catch (err) {
+        console.error(`error: ${err}`)
+      }
+    }
+  })
+  .catch((err) => {
+    console.error(`error: ${err}`)
+  })
 }
 
 export const configOps = {
