@@ -17,6 +17,9 @@ const schema = {
           },
           background: {
             type: "string",
+          },
+          enableResize: {
+            type: "boolean"
           }
         }
       },
@@ -104,7 +107,8 @@ const schema = {
         width: null,
         height: null,
         fit: "contain",
-        background: "#FFFFFF"
+        background: "#FFFFFF",
+        enableResize: false
       },
       settingsOptions: {
         outputDirectory: "",
@@ -145,13 +149,6 @@ const schema = {
           options: {
             colors: 256,
             dither: 1
-          }
-        },
-        {
-          format: 'heif',
-          options: {
-            compression: 'av1',
-            quality: 80
           }
         }
       ],

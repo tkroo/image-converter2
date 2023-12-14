@@ -145,25 +145,30 @@
     </section>
     <hr class="hr">
     <h2>resize settings</h2>
-    <p>leave height and width blank to keep original size</p>
-    <div class="gridme">
-    <label for="width">width</label>
-    <input id="width" type="number" bind:value={optionsStore.resizeOptions.width} />
-    <label for="height">height</label>
-    <input id="height" type="number" bind:value={optionsStore.resizeOptions.height} />
-    <label for="fit">fit</label>
-      <select id="fit" bind:value={optionsStore.resizeOptions.fit}>
-        <option value="cover">cover</option>
-        <option value="contain">contain</option>
-        <option value="fill">fill</option>
-        <option value="inside">inside</option>
-        <option value="outside">outside</option>
-      </select>
-    </div>
-    <label for="background">
-      <p>background color when contain is used:</p>
-      <input id="background" type="text" bind:value={optionsStore.resizeOptions.background} />
-    </label>
+    <label for="enableResize">enable resize</label>
+    <input type="checkbox" id="enableResize" bind:checked={optionsStore.resizeOptions.enableResize} />
+    <!-- <p>leave height and width blank to keep original size</p> -->
+
+    {#if optionsStore.resizeOptions.enableResize}
+      <div class="gridme">
+        <label for="width">width</label>
+        <input id="width" type="number" bind:value={optionsStore.resizeOptions.width} />
+        <label for="height">height</label>
+        <input id="height" type="number" bind:value={optionsStore.resizeOptions.height} />
+        <label for="fit">fit</label>
+        <select id="fit" bind:value={optionsStore.resizeOptions.fit}>
+          <option value="cover">cover</option>
+          <option value="contain">contain</option>
+          <option value="fill">fill</option>
+          <option value="inside">inside</option>
+          <option value="outside">outside</option>
+        </select>
+      </div>
+      <label for="background">
+        <p>background color when contain is used:</p>
+        <input id="background" type="text" bind:value={optionsStore.resizeOptions.background} />
+      </label>
+    {/if}
     <hr class="hr">
     <h2>theme settings</h2>
     <div class="flex-row">
@@ -197,7 +202,7 @@
 
 <style>
   :root {
-    --o: min(80%, 440px);
+    --o: min(80%, 400px);
     --c: calc(var(--o)*-1);
   }
   .hr {
