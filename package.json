@@ -25,7 +25,7 @@
     "electron-updater": "^6.1.7",
     "file-selector": "^0.6.0",
     "heic-convert": "^2.1.0",
-    "mmmagic": "^0.5.3",
+    "mime": "^3.0.0",
     "sharp": "^0.33.0"
   },
   "devDependencies": {

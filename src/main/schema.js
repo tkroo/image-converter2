@@ -146,6 +146,13 @@ const schema = {
             colors: 256,
             dither: 1
           }
+        },
+        {
+          format: 'heif',
+          options: {
+            compression: 'av1',
+            quality: 80
+          }
         }
       ],
       theme: {

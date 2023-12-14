@@ -197,7 +197,7 @@
 
 <style>
   :root {
-    --o: min(80%, 400px);
+    --o: min(80%, 440px);
     --c: calc(var(--o)*-1);
   }
   .hr {

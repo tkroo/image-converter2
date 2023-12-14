@@ -3,7 +3,7 @@ import path from 'path'
 import sharp from 'sharp'
 import { myStore, fallbackPath, thumbnailsDir } from '../helpers'
 import convert from 'heic-convert'
-import { Magic } from 'mmmagic'
+import mime from 'mime'
 
 
 const re = /\.[^.]*$/gm
@@ -36,34 +36,25 @@ function checkFileExistenceAndIncrementFilename(filepath) {
   return filepath
 }
 
-const magic = new Magic()
-
-async function convertHeif(file) {
-  const inputBuffer = fs.readFileSync(file, (err, data) => {
-    if (err) throw err
-    return data => convert({
-      buffer: data,
-      format: 'PNG'
-    })
-  })
+async function convertHeif(imagePath) {
+  try {
+    const imageBuffer = fs.readFileSync(imagePath)
+    return convert({ buffer: imageBuffer, format: 'PNG' })
+  } catch (error) {
+    console.error(`Error converting HEIF: ${error}`);
+    return null
+  }
 }
 
 async function imgConvert(f, format, outDirectory, appendString, options, resizeOptions) {
-  let file = f
   
   outDirectory = outDirectory ?? fallbackPath
   
-  const filename = path.basename(file).replace(re, appendString) + '.' + format
+  const filename = path.basename(f).replace(re, appendString) + '.' + format
   const filepath = checkFileExistenceAndIncrementFilename(path.join(outDirectory, filename))
   
-  magic.detectFile(f, (err, result) => {
-    if(err) console.error('MAGICerr: ', err);
-    if (result === 'ISO Media') {
-      console.log('found unknown image type reported as ISO Media')
-      file = convertHeif(f)
-    }
-    console.log('magic: ', result)
-  })
+  const imageType = mime.getType(f)
+  let file = imageType != 'image/heic' ? f : await convertHeif(f)
 
   try {
     const data = await sharp(file).resize(resizeOptions).toFormat(format, options).toFile(filepath)
