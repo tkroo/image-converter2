@@ -6,7 +6,7 @@ import convert from 'heic-convert'
 import mime from 'mime'
 
 
-const re = /\.[^.]*$/gm
+// const re = /\.[^.]*$/gm
 
 export async function createDirectories(_, outDirectory) {
   outDirectory = outDirectory ?? fallbackPath
@@ -36,7 +36,7 @@ function checkFileExistenceAndIncrementFilename(filepath) {
   return filepath
 }
 
-async function convertHeif(imagePath) {
+async function handleHeif(imagePath) {
   try {
     const imageBuffer = fs.readFileSync(imagePath)
     return convert({ buffer: imageBuffer, format: 'PNG' })
@@ -47,18 +47,17 @@ async function convertHeif(imagePath) {
 }
 
 async function imgConvert(f, format, outDirectory, appendString, options, resizeOptions) {
-  
   outDirectory = outDirectory ?? fallbackPath
-  
-  const filename = path.basename(f).replace(re, appendString) + '.' + format
+  const extname = path.extname(f)
+  const filename = path.basename(f).replace(extname, appendString) + '.' + format
   const filepath = checkFileExistenceAndIncrementFilename(path.join(outDirectory, filename))
   
   const imageType = mime.getType(f)
-  let file = imageType != 'image/heic' ? f : await convertHeif(f)
+  let file = imageType != 'image/heic' ? f : await handleHeif(f)
 
   try {
-    const data = await sharp(file).resize(resizeOptions).toFormat(format, options).toFile(filepath)
-    return { filename, filepath, imageFormat: format, status: 'success', data: data }
+    const data = resizeOptions.enableResize ? await sharp(file).resize(resizeOptions).toFormat(format, options).toFile(filepath) : await sharp(file).toFormat(format, options).toFile(filepath)
+    return { filename, filepath, imageFormat: format, status: 'success' }
   } catch (error) {
     console.error(`err: ${error} - ${path.basename(filepath)}`)
     try {
