@@ -2,6 +2,9 @@ import fs from 'node:fs'
 import path from 'path'
 import sharp from 'sharp'
 import { myStore, fallbackPath, thumbnailsDir } from '../helpers'
+import convert from 'heic-convert'
+import { Magic } from 'mmmagic'
+
 
 const re = /\.[^.]*$/gm
 
@@ -33,15 +36,38 @@ function checkFileExistenceAndIncrementFilename(filepath) {
   return filepath
 }
 
-async function convert(file, format, outDirectory, appendString, options, resizeOptions) {
-  outDirectory = outDirectory ?? fallbackPath
+const magic = new Magic()
 
+async function convertHeif(file) {
+  const inputBuffer = fs.readFileSync(file, (err, data) => {
+    if (err) throw err
+    return data => convert({
+      buffer: data,
+      format: 'PNG'
+    })
+  })
+}
+
+async function imgConvert(f, format, outDirectory, appendString, options, resizeOptions) {
+  let file = f
+  
+  outDirectory = outDirectory ?? fallbackPath
+  
   const filename = path.basename(file).replace(re, appendString) + '.' + format
   const filepath = checkFileExistenceAndIncrementFilename(path.join(outDirectory, filename))
+  
+  magic.detectFile(f, (err, result) => {
+    if(err) console.error('MAGICerr: ', err);
+    if (result === 'ISO Media') {
+      console.log('found unknown image type reported as ISO Media')
+      file = convertHeif(f)
+    }
+    console.log('magic: ', result)
+  })
 
   try {
-    await sharp(file).resize(resizeOptions).toFormat(format, options).toFile(filepath)
-    return { filename, filepath, imageFormat: format, status: 'success' }
+    const data = await sharp(file).resize(resizeOptions).toFormat(format, options).toFile(filepath)
+    return { filename, filepath, imageFormat: format, status: 'success', data: data }
   } catch (error) {
     console.error(`err: ${error} - ${path.basename(filepath)}`)
     try {
@@ -60,5 +86,5 @@ export async function handleFile(_, ...args) {
   if (resizeOptions.width === 0) resizeOptions.width = null
   if (resizeOptions.height === 0) resizeOptions.height = null
   if (resizeOptions.background === '') resizeOptions.background = '#000000'
-  return await convert(args[0], args[1], args[2], args[3] ? args[3] : '', options, resizeOptions)
+  return await imgConvert(args[0], args[1], args[2], args[3] ? args[3] : '', options, resizeOptions)
 }
