@@ -12,10 +12,7 @@
   let panel
   let showScroll = false
   
-  // $showScroll = pst > 10 ? true : false
-
   const formats = optionsStore.formatOptions.map((f) => f.format)
-  // const themeNames = ['system', 'light', 'dark']
   const themeNames = schema.fOptionsStore.properties.theme.properties.themeName.enum
 
   let panelOpen = false
