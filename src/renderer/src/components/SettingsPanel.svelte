@@ -17,6 +17,8 @@
 
   let panelOpen = false
 
+  $:showScroll = panelOpen && panel.scrollTop > 10
+
   onMount(async () => {
     updateConfig()
   })
