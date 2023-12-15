@@ -2,12 +2,17 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
   import SettingsIcon from './svg/SettingsIcon.svelte'
+  import UpArrow from './svg/UpArrow.svelte'
   import schema from '../../../main/schema'
 
   export let optionsStore  
   export let updateMsg
   export let convertImages
   export let filesDropped
+  let panel
+  let showScroll = false
+  
+  // $showScroll = pst > 10 ? true : false
 
   const formats = optionsStore.formatOptions.map((f) => f.format)
   // const themeNames = ['system', 'light', 'dark']
@@ -69,9 +74,10 @@
       on:mousewheel={(e) => (e.preventDefault(), e.stopPropagation())}
     ></button>
   {/if}
-  <aside>
+  <aside bind:this={panel} on:scroll={() => (showScroll = panel.scrollTop > 10 ? true : false)}>
     <button type="button" class="unbutton toggle-btn" on:click={toggle} title={panelOpen ? "close settings" : "open settings"}>
       <div class="icon"><SettingsIcon /></div>
+      {#if showScroll}<button transition:fade={{ delay: 250, duration: 300 }} class="unbutton backtotop" on:click|stopPropagation={() => panel.scrollTo({top:0, behavior:'smooth'})}><UpArrow /></button>{/if}
     </button>
     <div class="version-info">
       <small>{@html updateMsg}</small>
@@ -234,6 +240,11 @@
     display: none;
   }
 
+  .backtotop {
+    position: fixed;
+    bottom: 0.5rem;
+  }
+
   .panelOpen aside .options {
     display: flex;
     flex-direction: column;
@@ -283,82 +294,15 @@
     /* display: inline-block; */
     margin: 1rem 0 1rem 0;
   }
-  /* h2:before, h2:after{
-    color: var(--color-bg);
-    content: "";
-    flex: 1 1;
-    border-bottom: 1px solid;
-    margin: auto;
-    padding-top: 0.25rem;
-  }
-  h2:before {
-    margin-right: 1rem;
-  }
-  h2:after {
-    margin-left: 1rem;
-  } */
   p {
     margin: 0 0 0.25rem 0;
   }
   p:first-child {
     margin: 1rem 0 0.25rem 0;
   }
-  a {
-    color: var(--color-accent);
-    text-decoration: none !important;
-  }
-  a:hover {
-    text-decoration: underline !important;
-  }
-  input[type="number"], input[type="text"], select {
-    margin: 0.25rem 0;
-    padding: 0.25rem 0.5rem;
-    border: 1px solid #aaa;
-    border-radius: 0.25rem;
-  }
-
-  input[type="color"] {
-    margin-left: 0.25rem;
-    border-radius: 0.25rem;
-  }
-
-  /* label select, label>input[type="number"]:first-child, label>input[type="text"]:first-child {
-    margin-left: 0.25rem;
-  }
-
-  label>input[type="number"]:first-child {
-    width: 5rem;
-  } */
-
-  input[type="checkbox"], input[type="radio"] {
-    accent-color: var(--color-accent);
-  }
-
   #accentColor {
     margin: 0;
     width: 100%;
-  }
-
-  .btn {
-    font-weight: bold;
-    font-family: inherit;
-    width: fit-content;
-    padding: 0.25rem 0.5rem;
-    margin: 0;
-    border: 1px solid #aaa;
-    border-radius: 0.25rem;
-    background-color: #eee;
-    cursor: pointer;
-    word-break: break-all;
-  }
-  .btn:hover {
-    background-color: #ddd;
-  }
-  .btn:disabled {
-    cursor: auto;
-  }
-  .btn:disabled:hover {
-    background-color: #eee;
   }
   details {
     margin-bottom: 0rem;
@@ -375,20 +319,6 @@
   .flex-row label p {
     margin: 0 0 0.5rem 0;
 
-  }
-  fieldset {
-    padding: 0.5em 0.75em 0.5em 0.5;
-    width: fit-content;
-    border: 1px solid #aaa;
-    border-radius: 0.25rem;
-  }
-  fieldset label {
-    user-select: none;
-    cursor: pointer;
-    margin-right: 0.5rem;
-  }
-  fieldset label:last-child {
-    margin-right: 0;
   }
   .toggle-btn {
     z-index: 4;
@@ -411,7 +341,6 @@
     left: 0;
   }
   .panelOpen .toggle-btn {
-    /* background-color: unset; */
     height: 200%;
   }
   .format-options ul {
