@@ -16,6 +16,7 @@
     --color-btn-bg-hover: hsl(138, 40%, 70%);
     --color-settings-bg: hsl(250, 11%, 30%);
     --color-titlebar-bg: hsl(250, 11%, 20%);
+    color-scheme: dark;
   }
   
   @media (prefers-color-scheme: light) {
@@ -29,6 +30,7 @@
     --color-btn-bg-hover: hsl(138, 40%, 23%);
     --color-settings-bg: hsl(250, 11%, 94%);
     --color-titlebar-bg: hsl(250, 11%, 80%);
+    color-scheme: light;
   }
 
   [data-theme="dark"] {
@@ -42,6 +44,7 @@
     --color-btn-bg-hover: hsl(138, 40%, 70%);
     --color-settings-bg: hsl(250, 11%, 30%);
     --color-titlebar-bg: hsl(250, 11%, 20%);
+    color-scheme: dark;
   }
   [data-theme="light"] {
     --color-bg: hsl(250, 11%, 98%);
@@ -54,6 +57,7 @@
     --color-btn-bg-hover: hsl(138, 40%, 23%);
     --color-settings-bg: hsl(250, 11%, 94%);
     --color-titlebar-bg: hsl(250, 11%, 80%);
+    color-scheme: light;
   }
 
   --titlebar-height: 37px;
@@ -127,20 +131,39 @@ a:hover {
   width: fit-content;
   padding: 0.25rem 0.5rem;
   margin: 0.25rem 0;
-  border: 1px solid #666;
+  border: 0px solid var(--color-accent);
   border-radius: 0.25rem;
-  background-color: #ccc;
+  background-color: var(--color-accent);
+  /* color: var(--color-fg); */
   cursor: pointer;
   word-break: break-all;
+  position: relative;
+  
 }
-.btn:hover {
+/* .btn:hover {
   background-color: #ddd;
+} */
+.btn:hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: hsla(0, 0%, 100%, 0.25);
 }
 .btn:disabled {
   cursor: auto;
 }
-.btn:disabled:hover {
-  background-color: #eee;
+.btn:disabled:hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: hsla(0, 0%, 0%, 0);
+  /* background-color: #eee; */
 }
 
 .unbutton {
