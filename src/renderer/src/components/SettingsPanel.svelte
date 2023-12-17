@@ -14,6 +14,7 @@
   
   const formats = optionsStore.formatOptions.map((f) => f.format)
   const themeNames = schema.fOptionsStore.properties.theme.properties.themeName.enum
+  const accentColors = schema.fOptionsStore.properties.theme.properties.accentColor.enum
 
   let panelOpen = false
 
@@ -122,26 +123,23 @@
               </li>
             {/each}
           </ul>
-          <p>
-            read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid
-            values.
-          </p>
+          <p>read <a href="https://sharp.pixelplumbing.com/api-output" target="_blank">sharp output options</a> for valid values.</p>
         </details>
       </fieldset>
-      <div>
-        <p>save images to</p>
+      <p class="mt-2">save images to<br />
         <button type="button" on:click|preventDefault={async () => {optionsStore.settingsOptions.outputDirectory = await window.api.selectOutDir()}} class="btn">
           {optionsStore.settingsOptions.outputDirectory}
         </button>
-      </div>
-      <div>
+      </p>
+      <div class="mt-2">
         <label for="use_append">
-          <p>append string to file name
           <input
             id="use_append"
             type="checkbox"
             bind:checked={optionsStore.settingsOptions.appendStringUsed}
-          /></p>
+          />append string to file name
+        </label>
+        <label for="append_string">
           <input id="append_string" type="text" bind:value={optionsStore.settingsOptions.appendString} />
           <br/>
           <small>image.*** will be saved as image{#if optionsStore.settingsOptions.appendStringUsed}<em>{optionsStore.settingsOptions.appendString}</em>{/if}.{optionsStore.settingsOptions.defaultFormat}</small>
@@ -150,8 +148,7 @@
     </section>
     <hr class="hr">
     <h2>resize settings</h2>
-    <label for="enableResize">enable resize</label>
-    <input type="checkbox" id="enableResize" bind:checked={optionsStore.resizeOptions.enableResize} />
+    <label for="enableResize"><input type="checkbox" id="enableResize" bind:checked={optionsStore.resizeOptions.enableResize} />enable resize</label>
     <!-- <p>leave height and width blank to keep original size</p> -->
 
     {#if optionsStore.resizeOptions.enableResize}
@@ -186,14 +183,23 @@
           </label>
         {/each}
       </fieldset>
-      <fieldset>
+      <fieldset id="accentColors">
+        <legend>&nbsp;accent color&nbsp;</legend>
+        {#each accentColors as aColor}
+          <label for={aColor}>
+            <input bind:group={optionsStore.theme.accentColor} type="radio" id={aColor} value={aColor} style="appearance: none; padding: 7px; border-radius: 50%; background-color: {aColor}; accent-color: {aColor}; outline-color: {aColor};" />
+          </label>
+        {/each}
+      </fieldset>
+      <!-- <fieldset>
         <legend>&nbsp;accent color&nbsp;</legend>
       <label for="accentColor">
         <input type="color" id="accentColor" bind:value={optionsStore.theme.accentColor} />
       </label>
-      </fieldset>
-      <label for="showQuickSettings">show quick settings on main window
+      </fieldset> -->
+      <label for="showQuickSettings">
         <input type="checkbox" id="showQuickSettings" bind:checked={optionsStore.theme.showQuickSettings} />
+        show quick settings on main window
       </label>
     </div>
     <hr class="hr">
@@ -296,8 +302,8 @@
   p {
     margin: 0 0 0.25rem 0;
   }
-  p:first-child {
-    margin: 1rem 0 0.25rem 0;
+  .mt-2 {
+    margin-top: 1rem;
   }
   #accentColor {
     margin: 0;
@@ -339,6 +345,9 @@
     top: 0;
     left: 0;
   }
+  :global(.icon svg path) {
+    fill: var(--color-accent);
+  }
   .panelOpen .toggle-btn {
     height: 200%;
   }
@@ -378,5 +387,9 @@
   }
   .gridme input {
     max-width: 6rem;
+  }
+  #accentColors input[type="radio"]:checked {
+    outline: 1px solid;
+    outline-offset: 2px;
   }
 </style>

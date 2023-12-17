@@ -62,8 +62,8 @@
     display: none;
   }
   .dragover {
-    border: 4px dashed #66666666 !important;
-    background-color: var(--color-drop) !important;
+    border: 4px dashed #ffffff66 !important;
+    background-color: var(--color-accent) !important;
   }
   :global(.custom-dropzone) {
     border: 2px dashed #5a5a5a !important;
