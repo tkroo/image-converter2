@@ -38,7 +38,7 @@ function checkFileExistenceAndIncrementFilename(filepath) {
 
 async function handleHeif(imagePath) {
   try {
-    const imageBuffer = fs.readFileSync(imagePath)
+    const imageBuffer = await fs.promises.readFile(imagePath)
     return convert({ buffer: imageBuffer, format: 'PNG' })
   } catch (error) {
     console.error(`Error converting HEIF: ${error}`);
