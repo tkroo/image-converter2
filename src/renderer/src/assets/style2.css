@@ -27,7 +27,7 @@
     --color-accent2: #eee;
     --color-btn-bg: hsl(138, 40%, 33%);
     --color-btn-bg-hover: hsl(138, 40%, 23%);
-    --color-settings-bg: hsl(250, 11%, 90%);
+    --color-settings-bg: hsl(250, 11%, 94%);
     --color-titlebar-bg: hsl(250, 11%, 80%);
   }
 
@@ -52,7 +52,7 @@
     --color-accent2: #eee;
     --color-btn-bg: hsl(138, 40%, 33%);
     --color-btn-bg-hover: hsl(138, 40%, 23%);
-    --color-settings-bg: hsl(250, 11%, 90%);
+    --color-settings-bg: hsl(250, 11%, 94%);
     --color-titlebar-bg: hsl(250, 11%, 80%);
   }
 
@@ -122,15 +122,14 @@ a:hover {
 }
 
 .btn {
-  background-color: deeppink;
   font-weight: bold;
   font-family: inherit;
   width: fit-content;
   padding: 0.25rem 0.5rem;
   margin: 0.25rem 0;
-  border: 1px solid #aaa;
+  border: 1px solid #666;
   border-radius: 0.25rem;
-  background-color: #eee;
+  background-color: #ccc;
   cursor: pointer;
   word-break: break-all;
 }
