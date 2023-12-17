@@ -100,24 +100,4 @@
     width: 100%;
     gap: 1rem;
   }
-  .btn {
-    font-weight: bold;
-    font-family: inherit;
-    width: fit-content;
-    padding: 0.25rem 0.5rem;
-    margin: 0;
-    border: 1px solid #aaa;
-    border-radius: 0.25rem;
-    background-color: #eee;
-    cursor: pointer;
-  }
-  .btn:hover {
-    background-color: #ddd;
-  }
-  .btn:disabled {
-    cursor: auto;
-  }
-  .btn:disabled:hover {
-    background-color: #eee;
-  }
 </style>
