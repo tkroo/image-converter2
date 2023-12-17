@@ -90,7 +90,7 @@ const schema = {
         properties: {
           accentColor: {
             type: "string",
-            enum: ["#648FFF","#785EF0","#DC267F","#FE6100","#FFB000", "#85e0a0"]
+            enum: ["#648FFF","#785EF0","#DC267F","#FE6100","#FFB000", "#509163"]
           },
           themeName: {
             type: "string",
