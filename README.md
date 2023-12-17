@@ -3,6 +3,7 @@
 Batch image format conversion app built with Electron, electron-vite, sharp, and svelte.  
 Work in progress.  
 Only tested on linux.
+Conversion from heic is slow.
 
 ## Install  
 
