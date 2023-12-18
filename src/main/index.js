@@ -9,7 +9,6 @@ import { rememberWindowBounds, getWindowBounds } from './windowState'
 import icon from '../../build/icons/png/512x512.png?asset'
 
 let prevOrDefaultBounds = getWindowBounds()
-let magicNumber = process.platform === 'linux' ? 37 : 0 // titlebar height adjustment, see this issue: https://github.com/electron/electron/issues/10388
 
 let mainWindow
 let isMaximized = false
@@ -22,7 +21,7 @@ function createWindow() {
     minWidth: 400,
     minHeight: 600,
     x: prevOrDefaultBounds.x,
-    y: prevOrDefaultBounds.y-magicNumber,
+    y: prevOrDefaultBounds.y,
     backgroundColor: '#00000000',
     frame: false,
     transparent: true,
