@@ -68,8 +68,8 @@
   {#if panelOpen}
     <button
       class="unbutton close-overlay"
-      in:fade={{ delay: 100, duration: 300 }}
-      out:fade={{ delay: 250, duration: 300 }}
+      in:fade={{ delay: 100, duration: 200 }}
+      out:fade={{ delay: 250, duration: 200 }}
       on:click={() => (panelOpen = false)}
       on:mousewheel={(e) => (e.preventDefault(), e.stopPropagation())}
     ></button>
@@ -232,7 +232,7 @@
     background-color: var(--color-settings-bg);
     overflow: hidden;
     left: var(--c);
-    transition: left 400ms ease-out, background-color 300ms ease-in-out;
+    transition: left 300ms ease-out;
     /* border-right: 2px solid var(--color-accent2); */
     padding-right: 4rem;
     z-index: 1;
@@ -277,7 +277,7 @@
     overflow: auto;
     background-color: var(--color-settings-bg);
     /* border-right: 1px solid var(--color-settings-bg); */
-    transition: left 300ms ease-in-out, background-color 300ms ease-in-out;
+    transition: left 300ms ease-in-out;
   }
   .close-overlay {
     cursor: pointer !important;
