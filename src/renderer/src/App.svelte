@@ -124,7 +124,7 @@
     color: var(--color-accent);
   } */
   .message {
-    color: #222;
+    color: var(--color-accent);
     font-size: 1.2rem;
     font-weight: bold;
     margin: 0;
