@@ -187,7 +187,7 @@
         <legend>&nbsp;accent color&nbsp;</legend>
         {#each accentColors as aColor}
           <label for={aColor}>
-            <input bind:group={optionsStore.theme.accentColor} type="radio" id={aColor} value={aColor} style="appearance: none; padding: 7px; border-radius: 50%; background-color: {aColor}; accent-color: {aColor}; outline-color: {aColor};" />
+            <input bind:group={optionsStore.theme.accentColor} type="radio" id={aColor} value={aColor} style="background-color: {aColor}; accent-color: {aColor}; outline-color: {aColor};" />
           </label>
         {/each}
       </fieldset>
