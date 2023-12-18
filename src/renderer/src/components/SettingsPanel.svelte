@@ -86,9 +86,7 @@
       <button type="button" class="btn" on:click={convertImages} disabled={filesDropped.length === 0}>convert again</button>
       <button type="button" class="btn"
         on:click|preventDefault={async () => await window.api.openDirectory(optionsStore.settingsOptions.outputDirectory)}
-      >
-        open output directory
-      </button>
+      >open output directory</button>
     </div>
     <hr class="hr">
     <h2>conversion settings</h2>
@@ -336,7 +334,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    background-color: var(--color-settings-bg);
+    /* background-color: var(--color-settings-bg); */
     cursor: pointer;
     height: 200%;
   }
@@ -348,9 +346,9 @@
   :global(.icon svg path) {
     fill: var(--color-accent);
   }
-  .panelOpen .toggle-btn {
+  /* .panelOpen .toggle-btn {
     height: 200%;
-  }
+  } */
   .format-options ul {
     list-style: none;
     padding: 0;
