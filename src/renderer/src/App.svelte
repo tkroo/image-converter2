@@ -99,9 +99,10 @@
     padding-right: 2rem;
     background-color: var(--color-bg);
     color: var(--color-fg);
+    scrollbar-gutter: stable both-edges;
   }
   main {
-    width: 95vw;
+    width: 100%;
     font-size: 0.8em;
     padding: 1rem 0 0 4rem;
     /* height: 100%; */
