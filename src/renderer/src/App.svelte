@@ -37,19 +37,14 @@
     await window.api.createDirectories($optionsStore.settingsOptions.outputDirectory)
     filesDropped = e.detail.files ?? filesDropped
     const startTime = Date.now()
+
     await Promise.all(
-      filesDropped.map(async(f) => {
-        let tmp = await window.api.handleFile(
-          f,
-          $optionsStore.settingsOptions.defaultFormat,
-          $optionsStore.settingsOptions.outputDirectory,
-          $optionsStore.settingsOptions.appendStringUsed ? $optionsStore.settingsOptions.appendString : '',
-          $optionsStore.resizeOptions
-        )
+      filesDropped.map(async(file) => {
+        let tmp = await window.api.handleFile(file)
         filesConverted = [...filesConverted, tmp]
       })
     )
-
+    
     const endTime = Date.now()
     workDuration = formatTime(endTime - startTime)
     isProcessing = false
@@ -66,7 +61,7 @@
       <main>
         <!-- <h1 class="accent uppercase">{window.document.title}</h1> -->
         {#if $optionsStore.theme.showQuickSettings}
-          <QuickSettings bind:optionsStore={$optionsStore} />
+          <QuickSettings bind:optionsStore={$optionsStore} {convertImages} {filesDropped} />
         {/if}
         <Dropper on:gotFiles={convertImages}>
           <p class="message">Drop files / folders here<br/>or<br/>click to select files</p>

@@ -41,18 +41,21 @@ async function handleHeif(imagePath) {
   }
 }
 
-async function imgConvert(f, format, outDirectory, appendString, options, resizeOptions) {
-  outDirectory = outDirectory ?? fallbackPath
-  const extname = path.extname(f)
-  const filename = path.basename(f).replace(extname, appendString) + '.' + format
+
+async function imgConvert(file, resizeOptions) {
+  const { defaultFormat, outputDirectory, appendString } = myStore.get('fOptionsStore.settingsOptions')
+  const options = myStore.get('fOptionsStore.formatOptions').find((o) => o.format === defaultFormat).options
+  const outDirectory = outputDirectory ?? fallbackPath
+  const extname = path.extname(file)
+  const filename = path.basename(file).replace(extname, appendString) + '.' + defaultFormat
   const filepath = checkFileExistenceAndIncrementFilename(path.join(outDirectory, filename))
   
-  const imageType = mime.getType(f)
-  let file = imageType != 'image/heic' ? f : await handleHeif(f)
+  const imageType = mime.getType(file)
+  file = imageType != 'image/heic' ? file : await handleHeif(file)
 
   try {
-    const data = resizeOptions.enableResize ? await sharp(file).resize(resizeOptions).toFormat(format, options).toFile(filepath) : await sharp(file).toFormat(format, options).toFile(filepath)
-    return { filename, filepath, imageFormat: format, status: 'success' }
+    const data = resizeOptions.enableResize ? await sharp(file).resize(resizeOptions).toFormat(defaultFormat, options).toFile(filepath) : await sharp(file).toFormat(defaultFormat, options).toFile(filepath)
+    return { filename, filepath, imageFormat: defaultFormat, status: 'success' }
   } catch (error) {
     console.error(`err: ${error} - ${path.basename(filepath)}`)
     try {
@@ -64,12 +67,11 @@ async function imgConvert(f, format, outDirectory, appendString, options, resize
   }
 }
 
-export async function handleFile(_, ...args) {
-  const options = myStore.get('fOptionsStore.formatOptions').find((o) => o.format === args[1]).options
-  let resizeOptions = args[args.length-1]
+export async function handleFile(_, file) {
+  const resizeOptions = myStore.get('fOptionsStore.resizeOptions')
   // if width or height are 0, set them to null
   if (resizeOptions.width === 0) resizeOptions.width = null
   if (resizeOptions.height === 0) resizeOptions.height = null
   if (resizeOptions.background === '') resizeOptions.background = '#000000'
-  return await imgConvert(args[0], args[1], args[2], args[3] ? args[3] : '', options, resizeOptions)
+  return await imgConvert(file, resizeOptions)
 }
