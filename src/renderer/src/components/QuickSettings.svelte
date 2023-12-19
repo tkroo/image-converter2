@@ -1,5 +1,8 @@
 <script>
-  export let optionsStore  
+  import { fade } from 'svelte/transition'
+  export let optionsStore
+  export let convertImages
+  export let filesDropped
 </script>
 
 <div class="quick-settings">
@@ -12,6 +15,9 @@
       </label>
     {/each}
   </fieldset>
+  {#if filesDropped.length > 0}
+  <p transition:fade><button type="button" class="btn" on:click={convertImages}>convert again</button></p>
+  {/if}
   <p>save images to <button type="button" on:click|preventDefault={async () => {optionsStore.settingsOptions.outputDirectory = await window.api.selectOutDir()}} class="btn btn-output-select">
     {optionsStore.settingsOptions.outputDirectory}
   </button></p>
