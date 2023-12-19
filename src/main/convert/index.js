@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'path'
 import sharp from 'sharp'
-import { myStore, fallbackPath, thumbnailsDir } from '../helpers'
+import { myStore, fallbackPath } from '../helpers'
 import convert from 'heic-convert'
 import mime from 'mime'
 
@@ -13,11 +13,6 @@ export async function createDirectories(_, outDirectory) {
 
   if (!fs.existsSync(outDirectory)) {
     fs.mkdir(outDirectory, { recursive: true }, (err) => {
-      if (err) throw err
-    })
-  }
-  if (!fs.existsSync(thumbnailsDir)) {
-    fs.mkdir(thumbnailsDir, { recursive: true }, (err) => {
       if (err) throw err
     })
   }
