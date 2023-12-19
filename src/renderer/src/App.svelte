@@ -101,10 +101,10 @@
     color: var(--color-fg);
   }
   main {
-    width: 100%;
+    width: 95vw;
     font-size: 0.8em;
     padding: 1rem 0 0 4rem;
-    height: 100%;
+    /* height: 100%; */
   }
   /* h1 {
     text-transform: uppercase;
