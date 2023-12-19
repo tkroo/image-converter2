@@ -105,20 +105,7 @@
     width: 100%;
     font-size: 0.8em;
     padding: 1rem 0 0 4rem;
-    /* height: 100%; */
   }
-  /* h1 {
-    text-transform: uppercase;
-    font-size: 1.6em;
-    margin: 0;
-    user-select: none;
-  }
-  .uppercase {
-    text-transform: uppercase;
-  }
-  .accent {
-    color: var(--color-accent);
-  } */
   .message {
     color: var(--color-accent);
     font-size: 1.2rem;
@@ -128,7 +115,4 @@
     user-select: none;
     text-align: center;
   }
-  /* .mt-3 {
-    margin-bottom: 1rem;
-  } */
 </style>
